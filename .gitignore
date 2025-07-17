@@ -1,0 +1,29 @@
+# Ignore everything in the config folder, but keep the folder itself
+/config/*
+!.gitkeep
+
+# Ignore contents of each subfolder in data, but keep the folders themselves
+/data/cache/*
+/data/input/*
+/data/logs/*
+/data/output/*
+
+# Keep the folders themselves
+!/data/cache/
+/data/cache/.gitkeep
+!/data/input/
+/data/input/.gitkeep
+!/data/logs/
+/data/logs/.gitkeep
+!/data/output/
+/data/output/.gitkeep
+
+# Keep everything in docs
+# (no rule needed if nothing is being ignored)
+
+# Keep everything in src
+# (no rule needed if nothing is being ignored)
+
+# Ignore Python bytecode files
+__pycache__/
+*.py[cod]

@@ -1,0 +1,12 @@
+{
+    "python.analysis.typeCheckingMode": "standard",
+    "windsurfPyright.analysis.diagnosticMode": "workspace",
+    "windsurfPyright.analysis.typeCheckingMode": "standard",
+
+    "python.analysis.extraPaths": [
+        "./src"
+    ],
+    "python.autoComplete.extraPaths": [
+        "./src"
+    ]
+}
