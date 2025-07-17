@@ -1,0 +1,117 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    // 🟢 Full Pipeline
+    {
+      "name": "SDC: Run Full Pipeline",
+      "type": "python",
+      "request": "launch",
+      "module": "sdc.run_sdc",
+      "args": ["run", "--pipeline", "full"],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/src",
+      "justMyCode": true
+    },
+    {
+      "name": "SDC: Run Ingest Only Pipeline",
+      "type": "python",
+      "request": "launch",
+      "module": "sdc.run_sdc",
+      "args": ["run", "--pipeline", "ingest_only"],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/src",
+      "justMyCode": true
+    },
+
+    // 🟡 Caching
+    {
+      "name": "SDC: Cache Syncro",
+      "type": "python",
+      "request": "launch",
+      "module": "sdc.run_sdc",
+      "args": ["cache", "--source", "syncro"],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/src",
+      "justMyCode": true
+    },
+
+    // 🔵 Ingestors (Interactive)
+    {
+      "name": "SDC: Ingest Source (Interactive)",
+      "type": "python",
+      "request": "launch",
+      "module": "sdc.run_sdc",
+      "args": ["ingest", "--source", "${input:ingestSource}"],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/src",
+      "justMyCode": true
+    },
+
+    // 🔴 Processing
+    {
+      "name": "SDC: Process Customer Linking",
+      "type": "python",
+      "request": "launch",
+      "module": "sdc.run_sdc",
+      "args": ["process", "--step", "customer_linking"],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/src",
+      "justMyCode": true
+    },
+
+    // 🔧 Utilities
+    {
+      "name": "SDC: Reset Ingestor State (Interactive)",
+      "type": "python",
+      "request": "launch",
+      "module": "sdc.run_sdc",
+      "args": ["reset-state", "--source", "${input:resetSource}"],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/src",
+      "justMyCode": true
+    },
+    {
+      "name": "SDC: Reset State & Clean Output (Interactive)",
+      "type": "python",
+      "request": "launch",
+      "module": "sdc.run_sdc",
+      "args": [
+        "reset-state",
+        "--source",
+        "${input:resetSource}",
+        "--clean-output"
+      ],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/src",
+      "justMyCode": true
+    }
+  ],
+  "inputs": [
+    {
+      "id": "ingestSource",
+      "type": "pickString",
+      "description": "Select the data source to ingest:",
+      "options": [
+        "all",
+        "notes",
+        "screenconnect",
+        "sillytavern",
+        "syncro"
+      ],
+      "default": "all"
+    },
+    {
+      "id": "resetSource",
+      "type": "pickString",
+      "description": "Select the source to reset the state for:",
+      "options": [
+        "all",
+        "notes",
+        "screenconnect",
+        "sillytavern",
+        "syncro"
+      ],
+      "default": "syncro"
+    }
+  ]
+}
