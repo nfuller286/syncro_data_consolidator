@@ -3,11 +3,15 @@
 
 import json
 import os
+import uuid
+import hashlib
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List
 
-from sdc.models.cuis_v1 import CUISV1, CuisEntry
-from sdc.utils.cuis_handler import save_cuis_to_file
+# --- V2 IMPORTS ---
+from sdc.models.session_v2 import Session, SessionSegment, SessionMeta, SessionContext, SessionInsights
+from sdc.utils.session_handler import save_session_to_file
+# --- SHARED UTILS ---
 from sdc.utils.date_utils import parse_datetime_utc
 
 def _get_file_metadata(file_path: str) -> Dict[str, Any]:
@@ -24,30 +28,51 @@ def _load_ingestor_state(config: Dict[str, Any], logger) -> Dict[str, Any]:
     try:
         with open(state_file_path, 'r', encoding='utf-8') as f:
             return json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
+    except (FileNotFoundError, json.JSONDecodeError, TypeError):
         logger.info(f"SillyTavern Chat Ingestor state file not found or invalid at {state_file_path}. Starting fresh.")
-        return {}
+        # Return the new, structured state
+        return {"processed_files": {}, "seen_message_fingerprints": []}
 
 def _save_ingestor_state(state: Dict[str, Any], config: Dict[str, Any], logger) -> None:
     """Saves the ingestor state to a JSON file."""
     state_file_path = os.path.join(config['project_paths']['cache_folder'], 'st_chat_ingestor_file_state.json')
+    temp_file_path = state_file_path + ".tmp"
     try:
         os.makedirs(os.path.dirname(state_file_path), exist_ok=True)
-        with open(state_file_path, 'w', encoding='utf-8') as f:
+        with open(temp_file_path, 'w', encoding='utf-8') as f:
             json.dump(state, f, indent=4)
+        # Atomic rename to prevent state corruption if the process is interrupted
+        os.replace(temp_file_path, state_file_path)
     except IOError as e:
         logger.error(f"Failed to save SillyTavern Chat Ingestor state to {state_file_path}: {e}")
+    finally:
+        if os.path.exists(temp_file_path):
+            os.remove(temp_file_path)
+
+def _calculate_message_fingerprint(message: Dict[str, Any]) -> str:
+    """Creates a unique, deterministic hash for a message."""
+    # Use the most stable fields to create the fingerprint
+    timestamp = message.get('send_date', '')
+    author = message.get('name', '')
+    content = message.get('mes', '')
+    
+    # Concatenate and encode for hashing
+    fingerprint_str = f"{timestamp}|{author}|{content}".encode('utf-8')
+    return hashlib.sha256(fingerprint_str).hexdigest()
 
 def ingest_sillytavern_chats(config: Dict[str, Any], logger) -> None:
     """
     Loads SillyTavern .jsonl chat logs, segments them into sessions,
-    transforms them into CUIS format, and saves them.
+    transforms them into the V2 Session format, and saves them.
 
     Args:
         config: The application's configuration dictionary.
         logger: The SDC logger instance.
     """
     logger.info("Starting ingestion for source: SillyTavern")
+
+    # Define a placeholder for items with no valid timestamp.
+    UNDEFINED_TIMESTAMP = datetime(1970, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
 
     try:
         input_folder = config['project_paths']['sillytavern_chat_input_folder']
@@ -58,6 +83,8 @@ def ingest_sillytavern_chats(config: Dict[str, Any], logger) -> None:
 
     processed_files, total_sessions_created = 0, 0
     ingestor_state = _load_ingestor_state(config, logger)
+    # Use a set for fast O(1) lookups of seen fingerprints
+    seen_fingerprints_set = set(ingestor_state.get("seen_message_fingerprints", []))
     updated_state = False
 
     for filename in os.listdir(input_folder):
@@ -67,7 +94,8 @@ def ingest_sillytavern_chats(config: Dict[str, Any], logger) -> None:
         file_path = os.path.join(input_folder, filename)
         current_metadata = _get_file_metadata(file_path)
 
-        if file_path in ingestor_state and ingestor_state[file_path] == current_metadata:
+        # Check against the 'processed_files' key in the new state structure
+        if file_path in ingestor_state.get("processed_files", {}) and ingestor_state["processed_files"][file_path] == current_metadata:
             logger.info(f"SillyTavern chat file '{filename}' unchanged. Skipping re-ingestion.")
             processed_files += 1 # Count as processed, but skipped
             continue
@@ -83,101 +111,110 @@ def ingest_sillytavern_chats(config: Dict[str, Any], logger) -> None:
                 logger.warning(f"File {filename} is empty. Skipping.")
                 continue
 
+            # --- Message Deduplication Logic ---
             metadata = json.loads(lines[0])
-            messages = [json.loads(line) for line in lines[1:]]
-            # Sort messages chronologically using the robust date parser.
-            # This prevents incorrect sorting based on string representation.
-            # On failure, it defaults to the earliest possible time to sort them first.
-            messages.sort(key=lambda m: parse_datetime_utc(m.get('send_date'), config)
-                                        or datetime.min.replace(tzinfo=timezone.utc))
-
-            if not messages:
+            raw_messages = [json.loads(line) for line in lines[1:]]
+            
+            valid_messages = []
+            for msg in raw_messages:
+                fingerprint = _calculate_message_fingerprint(msg)
+                if fingerprint not in seen_fingerprints_set:
+                    valid_messages.append(msg)
+                    seen_fingerprints_set.add(fingerprint)
+            
+            if not valid_messages:
                 logger.warning(f"File {filename} has metadata but no messages. Skipping.")
                 continue
 
+            logger.info(f"Found {len(valid_messages)} new, unique messages in {filename} (out of {len(raw_messages)} total).")
+
+            # Sort the unique messages chronologically
+            valid_messages.sort(key=lambda m: parse_datetime_utc(m.get('send_date'), config)
+                                              or datetime.min.replace(tzinfo=timezone.utc))
+
             # --- Session Segmentation Logic ---
             sessions: List[List[Dict[str, Any]]] = []
-            current_session: List[Dict[str, Any]] = [messages[0]]
+            # Operate on the cleaned list of valid_messages
+            current_session: List[Dict[str, Any]] = [valid_messages[0]]
 
-            for i in range(1, len(messages)):
-                prev_date_str = messages[i-1].get('send_date')
-                curr_date_str = messages[i].get('send_date')
+            for i in range(1, len(valid_messages)):
+                prev_date_str = valid_messages[i-1].get('send_date')
+                curr_date_str = valid_messages[i].get('send_date')
 
                 prev_msg_time = parse_datetime_utc(prev_date_str, config)
                 curr_msg_time = parse_datetime_utc(curr_date_str, config)
 
                 if not prev_msg_time or not curr_msg_time:
-                    logger.warning(f"Skipping session gap check in {filename} due to invalid/missing timestamp near message {i+1}.")
-                    current_session.append(messages[i])
+                    logger.warning(f"Skipping session gap check in {filename} due to invalid/missing timestamp.")
+                    current_session.append(valid_messages[i])
                     continue
 
                 if (curr_msg_time - prev_msg_time) > timedelta(minutes=session_gap_minutes):
                     sessions.append(current_session)
-                    current_session = [messages[i]]
+                    current_session = [valid_messages[i]]
                 else:
-                    current_session.append(messages[i])
+                    current_session.append(valid_messages[i])
             
             sessions.append(current_session) # Add the last session
 
             logger.info(f"Segmented chat into {len(sessions)} sessions.")
 
-            # --- Process each session into a CUIS item ---
+            # --- Process each session into a V2 Session item ---
             session_errors = 0
             for i, session_messages in enumerate(sessions):
                 try:
-                    cuis = CUISV1()
-                    chat_id_hash = metadata.get('chat_id_hash', 'unknown_hash')
+                    # Extract metadata for this session
                     character_name = metadata.get('character_name', 'Unknown Character')
                     user_name = metadata.get('user_name', 'User')
-
-                    start_time_utc = parse_datetime_utc(session_messages[0].get('send_date'), config)
-                    first_msg_date = start_time_utc.strftime('%Y-%m-%d') if start_time_utc else "Unknown Date"
-
-                    # Populate sdc_core
-                    cuis.sdc_core.sdc_source_system = 'SillyTavern'
-                    cuis.sdc_core.sdc_source_sub_type = 'SillyTavern_Session'
-                    start_ts_id = int(start_time_utc.timestamp()) if start_time_utc else "unknown"
-                    cuis.sdc_core.sdc_source_primary_id = f"{chat_id_hash}-{start_ts_id}"
-                    cuis.sdc_core.sdc_source_file_path = file_path
-
-                    # Parse create_date from metadata, aligning with other ingestors
-                    create_date_str = metadata.get('create_date')
-                    if create_date_str:
-                        # Sanitize the non-standard format "2025-04-30@14h40m31s"
-                        sanitized_date_str = create_date_str.replace('@', 'T').replace('h', ':').replace('m', ':').replace('s', '')
-                        cuis.core_content.creation_timestamp_utc = parse_datetime_utc(sanitized_date_str, config)
-
-                    # Populate core_content
-                    cuis.core_content.summary_title_or_subject = f"ST Session with {character_name} on {first_msg_date}"
-                    cuis.core_content.start_timestamp_utc = start_time_utc
-                    cuis.core_content.end_timestamp_utc = parse_datetime_utc(session_messages[-1].get('send_date'), config)
-
-                    # Process each message into a CuisEntry for consistency with other conversational ingestors
-                    for msg in session_messages:
-                        entry = CuisEntry(
-                            entry_timestamp_utc=parse_datetime_utc(msg.get('send_date'), config),
-                            entry_author_name_source=msg.get('name'),
-                            entry_body_text=msg.get('mes')
-                        )
-                        cuis.cuis_entries.append(entry)
-
-                    # Populate source_specific_details
-                    # Adhere to the structure defined in CUIS V1.0 Definition.MD
-                    cuis.source_specific_details['sillytavern_character_name'] = character_name
-                    cuis.source_specific_details['sillytavern_user_name'] = user_name
-                    cuis.source_specific_details['sillytavern_main_chat_source_file'] = metadata.get('chat_metadata', {}).get('main_chat')
+                    chat_id_hash = metadata.get('chat_metadata', {}).get('chat_id_hash', 'unknown_hash')
                     
-                    structured_messages = []
-                    for msg in session_messages:
-                        structured_messages.append({
-                            "message_text": msg.get('mes'),
-                            "sender_name": msg.get('name'),
-                            "is_user_message": msg.get('is_user', False),
-                            "message_timestamp_utc": parse_datetime_utc(msg.get('send_date'), config)
-                        })
-                    cuis.source_specific_details['sillytavern_session_messages'] = structured_messages
+                    start_time_utc = parse_datetime_utc(session_messages[0].get('send_date'), config) or UNDEFINED_TIMESTAMP
+                    end_time_utc = parse_datetime_utc(session_messages[-1].get('send_date'), config) or UNDEFINED_TIMESTAMP
 
-                    save_cuis_to_file(cuis, config, logger)
+                    # Create a SessionSegment for each unique message
+                    segments = [
+                        SessionSegment(
+                            segment_id=str(uuid.uuid4()),
+                            start_time_utc=parse_datetime_utc(msg.get('send_date'), config) or UNDEFINED_TIMESTAMP,
+                            end_time_utc=parse_datetime_utc(msg.get('send_date'), config) or UNDEFINED_TIMESTAMP,
+                            type="ChatMessage",
+                            author=msg.get('name'),
+                            content=msg.get('mes'),
+                            metadata={"is_user": msg.get('is_user', False)}
+                        ) for msg in session_messages
+                    ]
+
+                    session_object = Session(
+                        meta=SessionMeta(
+                            session_id=str(uuid.uuid4()),
+                            schema_version="2.0",
+                            source_system="SillyTavern",
+                            source_identifiers=[file_path],
+                            processing_status="Complete", # No customer linking needed
+                            ingestion_timestamp_utc=datetime.now(timezone.utc),
+                            last_updated_timestamp_utc=datetime.now(timezone.utc)
+                        ),
+                        context=SessionContext(
+                            # SillyTavern chats do not map to a customer/contact model.
+                            # This information is available in the segments' author field and insights title.
+                            customer_name=None,
+                            contact_name=None,
+                            links=[f"st_chat_id:{chat_id_hash}"], # Add the grouping link
+                            customer_id=None,
+                            contact_id=None
+                        ),
+                        insights=SessionInsights(
+                            session_start_time_utc=start_time_utc,
+                            session_end_time_utc=end_time_utc,
+                            session_duration_minutes=int((end_time_utc - start_time_utc).total_seconds() / 60) if start_time_utc and end_time_utc else 0,
+                            source_title=f"SillyTavern Chat with {character_name}",
+                            llm_generated_title=None,
+                            user_notes=""
+                        ),
+                        segments=segments
+                    )
+
+                    save_session_to_file(session_object, config, logger)
                     total_sessions_created += 1
                 except Exception as e:
                     logger.error(f"Failed to process session {i} from file {filename}: {e}", exc_info=True)
@@ -185,7 +222,7 @@ def ingest_sillytavern_chats(config: Dict[str, Any], logger) -> None:
             
             # If all sessions from this file were processed without errors, update state
             if session_errors == 0:
-                ingestor_state[file_path] = current_metadata
+                ingestor_state["processed_files"][file_path] = current_metadata
                 updated_state = True
 
         except json.JSONDecodeError as e:
@@ -193,7 +230,9 @@ def ingest_sillytavern_chats(config: Dict[str, Any], logger) -> None:
         except Exception as e:
             logger.error(f"An unexpected error occurred processing {filename}: {e}", exc_info=True)
 
-    logger.info(f"Finished SillyTavern ingestion. Processed {processed_files} files, created {total_sessions_created} CUIS items.")
+    logger.info(f"Finished SillyTavern ingestion. Processed {processed_files} files, created {total_sessions_created} Session items.")
     
     if updated_state:
+        # Convert the set back to a list for JSON serialization
+        ingestor_state["seen_message_fingerprints"] = sorted(list(seen_fingerprints_set))
         _save_ingestor_state(ingestor_state, config, logger)

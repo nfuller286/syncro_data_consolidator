@@ -12,44 +12,50 @@ _cached_config: Optional[Dict[str, Any]] = None
 
 def _resolve_placeholders_recursive(obj: Union[Dict, List], templates: Dict[str, str]) -> bool:
     """
-    Recursively traverses a dictionary or list to resolve placeholders.
-
-    Args:
-        obj: The dictionary or list to process.
-        templates: A dictionary of placeholder keys and their resolved values.
-
-    Returns:
-        True if any placeholder was resolved in this pass, otherwise False.
+    To recursively search through the configuration dictionary and replace
+    placeholder strings (e.g., `{{project_root}}`) with their actual values.
     """
-    unresolved_found_in_pass = False
-    iterator = obj.items() if isinstance(obj, dict) else enumerate(obj)
-
-    for key, value in iterator:
-        if isinstance(value, str):
-            placeholders = re.findall(r'{{(\w+)}}', value)
-            if not placeholders:
-                continue
-
-            for placeholder in placeholders:
-                if placeholder in templates:
-                    # Replace and normalize path if it's a path placeholder
-                    replacement = str(templates[placeholder])
-                    new_value = value.replace(f'{{{{{placeholder}}}}}', replacement)
+    made_replacement = False
+    
+    # --- START OF FIX ---
+    # Handle dictionaries and lists separately to resolve type ambiguity
+    if isinstance(obj, dict):
+        for key, value in obj.items():
+            if isinstance(value, str):
+                new_value = value
+                for placeholder, replacement in templates.items():
+                    if f"{{{{{placeholder}}}}}" in new_value:
+                        new_value = new_value.replace(f"{{{{{placeholder}}}}}", replacement)
+                        made_replacement = True
+                
+                if new_value != value:
                     if 'folder' in key or 'path' in key:
                         obj[key] = os.path.normpath(new_value)
                     else:
                         obj[key] = new_value
-                    unresolved_found_in_pass = True
-        
-        elif isinstance(value, dict):
-            if _resolve_placeholders_recursive(value, templates):
-                unresolved_found_in_pass = True
-        
-        elif isinstance(value, list):
-            if _resolve_placeholders_recursive(value, templates):
-                unresolved_found_in_pass = True
+            
+            elif isinstance(value, (dict, list)):
+                if _resolve_placeholders_recursive(value, templates):
+                    made_replacement = True
+
+    elif isinstance(obj, list):
+        for i, item in enumerate(obj):
+            if isinstance(item, str):
+                new_item = item
+                for placeholder, replacement in templates.items():
+                    if f"{{{{{placeholder}}}}}" in new_item:
+                        new_item = new_item.replace(f"{{{{{placeholder}}}}}", replacement)
+                        made_replacement = True
                 
-    return unresolved_found_in_pass
+                if new_item != item:
+                    obj[i] = new_item # No path normalization needed for list items by default
+            
+            elif isinstance(item, (dict, list)):
+                if _resolve_placeholders_recursive(item, templates):
+                    made_replacement = True
+    # --- END OF FIX ---
+            
+    return made_replacement
 
 def _find_and_load_config() -> Optional[Dict[str, Any]]:
     """

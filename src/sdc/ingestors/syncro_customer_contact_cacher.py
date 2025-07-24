@@ -150,8 +150,10 @@ def cache_syncro_data(config: Dict[str, Any], logger):
         logger.info("Creating lean customer cache from fetched data...")
         contacts_by_customer_id = defaultdict(list)
         for contact in all_contacts:
-            if contact.get('customer_id') and contact.get('name'):
-                contacts_by_customer_id[contact['customer_id']].append(contact['name'])
+            if contact.get('customer_id') and contact.get('name') and contact.get('id'):
+                contacts_by_customer_id[contact['customer_id']].append(
+                    {'id': contact['id'], 'name': contact['name']}
+                )
 
         lean_customers = []
         for customer in all_customers:
