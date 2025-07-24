@@ -4,7 +4,7 @@
     // 🟢 Full Pipeline
     {
       "name": "SDC: Run Full Pipeline",
-      "type": "python",
+      "type": "debugpy",
       "request": "launch",
       "module": "sdc.run_sdc",
       "args": ["run", "--pipeline", "full"],
@@ -14,7 +14,7 @@
     },
     {
       "name": "SDC: Run Ingest Only Pipeline",
-      "type": "python",
+      "type": "debugpy",
       "request": "launch",
       "module": "sdc.run_sdc",
       "args": ["run", "--pipeline", "ingest_only"],
@@ -26,7 +26,7 @@
     // 🟡 Caching
     {
       "name": "SDC: Cache Syncro",
-      "type": "python",
+      "type": "debugpy",
       "request": "launch",
       "module": "sdc.run_sdc",
       "args": ["cache", "--source", "syncro"],
@@ -38,7 +38,7 @@
     // 🔵 Ingestors (Interactive)
     {
       "name": "SDC: Ingest Source (Interactive)",
-      "type": "python",
+      "type": "debugpy",
       "request": "launch",
       "module": "sdc.run_sdc",
       "args": ["ingest", "--source", "${input:ingestSource}"],
@@ -49,11 +49,21 @@
 
     // 🔴 Processing
     {
-      "name": "SDC: Process Customer Linking",
-      "type": "python",
+      "name": "SDC: Process Customer Linking (V1 CUIS)",
+      "type": "debugpy",
       "request": "launch",
       "module": "sdc.run_sdc",
       "args": ["process", "--step", "customer_linking"],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/src",
+      "justMyCode": true
+    },
+    {
+      "name": "SDC: Process Session Customer Linking (V2)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "sdc.run_sdc",
+      "args": ["process", "--step", "session_customer_linking"],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/src",
       "justMyCode": true
@@ -62,7 +72,7 @@
     // 🔧 Utilities
     {
       "name": "SDC: Reset Ingestor State (Interactive)",
-      "type": "python",
+      "type": "debugpy",
       "request": "launch",
       "module": "sdc.run_sdc",
       "args": ["reset-state", "--source", "${input:resetSource}"],
@@ -72,7 +82,7 @@
     },
     {
       "name": "SDC: Reset State & Clean Output (Interactive)",
-      "type": "python",
+      "type": "debugpy",
       "request": "launch",
       "module": "sdc.run_sdc",
       "args": [

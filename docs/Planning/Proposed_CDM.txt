@@ -1,0 +1,95 @@
+# SDC V2.0: Common Data Model (CDM) - Complete Blueprint
+
+This document details the complete and final data structures for SDC V2.0. This is the definitive blueprint for our data.
+
+## Part 1: Conceptual Data Flow
+
+The overall data flow remains the same, transforming raw data into structured, aggregated work items.
+
+```mermaid
+graph TD
+    subgraph "Raw Data Sources"
+        A[Log Files & API Data]
+    end
+
+    subgraph "Transformation Pipeline"
+        direction LR
+        A -- "Creates Segments" --> B[Session Object]
+        B -- "Groups by Time" --> C[Work Item Object]
+    end
+
+    subgraph "Final Persisted Data"
+        B --> D(fa:fa-file-alt Session.json)
+        C --> E(fa:fa-file-alt WorkItem.json)
+    end
+```
+
+
+---
+
+## Part 2: Complete Model Structure
+
+This is the detailed, unabridged blueprint of each data object, with explanations for every field.
+
+### `Session` Model
+*The purpose of a Session is to be a complete, standardized record of a single, continuous activity from one source.*
+
+```
+Session
+├── meta: SessionMeta
+│   ├── session_id: str (A unique, deterministic hash of core data)
+│   ├── schema_version: str (The version of this model, e.g., "2.0")
+│   ├── source_system: str (The system the data came from, e.g., "ScreenConnect")
+│   ├── source_identifiers: List[str] (The specific source filename(s))
+│   ├── processing_status: str (The workflow state, e.g., "Needs Review", "Reviewed")
+│   ├── ingestion_timestamp_utc: datetime (When the system first created this record)
+│   └── last_updated_timestamp_utc: datetime (When this record was last modified)
+│
+├── context: SessionContext
+│   ├── customer_id: Optional[int] (The authoritative Syncro customer ID)
+│   ├── customer_name: Optional[str] (The authoritative Syncro customer name)
+│   ├── contact_id: Optional[int] (The authoritative Syncro contact ID)
+│   ├── contact_name: Optional[str] (The authoritative Syncro contact name)
+│   └── links: List[str] (A list of user-added keywords for project grouping)
+│
+├── insights: SessionInsights
+│   ├── session_start_time_utc: datetime (The start time of the first segment)
+│   ├── session_end_time_utc: datetime (The end time of the last segment)
+│   ├── session_duration_minutes: int (The total calculated duration of the session)
+│   ├── llm_generated_title: Optional[str] (Placeholder for a future AI-generated title)
+│   ├── llm_summary_for_billing: Optional[str] (Placeholder for a future AI-generated summary)
+│   └── user_notes: str (A dedicated field for your manual notes and summaries)
+│
+└── segments: List[SessionSegment] (A list of the raw, granular events that make up this session)
+```
+
+### `SessionSegment` Model
+*The purpose of a Segment is to be the smallest possible unit of raw data, representing one atomic event.*
+
+```
+SessionSegment
+├── segment_id: str (A unique ID for this specific event)
+├── start_time_utc: datetime
+├── end_time_utc: datetime
+├── type: str (The kind of event, e.g., "ChatMessage", "RemoteConnection")
+├── author: Optional[str] (Who or what created the event)
+├── content: Optional[str] (The text content of the event, if any)
+└── metadata: Dict (A flexible "bucket" for any other source-specific raw data)
+```
+
+### `WorkItem` Model
+*The purpose of a Work Item is to aggregate one or more Sessions into a single, continuous block of labor.*
+
+```
+WorkItem
+├── work_item_id: str (A unique ID for this specific block of labor)
+├── schema_version: str
+├── customer_id: Optional[int] (The customer ID, inherited for easy reporting)
+├── component_session_ids: List[str] (A list of the session_ids that were merged to create this)
+├── calculated_links: List[str] (A combined, unique list of all links from the component sessions)
+└── calculated_insights: WorkItemCalculatedInsights
+    ├── work_item_start_time_utc: datetime (The start time of the earliest session in the group)
+    ├── work_item_end_time_utc: datetime (The end time of the latest session in the group)
+    ├── total_duration_minutes: int (The total duration of the entire block of work)
+    └── llm_combined_summary: Optional[str] (Placeholder for a future AI-generated summary of the whole item)
+```

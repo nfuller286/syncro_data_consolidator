@@ -13,7 +13,11 @@ from sdc.ingestors.notes_json_ingestor import ingest_notes
 from sdc.ingestors.screenconnect_log_ingestor import ingest_screenconnect
 from sdc.ingestors.st_chat_ingestor import ingest_sillytavern_chats
 from sdc.ingestors.syncro_ticket_ingestor import ingest_syncro_tickets
+
+# CHANGED: Import both the V1 and V2 linkers
 from sdc.processors.cuis_customer_linker import link_customers_to_cuis
+from sdc.processors.session_customer_linker import link_customers_to_sessions
+
 
 def main():
     """Main entry point for the SDC application."""
@@ -36,11 +40,13 @@ def main():
 
     # 'process' command
     parser_process = subparsers.add_parser('process', help='Run a specific processing step')
-    parser_process.add_argument('--step', required=True, choices=['all', 'customer_linking'], help='The processing step to run')
+    # CHANGED: Added 'session_linking' to the available choices
+    parser_process.add_argument('--step', required=True, choices=['all', 'customer_linking', 'session_customer_linking'], help='The processing step to run')
 
     # 'run' command
     parser_run = subparsers.add_parser('run', help='Run a predefined pipeline')
-    parser_run.add_argument('--pipeline', required=True, choices=['full', 'ingest_only'], help='The pipeline to execute')
+    # CHANGED: Added 'full_v2' pipeline option
+    parser_run.add_argument('--pipeline', required=True, choices=['full', 'full_v2', 'ingest_only'], help='The pipeline to execute')
 
     # 'cache' command
     parser_cache = subparsers.add_parser('cache', help='Manage data caches')
@@ -66,8 +72,15 @@ def main():
             ingest_screenconnect(config)
 
     elif args.command == 'process':
+        # CHANGED: Updated logic to handle both V1 and V2 linkers.
+        # The 'all' option will now run both.
         if args.step in ['customer_linking', 'all']:
+            logger.info("Running V1 CUIS Customer Linker...")
             link_customers_to_cuis(config, logger)
+        if args.step in ['session_customer_linking', 'all']:
+            logger.info("Running V2 Session Customer Linker...")
+            link_customers_to_sessions(config, logger)
+        
 
     elif args.command == 'run':
         if args.pipeline == 'ingest_only':
@@ -77,7 +90,8 @@ def main():
             ingest_notes(config)
             ingest_screenconnect(config)
         elif args.pipeline == 'full':
-            logger.info("Executing 'full' V1.0.1 pipeline...")
+            # CHANGED: Clarified this is the V1 pipeline
+            logger.info("Executing 'full' V1 pipeline...")
             # 1. Cache
             cache_syncro_data(config, logger)
             # 2. Ingest All
@@ -85,8 +99,21 @@ def main():
             ingest_sillytavern_chats(config, logger)
             ingest_notes(config)
             ingest_screenconnect(config)
-            # 3. Process
+            # 3. Process (V1)
             link_customers_to_cuis(config, logger)
+            
+        # ADDED: New V2 pipeline definition
+        elif args.pipeline == 'full_v2':
+            logger.info("Executing 'full' V2 pipeline...")
+            # 1. Cache (re-used)
+            cache_syncro_data(config, logger)
+            # 2. Ingest All (these now produce V2 Session files)
+            ingest_syncro_tickets(config)
+            ingest_sillytavern_chats(config, logger)
+            ingest_notes(config)
+            ingest_screenconnect(config)
+            # 3. Process (V2)
+            link_customers_to_sessions(config, logger)
 
     logger.info("SDC application finished.")
 

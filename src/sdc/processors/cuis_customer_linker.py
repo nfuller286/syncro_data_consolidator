@@ -143,11 +143,14 @@ def link_customers_to_cuis(config: Dict[str, Any], logger):
                         if llm:
                             candidate_names = [c['business_name'] for c in candidate_customers]
                             prompt = f"""From the following list of company names:\n{json.dumps(candidate_names, indent=2)}\n\nWhich one is the most likely match for the name: "{guessed_name}"?\n\nPlease respond with only the single, best-matching company name from the list provided."""
-                            logger.debug(f"LLM Disambiguation Prompt:\n{prompt}")
+                            logger.debug(f"LLM Disambiguation Prompt:\n{prompt}") # The method to call the LLM is now .invoke()
                             response = llm.invoke(prompt)
-                            winner = _find_winner_from_llm_response(response.content, candidate_customers, 'business_name', logger)
-                            if winner:
-                                linked_by_llm += 1
+                            if isinstance(response.content, str):
+                                winner = _find_winner_from_llm_response(response.content, candidate_customers, 'business_name', logger)
+                                if winner:
+                                    linked_by_llm += 1
+                            else:
+                                logger.warning(f"LLM returned a non-string response content for customer disambiguation: {response.content}")
 
             if winner:
                 cuis.entities_involved.syncro_customer_id_authoritative = winner.get('id')
@@ -183,7 +186,10 @@ def link_customers_to_cuis(config: Dict[str, Any], logger):
                         if llm:
                             prompt = f"""From the following list of contact names:\n{json.dumps(candidate_contacts, indent=2)}\n\nWhich one is the most likely match for the name: "{guessed_contact}"?\n\nPlease respond with only the single, best-matching name from the list provided."""
                             response = llm.invoke(prompt)
-                            contact_winner = _find_winner_from_llm_response(response.content, candidate_contacts, None, logger)
+                            if isinstance(response.content, str):
+                                contact_winner = _find_winner_from_llm_response(response.content, candidate_contacts, None, logger)
+                            else:
+                                logger.warning(f"LLM returned a non-string response content for contact disambiguation: {response.content}")
 
                     if contact_winner:
                         cuis.entities_involved.syncro_contact_name_authoritative = contact_winner
