@@ -1,7 +1,28 @@
 import typing
-from typing import Optional, Union
+from typing import Optional, Union, overload, Literal
 
 from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
+
+# Define a type alias for known chat capabilities.
+# This makes the overloads explicit and may need to be updated if new
+# capabilities (e.g., 'super_complex') are added to config.json.
+ChatCapability = Literal['lightweight', 'complex']
+
+@overload
+def get_llm_client(
+    capability: Literal['embedding'],
+    config: dict,
+    logger
+) -> Optional[GoogleGenerativeAIEmbeddings]:
+    ...
+
+@overload
+def get_llm_client(
+    capability: ChatCapability,
+    config: dict,
+    logger
+) -> Optional[ChatGoogleGenerativeAI]:
+    ...
 
 def get_llm_client(
     capability: str,

@@ -13,7 +13,11 @@ from sdc.ingestors.notes_json_ingestor import ingest_notes
 from sdc.ingestors.screenconnect_log_ingestor import ingest_screenconnect
 from sdc.ingestors.st_chat_ingestor import ingest_sillytavern_chats
 from sdc.ingestors.syncro_ticket_ingestor import ingest_syncro_tickets
-from sdc.processors.cuis_customer_linker import link_customers_to_cuis
+
+# Import the session-based customer linker
+from sdc.processors.session_customer_linker import link_customers_to_sessions # V2 linker
+from sdc.processors.session_llm_analyzer import analyze_sessions_with_llm # V2 analyzer
+
 
 def main():
     """Main entry point for the SDC application."""
@@ -36,7 +40,7 @@ def main():
 
     # 'process' command
     parser_process = subparsers.add_parser('process', help='Run a specific processing step')
-    parser_process.add_argument('--step', required=True, choices=['all', 'customer_linking'], help='The processing step to run')
+    parser_process.add_argument('--step', required=True, choices=['all', 'customer_linking', 'llm_analysis'], help='The processing step to run')
 
     # 'run' command
     parser_run = subparsers.add_parser('run', help='Run a predefined pipeline')
@@ -67,7 +71,11 @@ def main():
 
     elif args.command == 'process':
         if args.step in ['customer_linking', 'all']:
-            link_customers_to_cuis(config, logger)
+            logger.info("Running Session Customer Linker...")
+            link_customers_to_sessions(config, logger)
+        if args.step in ['llm_analysis', 'all']:
+            logger.info("Running Session LLM Analyzer...")
+            analyze_sessions_with_llm(config, logger)
 
     elif args.command == 'run':
         if args.pipeline == 'ingest_only':
@@ -77,7 +85,7 @@ def main():
             ingest_notes(config)
             ingest_screenconnect(config)
         elif args.pipeline == 'full':
-            logger.info("Executing 'full' V1.0.1 pipeline...")
+            logger.info("Executing 'full' pipeline...")
             # 1. Cache
             cache_syncro_data(config, logger)
             # 2. Ingest All
@@ -85,8 +93,9 @@ def main():
             ingest_sillytavern_chats(config, logger)
             ingest_notes(config)
             ingest_screenconnect(config)
-            # 3. Process
-            link_customers_to_cuis(config, logger)
+            # 3. Process (V2)
+            link_customers_to_sessions(config, logger)
+            analyze_sessions_with_llm(config, logger)
 
     logger.info("SDC application finished.")
 
