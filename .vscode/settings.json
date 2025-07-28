@@ -1,4 +1,5 @@
 {
+    "python.defaultInterpreterPath": "D/Python/Conda/Environments/syncro_data_consolidator",
     "python.analysis.typeCheckingMode": "standard",
     "windsurfPyright.analysis.diagnosticMode": "workspace",
     "windsurfPyright.analysis.typeCheckingMode": "standard",
