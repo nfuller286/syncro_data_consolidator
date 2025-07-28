@@ -13,7 +13,7 @@ from sdc.models.session_v2 import Session
 
 def save_session_to_file(session_object: Session, config: Dict[str, Any], logger) -> None:
     """
-    Serializes a Session Pydantic object to a JSON file.
+    Serializes a Session Pydantic object to a JSON file with a descriptive name.
 
     Args:
         session_object: The Session object to save.
@@ -25,8 +25,21 @@ def save_session_to_file(session_object: Session, config: Dict[str, Any], logger
         output_dir = config['project_paths']['sessions_output_folder']
         os.makedirs(output_dir, exist_ok=True)
         
-        # Use the session_id from the meta block for a unique filename
-        filename = f"{session_object.meta.session_id}.json"
+        # --- Create a more descriptive filename ---
+        source_system = session_object.meta.source_system
+        start_time = session_object.insights.session_start_time_utc
+        session_id = session_object.meta.session_id
+
+        # Sanitize the source system name for use in a filename
+        sanitized_source = source_system.replace('.', '_').replace(' ', '')
+
+        # Format the date, handling placeholder/missing dates gracefully
+        date_str = "UNKNOWN-DATE"
+        if start_time and start_time.year > 1970:
+            date_str = start_time.strftime('%Y-%m-%d')
+        
+        # Assemble the new filename: YYYY-MM-DD_SourceSystem_session-id.json
+        filename = f"{date_str}_{sanitized_source}_{session_id}.json"
         file_path = os.path.join(output_dir, filename)
         
         logger.info(f"Saving Session item to: {file_path}")

@@ -181,7 +181,7 @@ def ingest_screenconnect(config: Dict[str, Any]) -> None:
                     ),
                     context=SessionContext(
                         customer_name=customer_name,
-                        contact_name=participant_name,
+                        contact_name=None, # ParticipantName is the technician, not the contact.
                         # Explicitly set fields that will be populated by the linker
                         customer_id=None,
                         contact_id=None

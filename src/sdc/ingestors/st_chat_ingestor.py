@@ -63,7 +63,7 @@ def _calculate_message_fingerprint(message: Dict[str, Any]) -> str:
 def ingest_sillytavern_chats(config: Dict[str, Any], logger) -> None:
     """
     Loads SillyTavern .jsonl chat logs, segments them into sessions,
-    transforms them into CUIS format, and saves them.
+    transforms them into the V2 Session format, and saves them.
 
     Args:
         config: The application's configuration dictionary.

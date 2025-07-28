@@ -28,6 +28,7 @@ class SessionMeta(BaseModel):
     source_system: str = Field(..., description="The system the data came from, e.g., 'ScreenConnect', 'SyncroTicket'.")
     source_identifiers: List[str] = Field(..., description="The specific source filename(s) or API IDs.")
     processing_status: str = Field(..., description="The workflow state, e.g., 'Needs Linking', 'Linked', 'Reviewed'.")
+    processing_log: List[str] = Field(default_factory=list, description="A log of processing steps applied to this session, e.g., 'customer_linker_v2.1'.")
     ingestion_timestamp_utc: datetime.datetime
     last_updated_timestamp_utc: datetime.datetime
 

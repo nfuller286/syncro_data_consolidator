@@ -13,7 +13,7 @@ from thefuzz import fuzz, process
 
 # --- V2 IMPORTS ---
 from sdc.models.session_v2 import Session
-from sdc.utils import session_handler, llm_utils, cuis_handler # Still need cuis_handler for the lean cache
+from sdc.utils import session_handler, llm_utils, cache_utils
 
 # --- HELPER FUNCTION (UNCHANGED) ---
 # This function is generic and does not need to be modified.
@@ -55,7 +55,7 @@ def link_customers_to_sessions(config: Dict[str, Any], logger):
         return
 
     # NOTE: The lean customer cache is generic and can be reused without changes.
-    customer_cache = cuis_handler.load_lean_customer_cache(config, logger)
+    customer_cache = cache_utils.load_lean_customer_cache(config, logger)
     if not customer_cache:
         logger.critical("Failed to load lean customer cache. Aborting linking process.")
         return

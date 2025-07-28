@@ -49,7 +49,7 @@
 
     // 🔴 Processing
     {
-      "name": "SDC: Process Customer Linking (V1 CUIS)",
+      "name": "SDC: Process Customer Linking",
       "type": "debugpy",
       "request": "launch",
       "module": "sdc.run_sdc",
@@ -59,38 +59,21 @@
       "justMyCode": true
     },
     {
-      "name": "SDC: Process Session Customer Linking (V2)",
+      "name": "SDC: Process LLM Analysis",
       "type": "debugpy",
       "request": "launch",
       "module": "sdc.run_sdc",
-      "args": ["process", "--step", "session_customer_linking"],
-      "console": "integratedTerminal",
-      "cwd": "${workspaceFolder}/src",
-      "justMyCode": true
-    },
-
-    // 🔧 Utilities
-    {
-      "name": "SDC: Reset Ingestor State (Interactive)",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "sdc.run_sdc",
-      "args": ["reset-state", "--source", "${input:resetSource}"],
+      "args": ["process", "--step", "llm_analysis"],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/src",
       "justMyCode": true
     },
     {
-      "name": "SDC: Reset State & Clean Output (Interactive)",
+      "name": "SDC: Process All Steps",
       "type": "debugpy",
       "request": "launch",
       "module": "sdc.run_sdc",
-      "args": [
-        "reset-state",
-        "--source",
-        "${input:resetSource}",
-        "--clean-output"
-      ],
+      "args": ["process", "--step", "all"],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/src",
       "justMyCode": true
@@ -109,19 +92,6 @@
         "syncro"
       ],
       "default": "all"
-    },
-    {
-      "id": "resetSource",
-      "type": "pickString",
-      "description": "Select the source to reset the state for:",
-      "options": [
-        "all",
-        "notes",
-        "screenconnect",
-        "sillytavern",
-        "syncro"
-      ],
-      "default": "syncro"
     }
   ]
 }

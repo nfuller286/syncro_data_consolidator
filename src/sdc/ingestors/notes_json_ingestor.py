@@ -26,7 +26,7 @@ def _get_file_metadata(file_path: str) -> Dict[str, Any]:
 
 def _load_ingestor_state(config: Dict[str, Any], logger) -> Dict[str, Any]:
     """Loads the ingestor state from a JSON file."""
-    state_file_path = os.path.join(config['project_paths']['cache_folder'], 'ingestor_file_state.json')
+    state_file_path = os.path.join(config['project_paths']['cache_folder'], 'notes_json_ingestor_state.json')
     try:
         with open(state_file_path, 'r', encoding='utf-8') as f:
             return json.load(f)
@@ -36,7 +36,7 @@ def _load_ingestor_state(config: Dict[str, Any], logger) -> Dict[str, Any]:
 
 def _save_ingestor_state(state: Dict[str, Any], config: Dict[str, Any], logger) -> None:
     """Saves the ingestor state to a JSON file."""
-    state_file_path = os.path.join(config['project_paths']['cache_folder'], 'ingestor_file_state.json')
+    state_file_path = os.path.join(config['project_paths']['cache_folder'], 'notes_json_ingestor_state.json')
     try:
         os.makedirs(os.path.dirname(state_file_path), exist_ok=True)
         with open(state_file_path, 'w', encoding='utf-8') as f:
