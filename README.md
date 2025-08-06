@@ -21,37 +21,65 @@ The project follows a logical ETL pattern, orchestrated by a main execution scri
 
 ```mermaid
 graph TD
-    subgraph A[1. Extract: Ingestion]
+    subgraph "A: Data Sources (Inputs)"
         direction LR
-        A1[Syncro API] --> I1(syncro_ticket_ingestor)
-        A2[ScreenConnect CSV] --> I2(screenconnect_log_ingestor)
-        A3[SillyTavern JSONL] --> I3(st_chat_ingestor)
-        A4[Legacy Notes JSON] --> I4(notes_json_ingestor)
+        S1[Syncro API]
+        S2[ScreenConnect CSVs]
+        S3[SillyTavern JSONL]
+        S4[Legacy Notes JSON]
     end
 
-    subgraph B[2. Transform: Standardization]
+    subgraph "B: Ingestion & Standardization Pipeline"
         direction LR
-        I1 --> T1{Standardize to Session v2 Model}
-        I2 --> T1
-        I3 --> T1
-        I4 --> T1
+        I1(syncro_ticket_ingestor)
+        I2(screenconnect_log_ingestor)
+        I3(st_chat_ingestor)
+        I4(notes_json_ingestor)
     end
 
-    subgraph C[3. Load & Enrich: Processing]
-        direction TB
-        C1[Cache Syncro Customers] -- Fetched via API --> P1(session_customer_linker)
-        T1 -- "Saved as JSON, then processed" --> P1
-        P1 -- "Updates Session file with Customer ID" --> P2(session_llm_analyzer)
-        P2 -- "Updates Session file with LLM Insights" --> O1[Enriched Session JSON Files]
+    subgraph "C: Stored Data Artifacts"
+        F1["fa:fa-folder Raw Session Files<br/>(Status: 'Needs Linking')"]
+        F2["fa:fa-file-alt Customer Cache File"]
     end
 
-    subgraph D[4. Orchestration & Configuration]
-        D1(run_sdc.py) -- "Reads configuration" --> D2(config.json)
-        D1 -- "Executes" --> A
-        D1 -- "Executes" --> C
+    subgraph "D: Processing & Enrichment Pipeline"
+        P1(session_customer_linker)
+        P2(session_llm_analyzer)
     end
 
-    A --> B --> C
+    subgraph "E: Final Output"
+        O1["fa:fa-folder-open Enriched Session Files<br/>(Status: 'Analyzed')"]
+    end
+
+    %% Define the flow
+    S1 --> I1
+    S2 --> I2
+    S3 --> I3
+    S4 --> I4
+
+    I1 -- Transforms & Saves --> F1
+    I2 -- Transforms & Saves --> F1
+    I3 -- Transforms & Saves --> F1
+    I4 -- Transforms & Saves --> F1
+
+    %% Caching Flow
+    S1 -- Fetches Customers --> F2
+
+    %% Processing Flow
+    F1 -- "Loads Sessions" --> P1
+    F2 -- "Reads Customers" --> P1
+    P1 -- "Updates & Saves Sessions" --> F1
+
+    F1 -- "Loads Linked Sessions" --> P2
+    P2 -- Interacts with --> LLM[LLM API]
+    P2 -- "Updates & Saves Sessions" --> O1
+
+    %% Annotations
+    linkStyle 10 stroke-width:2px,fill:none,stroke:green;
+    linkStyle 11 stroke-width:2px,fill:none,stroke:green;
+    linkStyle 12 stroke-width:2px,fill:none,stroke:orange;
+    linkStyle 13 stroke-width:2px,fill:none,stroke:blue;
+    linkStyle 14 stroke-width:2px,fill:none,stroke:blue;
 ```
 
 **The process unfolds in these stages:**
