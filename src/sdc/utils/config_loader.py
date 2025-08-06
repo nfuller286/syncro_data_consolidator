@@ -84,6 +84,16 @@ def _find_and_load_config() -> Optional[Dict[str, Any]]:
         with open(config_path, 'r', encoding='utf-8') as f:
             config = json.load(f)
 
+        # --- Load and merge all LLM-related configurations ---
+        llm_configs_path = os.path.join(project_root, "config", "llm_configs.json")
+        if os.path.exists(llm_configs_path):
+            with open(llm_configs_path, 'r', encoding='utf-8') as f:
+                llm_configs = json.load(f)
+                config['llm_configs'] = llm_configs
+        else:
+            print(f"WARNING: LLM configs file not found at {llm_configs_path}. LLM functionality will be limited.")
+            config['llm_configs'] = {}
+
         # --- REVISED PLACEHOLDER RESOLUTION ---
         # 1. Seed the templates with the project root.
         templates = config.get('project_paths', {})

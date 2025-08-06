@@ -3,58 +3,11 @@
 # Standard library imports
 import json
 import os
-import time
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List, Optional
 
-# Third-party imports
-import requests
-
-
-def _fetch_paginated_data(endpoint_url: str, headers: Dict[str, str], logger) -> Optional[List[Dict[str, Any]]]:
-    """Fetches all items from a paginated Syncro API endpoint."""
-    all_items = []
-    data_key = endpoint_url.split('/')[-1].split('?')[0]
-    page = 1
-    max_pages = 100
-
-    logger.info(f"Starting to fetch all {data_key} from {endpoint_url}...")
-
-    while page <= max_pages:
-        params = {'page': page}
-        try:
-            response = requests.get(endpoint_url, headers=headers, params=params, timeout=30)
-            response.raise_for_status()
-            data = response.json()
-
-            if data_key in data and data[data_key]:
-                items_on_page = data[data_key]
-                all_items.extend(items_on_page)
-                logger.debug(f"Fetched page {page} for {data_key}, {len(items_on_page)} items. Total so far: {len(all_items)}")
-            else:
-                logger.info(f"No more {data_key} found on page {page}. Concluding fetch.")
-                break
-
-            if 'meta' in data and data['meta'].get('total_pages'):
-                total_pages = data['meta']['total_pages']
-                if page >= total_pages:
-                    logger.info(f"Reached the last page ({page}/{total_pages}) for {data_key}.")
-                    break
-                max_pages = total_pages
-            else:
-                logger.warning(f"Pagination 'meta' data not found for {data_key}. Assuming single page and stopping.")
-                break
-
-            page += 1
-            time.sleep(0.2)
-
-        except requests.exceptions.RequestException as e:
-            logger.error(f"API request failed while fetching {data_key} page {page}: {e}")
-            return None
-
-    logger.info(f"Finished fetching {data_key}. Total retrieved: {len(all_items)}")
-    return all_items
+from sdc.api_clients.syncro_gateway import SyncroGateway
 
 def cache_syncro_data(config: Dict[str, Any], logger):
     """Main entry point to fetch and cache Syncro customer and contact data."""
@@ -99,24 +52,17 @@ def cache_syncro_data(config: Dict[str, Any], logger):
     if not run_fetch:
         return
 
+    # Instantiate the gateway. It will raise an error if config is missing.
     try:
-        api_key = config['syncro_api']['api_key']
-        base_url = config['syncro_api']['base_url'].rstrip('/')
-    except KeyError as e:
-        logger.error(f"Syncro API configuration key missing: {e}. Aborting.")
+        gateway = SyncroGateway(config, logger)
+    except KeyError:
+        # The gateway's __init__ already logs the specific error and raises it.
+        # We catch it here to abort the function gracefully.
+        logger.critical("Aborting caching process due to gateway initialization failure.")
         return
 
-    if not api_key or not base_url:
-        logger.error("Syncro API key or base URL is not configured. Aborting.")
-        return
-
-    headers = {'Authorization': f'Bearer {api_key}'}
-
-    customers_url = f"{base_url}/customers"
-    all_customers = _fetch_paginated_data(customers_url, headers, logger)
-
-    contacts_url = f"{base_url}/contacts"
-    all_contacts = _fetch_paginated_data(contacts_url, headers, logger)
+    all_customers = gateway.fetch_all_customers()
+    all_contacts = gateway.fetch_all_contacts()
 
     try:
         os.makedirs(cache_folder, exist_ok=True)

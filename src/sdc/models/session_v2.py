@@ -1,5 +1,5 @@
 import datetime
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, Field
 
 # ===================================================================
@@ -47,7 +47,9 @@ class SessionInsights(BaseModel):
     session_duration_minutes: int
     source_title: Optional[str] = Field(None, description="The title as it appeared in the source system (e.g., ticket subject).")
     llm_generated_title: Optional[str] = Field(None, description="A placeholder for a future AI-generated title.")
+    llm_generated_category: Optional[str] = Field(None, description="A category assigned by an LLM processor.")
     generated_summaries: Dict[str, str] = Field(default_factory=dict, description="A flexible dictionary for multiple summary types (e.g., 'invoice', 'detailed').")
+    structured_llm_results: Dict[str, Any] = Field(default_factory=dict, description="A flexible dictionary for storing structured JSON results from LLM analysis.")
     user_notes: str = Field("", description="A dedicated field for your manual notes and summaries.")
 
 
