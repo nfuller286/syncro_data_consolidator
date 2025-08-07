@@ -1,18 +1,20 @@
 # Ignore everything in the config folder, but keep the folder itself
 /config/*
 !.gitkeep
+!/config/sampleconfig.json
+/config/config.json
 
 # Ignore contents of each subfolder in data, but keep the folders themselves
 /data/cache/*
-/data/input/*
+# /data/input/* ← removed to allow input data
 /data/logs/*
 /data/output/*
 
 # Keep the folders themselves
 !/data/cache/
 /data/cache/.gitkeep
-!/data/input/
-/data/input/.gitkeep
+#!/data/input/
+#/data/input/.gitkeep
 !/data/logs/
 /data/logs/.gitkeep
 !/data/output/
@@ -27,4 +29,6 @@
 # Ignore Python bytecode files
 __pycache__/
 *.py[cod]
+
+# Ignore VS Code settings
 .vscode/settings.json
