@@ -1,0 +1,76 @@
+{
+  "project_paths": {
+    "project_root": "DO_NOT_EDIT_-_SET_BY_LOADER",
+    "data_folder": "{{project_root}}/data",
+    "input_folder": "{{data_folder}}/input",
+    "output_folder": "{{data_folder}}/output",
+    "logs_folder": "{{data_folder}}/logs",
+    "notes_json": "{{input_folder}}/notes_json/notes.json",
+    "screenconnect_logs": "{{input_folder}}/screenconnect_logs",
+    "sillytavern_chat_input_folder": "{{input_folder}}/sillytavern_chat",
+    "cuis_items_output_folder": "{{output_folder}}/cuis_items",
+    "sessions_output_folder": "{{output_folder}}/sessions",
+    "reports_output_folder": "{{output_folder}}/reports",
+    "cache_folder": "{{data_folder}}/cache"
+  },
+  "logging": {
+    "log_file_path": "{{logs_folder}}/sdc.log",
+    "log_level": "INFO",
+    "log_to_terminal": true
+  },
+  "syncro_api": {
+    "base_url": "https://url.syncromsp.com/api/v1",
+    "api_key": "",
+    "tickets_endpoint": "/tickets",
+	"test_file_path": "{{project_root}}/input/syncro_tickets_sample.json"
+  },
+  "llm_config": {
+    "active_provider": "google_gemini",
+    "google_gemini": {
+      "api_key": "",
+      "models": {
+        "complex": "gemini-2.5-pro",
+        "general": "gemini-2.5-flash",
+        "lightweight": "gemini-2.5-flash-lite",
+        "embedding": "models/text-embedding-004",
+        "flash": "gemini-2.5-flash"
+      }
+    },
+    "local_llm": {
+      "base_url": "http://localhost:1234/v1",
+      "api_key": "NotNeeded",
+      "models": {
+        "complex": "local-llm-model-for-complex-tasks",
+        "general": "local-llm-model-for-general-tasks",
+        "lightweight": "gemini-2.5-flash-lite-preview-06-17",
+        "embedding": "local-llm-model-for-embeddings"
+      }
+    },
+    "default_llm_params": {
+      "temperature": 0.7,
+      "max_tokens": 2048
+    }
+  },
+  "processing_defaults": {
+    "recursive_sillytavern_scan": true,
+    "syncro_cache_policy": "if_older_than_hours",
+    "syncro_cache_expiry_hours": 24,
+    "internal_work_customer_id": 0,
+    "sillytavern_session_gap_minutes": 4,
+    "customer_linking_fuzzy_match_threshold": 95,
+    "notes_json_filename": "notes.json"
+  },
+  "prompts": {
+    "default": {
+      "generate_title": "Based on the following conversation, create a very short, concise title (less than 10 words) that summarizes the main topic.\n\n---\n{content}\n---\n\nTitle:",
+      "generate_summary": "Summarize the following conversation in 2-3 sentences, focusing on the key problem and resolution.\n\n---\n{content}\n---\n\nSummary:",
+      "categorize_session": "Categorize the following session into one of these categories: [Hardware, Software, Network, Account, How-To, Other]. Respond with only the category name.\n\n---\n{content}\n---\n\nCategory:"
+    },
+    "SillyTavern": {
+      "extract_and_analyze": "Analyze the following chat log between a user and an AI assistant. The user is an IT professional documenting their work. Your task is to extract key information and provide a structured analysis in JSON format. \n\n**Chat Log:**\n---\n{content}\n---\n\n**Instructions:**\nRespond with ONLY a valid JSON object. Do not include any other text or markdown formatting. The JSON object must have the following keys:\n\n- `title`: A concise, 10-word-or-less title for the work session.\n- `summary`: A 2-3 sentence summary of the problem, the work performed, and the outcome. This is a play-by-play of the work done.\n- `mentioned_customer`: The full name of the business or customer being worked on. If none is mentioned, use null.\n- `mentioned_contact`: The full name of the specific person (contact) at the customer's business. If none is mentioned, use null.\n- `categories`: A JSON array of strings categorizing the work. Choose from: [\"Ticket Work\", \"Documentation\", \"Internal Project\", \"Research\", \"System Maintenance\", \"User Support\", \"Quoting\"].\n\n**JSON Output Example:**\n{\n  \"title\": \"Resolved Network Connectivity for ABC Corp\",\n  \"summary\": \"User investigated a network outage for ABC Corp. They diagnosed a faulty switch, replaced it, and verified connectivity was restored for the user Jane Doe.\",\n  \"mentioned_customer\": \"ABC Corp\",\n  \"mentioned_contact\": \"Jane Doe\",\n  \"categories\": [\"Ticket Work\", \"System Maintenance\"]\n}\n\n**JSON Output:**"
+    },
+    "notes.json": {
+      "summarize_and_categorize": "Analyze the following collection of notes and to-do items for an IT work session. Your task is to extract key information and provide a structured analysis in JSON format.\n\n**Session Content:**\n---\n{content}\n---\n\n**Instructions:**\nRespond with ONLY a valid JSON object. Do not include any other text or markdown formatting. The JSON object must have the following keys:\n\n- `summary`: A 2-3 sentence summary of the work performed, based on the notes. This is a play-by-play of the work done.\n- `keywords`: A JSON array of 3-5 single-word keywords that describe the main topics (e.g., \"Firewall\", \"Password\", \"QuickBooks\", \"Server\").\n\n**JSON Output:**"
+    }
+  }
+}
