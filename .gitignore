@@ -18,11 +18,6 @@
 !/data/output/
 /data/output/.gitkeep
 
-# Keep everything in docs
-# (no rule needed if nothing is being ignored)
-
-# Keep everything in src
-# (no rule needed if nothing is being ignored)
 
 # Ignore Python bytecode files
 __pycache__/
