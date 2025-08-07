@@ -47,11 +47,10 @@ def _save_ingestor_state(state: Dict[str, Any], config: Dict[str, Any], logger) 
 # =================================================================================
 #  REFACTORED INGESTION FUNCTION
 # =================================================================================
-def ingest_notes(config: Dict[str, Any]) -> None:
+def ingest_notes(config: Dict[str, Any], logger) -> None:
     """
     Loads data from notes.json, transforms it into the V2 Session format, and saves it.
     """
-    logger = get_sdc_logger(__name__, config)
     logger.info("Starting ingestion for source: NotesJSON")
 
     # Define a placeholder for items with no valid timestamp, ensuring orphaned work is captured for review.

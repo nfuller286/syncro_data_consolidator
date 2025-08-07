@@ -97,16 +97,31 @@ def main():
 
         elif args.pipeline == 'full':
             logger.info("Executing 'full' pipeline...")
-            # 1. Cache
-            logger.info("Caching Syncro data...")
-            cache_syncro_data(config, logger)
+            
+            # Check if we are in a test file mode for Syncro
+            syncro_test_mode = config.get('syncro_api', {}).get('test_file_path')
+
+            if not syncro_test_mode:
+                # 1. Cache (only if not in test mode)
+                logger.info("Caching Syncro data...")
+                cache_syncro_data(config, logger)
+            else:
+                logger.info("Syncro test file path is configured. Skipping live data caching.")
+
             # 2. Ingest All
             for source, func in ingest_map.items():
                 logger.info(f"Ingesting from {source}...")
                 func()
-            # 3. Process (V2) - This is now an explicit step.
-            # The user should run 'process --step all' or a specific step after ingestion.
-            logger.info("Full ingestion pipeline complete. Run the 'process' command to link customers or perform LLM analysis.")
+
+            # 3. Automated Processing
+            logger.info("--- Starting Automated Processing ---")
+            
+            # Run the customer linker to link all newly ingested sessions.
+            logger.info("Running Customer Linker...")
+            process_map['customer_linking']()
+
+            logger.info("--- Full pipeline complete. ---")
+            logger.info("NOTE: LLM analysis for summarization/categorization must be run separately using the 'process --step llm_analysis' command.")
 
     logger.info("SDC application finished.")
 

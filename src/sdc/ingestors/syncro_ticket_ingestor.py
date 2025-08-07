@@ -68,8 +68,7 @@ def _fetch_all_pages(base_url: str, headers: Dict[str, str], params: Dict[str, A
             break
     return all_tickets
 
-def ingest_syncro_tickets(config: Dict[str, Any]) -> None:
-    logger = get_sdc_logger(__name__, config)
+def ingest_syncro_tickets(config: Dict[str, Any], logger) -> None:
     logger.info("Starting Syncro Ticket Ingestor...")
 
     api_config = config.get('syncro_api', {})

@@ -52,12 +52,11 @@ def _save_ingestor_state(state: Dict[str, Any], config: Dict[str, Any], logger) 
 # =================================================================================
 #  REFACTORED INGESTION FUNCTION
 # =================================================================================
-def ingest_screenconnect(config: Dict[str, Any]) -> None:
+def ingest_screenconnect(config: Dict[str, Any], logger) -> None:
     """
     Loads ScreenConnect CSV logs, consolidates events into sessions,
     and transforms them into the V2 Session format.
     """
-    logger = get_sdc_logger(__name__, config)
     logger.info("Starting ScreenConnect ingestion...")
 
     log_dir = config['project_paths']['screenconnect_logs']
