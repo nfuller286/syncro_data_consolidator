@@ -47,7 +47,19 @@
       "justMyCode": true
     },
 
-    // 🔴 Processing
+    // 🔴 Processing (Interactive)
+    {
+      "name": "SDC: Process Step (Interactive)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "sdc.run_sdc",
+      "args": ["process", "--step", "${input:processStep}"],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/src",
+      "justMyCode": true
+    },
+
+    // 🔴 Processing (Specific Steps)
     {
       "name": "SDC: Process Customer Linking",
       "type": "debugpy",
@@ -59,11 +71,21 @@
       "justMyCode": true
     },
     {
-      "name": "SDC: Process LLM Analysis",
+      "name": "SDC: Process LLM Title Generation",
       "type": "debugpy",
       "request": "launch",
       "module": "sdc.run_sdc",
-      "args": ["process", "--step", "llm_analysis"],
+      "args": ["process", "--step", "llm_title"],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/src",
+      "justMyCode": true
+    },
+    {
+      "name": "SDC: Process LLM Summarization",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "sdc.run_sdc",
+      "args": ["process", "--step", "llm_summary"],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/src",
       "justMyCode": true
@@ -90,6 +112,19 @@
         "screenconnect",
         "sillytavern",
         "syncro"
+      ],
+      "default": "all"
+    },
+    {
+      "id": "processStep",
+      "type": "pickString",
+      "description": "Select the processing step to run:",
+      "options": [
+        "all",
+        "customer_linking",
+        "llm_title",
+        "llm_summary",
+        "llm_categorize"
       ],
       "default": "all"
     }

@@ -17,7 +17,7 @@ from sdc.ingestors.syncro_ticket_ingestor import ingest_syncro_tickets
 
 # Import the session-based customer linker
 from sdc.processors.session_customer_linker import link_customers_to_sessions # V2 linker
-from sdc.processors.session_llm_analyzer import analyze_sessions_with_llm # V2 analyzer
+from sdc.processors.session_llm_analyzer import run_llm_analysis # V2 analyzer
 
 
 def main():
@@ -41,7 +41,7 @@ def main():
 
     # 'process' command
     parser_process = subparsers.add_parser('process', help='Run a specific processing step')
-    parser_process.add_argument('--step', required=True, choices=['all', 'customer_linking', 'llm_analysis'], help='The processing step to run')
+    parser_process.add_argument('--step', required=True, choices=['all', 'customer_linking', 'llm_title', 'llm_summary', 'llm_categorize'], help='The processing step to run')
 
     # 'run' command
     parser_run = subparsers.add_parser('run', help='Run a predefined pipeline')
@@ -67,7 +67,9 @@ def main():
     
     process_map = {
         'customer_linking': partial(link_customers_to_sessions, config, logger),
-        'llm_analysis': partial(analyze_sessions_with_llm, config, logger)
+        'llm_title': partial(run_llm_analysis, config, logger, analysis_type='title'),
+        'llm_summary': partial(run_llm_analysis, config, logger, analysis_type='summary'),
+        'llm_categorize': partial(run_llm_analysis, config, logger, analysis_type='categorize')
     }
     
     if args.command == 'cache':
@@ -121,7 +123,7 @@ def main():
             process_map['customer_linking']()
 
             logger.info("--- Full pipeline complete. ---")
-            logger.info("NOTE: LLM analysis for summarization/categorization must be run separately using the 'process --step llm_analysis' command.")
+            logger.info("NOTE: LLM analysis for titles/summaries must be run separately using the 'process' command (e.g., 'process --step llm_title').")
 
     logger.info("SDC application finished.")
 

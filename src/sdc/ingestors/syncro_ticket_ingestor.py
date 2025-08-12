@@ -236,6 +236,7 @@ def ingest_syncro_tickets(config: Dict[str, Any], logger) -> None:
                     session_end_time_utc=session_end_time,
                     session_duration_minutes=int((session_end_time - session_start_time).total_seconds() / 60),
                     source_title=ticket.get('subject'),
+                    llm_generated_category=None,
                     llm_generated_title=None,
                     user_notes=""
                 ),
