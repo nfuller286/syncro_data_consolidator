@@ -100,6 +100,28 @@
       "cwd": "${workspaceFolder}/src",
       "justMyCode": true
     }
+    ,
+    // 🧹 Cleaning
+    {
+      "name": "SDC: Clean Source (Interactive Dry Run)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "sdc.run_sdc",
+      "args": ["clean", "${input:cleanSource}"],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/src",
+      "justMyCode": true
+    },
+    {
+      "name": "SDC: Clean Source (Interactive Commit)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "sdc.run_sdc",
+      "args": ["clean", "${input:cleanSource}", "--commit"],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/src",
+      "justMyCode": true
+    }
   ],
   "inputs": [
     {
@@ -127,6 +149,20 @@
         "llm_categorize"
       ],
       "default": "all"
+    },
+    {
+      "id": "cleanSource",
+      "type": "pickString",
+      "description": "Select the source to clean (dry run by default):",
+      "options": [
+        "all",
+        "logs",
+        "screenconnect",
+        "sillytavern",
+        "syncro",
+        "notes"
+      ],
+      "default": "screenconnect"
     }
   ]
 }

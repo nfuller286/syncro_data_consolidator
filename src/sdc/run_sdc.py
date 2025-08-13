@@ -18,6 +18,7 @@ from sdc.ingestors.syncro_ticket_ingestor import ingest_syncro_tickets
 # Import the session-based customer linker
 from sdc.processors.session_customer_linker import link_customers_to_sessions # V2 linker
 from sdc.processors.session_llm_analyzer import run_llm_analysis # V2 analyzer
+from sdc.utils.workspace_cleaner import clean_workspace, SOURCE_MAPPING
 
 
 def main():
@@ -50,6 +51,12 @@ def main():
     # 'cache' command
     parser_cache = subparsers.add_parser('cache', help='Manage data caches')
     parser_cache.add_argument('--source', required=True, choices=['syncro'], help='The data source to cache')
+
+    # 'clean' command
+    valid_clean_targets = list(SOURCE_MAPPING.keys()) + ['all', 'logs']
+    parser_clean = subparsers.add_parser('clean', help='Clean workspace by deleting files for specified sources (e.g., screenconnect syncro).')
+    parser_clean.add_argument('sources', nargs='+', choices=valid_clean_targets, help='One or more sources to clean. Use "all" to clean all sources and logs.')
+    parser_clean.add_argument('--commit', action='store_true', help='Perform the actual deletion. Without this flag, a dry run is performed.')
 
     args = parser.parse_args()
 
@@ -124,6 +131,32 @@ def main():
 
             logger.info("--- Full pipeline complete. ---")
             logger.info("NOTE: LLM analysis for titles/summaries must be run separately using the 'process' command (e.g., 'process --step llm_title').")
+
+    elif args.command == 'clean':
+        # Determine if this is a dry run based on the ABSENCE of --commit
+        is_dry_run = not args.commit
+
+        # The dangerous interactive confirmation prompt ONLY appears if we are committing changes.
+        if not is_dry_run:
+            confirm_sources = ' '.join(args.sources)
+            confirm = input(f"WARNING: This will permanently delete files for source(s): '{confirm_sources}'. Are you sure? [y/N] ")
+            if confirm.lower() != 'y':
+                logger.info("Cleanup aborted by user.")
+                return
+
+        # Separate 'logs' from the other sources, as it's handled by a separate flag.
+        # The cleaner utility handles the 'all' keyword for sources.
+        sources_to_clean = [s for s in args.sources if s != 'logs']
+        should_clean_logs = 'logs' in args.sources or 'all' in args.sources
+
+        # Call the new, safer utility function
+        clean_workspace(
+            sources=sources_to_clean,
+            clean_logs=should_clean_logs,
+            config=config,
+            logger=logger,
+            dry_run=is_dry_run
+        )
 
     logger.info("SDC application finished.")
 
