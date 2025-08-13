@@ -1,48 +1,19 @@
-import requests
 import json
 import os
 import uuid
+from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List
-from datetime import datetime, timezone, timedelta
+
+import requests
 
 from sdc.utils.sdc_logger import get_sdc_logger
 # --- V2 IMPORTS ---
 from sdc.models.session_v2 import Session, SessionSegment, SessionMeta, SessionContext, SessionInsights
 from sdc.utils.session_handler import save_session_to_file
 from sdc.utils.date_utils import parse_datetime_utc
+from sdc.utils import file_ingestor_state_handler as state_handler
 
 STATE_FILE_NAME = 'syncro_ticket_ingestor_state.json'
-
-def _get_file_metadata(file_path: str) -> Dict[str, Any]:
-    try:
-        stat = os.stat(file_path)
-        return {'size': stat.st_size, 'mtime': stat.st_mtime}
-    except FileNotFoundError:
-        return {}
-
-def _load_ingestor_state(config: Dict[str, Any], logger) -> Dict[str, Any]:
-    state_file_path = os.path.join(config['project_paths']['cache_folder'], STATE_FILE_NAME)
-    try:
-        with open(state_file_path, 'r', encoding='utf-8') as f:
-            return json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        logger.info(f"Ingestor state file not found or invalid at {state_file_path}. Starting fresh.")
-        return {'files': {}, 'api': {}}
-
-def _save_ingestor_state(state: Dict[str, Any], config: Dict[str, Any], logger) -> None:
-    state_file_path = os.path.join(config['project_paths']['cache_folder'], STATE_FILE_NAME)
-    temp_file_path = state_file_path + ".tmp"
-    try:
-        os.makedirs(os.path.dirname(state_file_path), exist_ok=True)
-        with open(temp_file_path, 'w', encoding='utf-8') as f:
-            json.dump(state, f, indent=4)
-        # Atomic rename to prevent state corruption
-        os.replace(temp_file_path, state_file_path)
-    except IOError as e:
-        logger.error(f"Failed to save ingestor state to {state_file_path}: {e}")
-    finally:
-        if os.path.exists(temp_file_path):
-            os.remove(temp_file_path)
 
 def _fetch_all_pages(base_url: str, headers: Dict[str, str], params: Dict[str, Any], logger) -> list:
     all_tickets = []
@@ -75,14 +46,19 @@ def ingest_syncro_tickets(config: Dict[str, Any], logger) -> None:
     test_file_path = api_config.get('test_file_path')
 
     tickets_data = []
-    ingestor_state = _load_ingestor_state(config, logger)
+    state_file_path = os.path.join(config['project_paths']['cache_folder'], STATE_FILE_NAME)
+    # The default state ensures 'files' and 'api' keys always exist.
+    default_state = {'files': {}, 'api': {}}
+    ingestor_state = state_handler.load_state(state_file_path, logger, default_state=default_state)
+
     processed_successfully = True
+    state_needs_saving = False  # Flag to track if we need to save state at the end
     last_updated_at_str = None  # Initialize to handle unbound variable case
 
     if test_file_path:
         logger.info(f"Processing Syncro tickets from test file: {test_file_path}")
         try:
-            current_metadata = _get_file_metadata(test_file_path)
+            current_metadata = state_handler.get_file_metadata(test_file_path)
             if ingestor_state.get('files', {}).get(test_file_path) == current_metadata:
                 logger.info(f"Test file '{test_file_path}' unchanged. Skipping re-ingestion.")
                 return
@@ -90,8 +66,9 @@ def ingest_syncro_tickets(config: Dict[str, Any], logger) -> None:
             with open(test_file_path, 'r', encoding='utf-8') as f:
                 data = json.load(f)
                 tickets_data = data.get('tickets', [])
-            
-            ingestor_state.setdefault('files', {})[test_file_path] = current_metadata
+
+            ingestor_state['files'][test_file_path] = current_metadata
+            state_needs_saving = True  # We will process this file, so state should be saved on success
             logger.info(f"Loaded {len(tickets_data)} tickets from test file.")
 
         except FileNotFoundError:
@@ -115,7 +92,7 @@ def ingest_syncro_tickets(config: Dict[str, Any], logger) -> None:
         full_url = f"{base_url.rstrip('/')}{tickets_endpoint}"
         params = {}
 
-        last_updated_at_str = ingestor_state.get('api', {}).get('last_updated_at')
+        last_updated_at_str = ingestor_state['api'].get('last_updated_at')
         if last_updated_at_str:
             params['since_updated_at'] = last_updated_at_str
             logger.info(f"Fetching tickets updated since: {last_updated_at_str}")
@@ -256,8 +233,13 @@ def ingest_syncro_tickets(config: Dict[str, Any], logger) -> None:
         logger.warning("Errors occurred during processing. State will not be updated.")
         return
 
-    if processed_successfully and not test_file_path and latest_timestamp_this_run:
+    # If it was an API run, update the timestamp
+    if not test_file_path and latest_timestamp_this_run:
         final_timestamp = latest_timestamp_this_run + timedelta(seconds=1)
         ingestor_state['api']['last_updated_at'] = final_timestamp.strftime('%Y-%m-%dT%H:%M:%SZ')
         logger.info(f"Updating last_updated_at timestamp to: {ingestor_state['api']['last_updated_at']}")
-        _save_ingestor_state(ingestor_state, config, logger)
+        state_needs_saving = True
+
+    if state_needs_saving:
+        logger.info("Saving updated ingestor state.")
+        state_handler.save_state(ingestor_state, state_file_path, logger)

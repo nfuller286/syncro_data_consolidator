@@ -22,7 +22,7 @@
     "base_url": "https://url.syncromsp.com/api/v1",
     "api_key": "",
     "tickets_endpoint": "/tickets",
-	"test_file_path": "{{project_root}}/input/syncro_tickets_sample.json"
+    "test_file_path": "{{project_root}}/data/input/syncro_tickets_sample/rmm_tickets_response.json"
   },
   "llm_config": {
     "active_provider": "google_gemini",
@@ -32,8 +32,7 @@
         "complex": "gemini-2.5-pro",
         "general": "gemini-2.5-flash",
         "lightweight": "gemini-2.5-flash-lite",
-        "embedding": "models/text-embedding-004",
-        "flash": "gemini-2.5-flash"
+        "embedding": "models/text-embedding-004"
       }
     },
     "local_llm": {
@@ -59,18 +58,5 @@
     "sillytavern_session_gap_minutes": 4,
     "customer_linking_fuzzy_match_threshold": 95,
     "notes_json_filename": "notes.json"
-  },
-  "prompts": {
-    "default": {
-      "generate_title": "Based on the following conversation, create a very short, concise title (less than 10 words) that summarizes the main topic.\n\n---\n{content}\n---\n\nTitle:",
-      "generate_summary": "Summarize the following conversation in 2-3 sentences, focusing on the key problem and resolution.\n\n---\n{content}\n---\n\nSummary:",
-      "categorize_session": "Categorize the following session into one of these categories: [Hardware, Software, Network, Account, How-To, Other]. Respond with only the category name.\n\n---\n{content}\n---\n\nCategory:"
-    },
-    "SillyTavern": {
-      "extract_and_analyze": "Analyze the following chat log between a user and an AI assistant. The user is an IT professional documenting their work. Your task is to extract key information and provide a structured analysis in JSON format. \n\n**Chat Log:**\n---\n{content}\n---\n\n**Instructions:**\nRespond with ONLY a valid JSON object. Do not include any other text or markdown formatting. The JSON object must have the following keys:\n\n- `title`: A concise, 10-word-or-less title for the work session.\n- `summary`: A 2-3 sentence summary of the problem, the work performed, and the outcome. This is a play-by-play of the work done.\n- `mentioned_customer`: The full name of the business or customer being worked on. If none is mentioned, use null.\n- `mentioned_contact`: The full name of the specific person (contact) at the customer's business. If none is mentioned, use null.\n- `categories`: A JSON array of strings categorizing the work. Choose from: [\"Ticket Work\", \"Documentation\", \"Internal Project\", \"Research\", \"System Maintenance\", \"User Support\", \"Quoting\"].\n\n**JSON Output Example:**\n{\n  \"title\": \"Resolved Network Connectivity for ABC Corp\",\n  \"summary\": \"User investigated a network outage for ABC Corp. They diagnosed a faulty switch, replaced it, and verified connectivity was restored for the user Jane Doe.\",\n  \"mentioned_customer\": \"ABC Corp\",\n  \"mentioned_contact\": \"Jane Doe\",\n  \"categories\": [\"Ticket Work\", \"System Maintenance\"]\n}\n\n**JSON Output:**"
-    },
-    "notes.json": {
-      "summarize_and_categorize": "Analyze the following collection of notes and to-do items for an IT work session. Your task is to extract key information and provide a structured analysis in JSON format.\n\n**Session Content:**\n---\n{content}\n---\n\n**Instructions:**\nRespond with ONLY a valid JSON object. Do not include any other text or markdown formatting. The JSON object must have the following keys:\n\n- `summary`: A 2-3 sentence summary of the work performed, based on the notes. This is a play-by-play of the work done.\n- `keywords`: A JSON array of 3-5 single-word keywords that describe the main topics (e.g., \"Firewall\", \"Password\", \"QuickBooks\", \"Server\").\n\n**JSON Output:**"
-    }
   }
 }
