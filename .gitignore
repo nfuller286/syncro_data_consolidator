@@ -1,4 +1,3 @@
-# Ignore everything in the config folder, but keep the folder itself
 /config/*
 !.gitkeep
 !/config/sampleconfig.json
