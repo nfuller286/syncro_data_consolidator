@@ -5,18 +5,6 @@
 
 /data/*
 
-# Keep the folders themselves
-!/data/cache/
-/data/cache/.gitkeep
-!/data/input/
-/data/input/.gitkeep
-#/data/input/.gitkeep
-!/data/logs/
-/data/logs/.gitkeep
-!/data/output/
-/data/output/.gitkeep
-
-
 # Ignore Python bytecode files
 __pycache__/
 *.py[cod]
