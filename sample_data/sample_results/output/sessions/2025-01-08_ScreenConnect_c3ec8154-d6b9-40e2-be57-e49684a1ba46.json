@@ -1,0 +1,110 @@
+{
+    "meta": {
+        "session_id": "c3ec8154-d6b9-40e2-be57-e49684a1ba46",
+        "schema_version": "2.0",
+        "source_system": "ScreenConnect",
+        "source_identifiers": [
+            "\\syncro_data_consolidator\\data\\input/screenconnect_logs\\SampleRemoteAccessLogs.csv",
+            "rows/7,8,9,10,11"
+        ],
+        "processing_status": "Linked",
+        "processing_log": [
+            "session_llm_analyzer_title_v1.1",
+            "session_llm_analyzer_summary_v1.1"
+        ],
+        "ingestion_timestamp_utc": "2025-08-13T21:01:01.377041Z",
+        "last_updated_timestamp_utc": "2025-08-13T21:03:10.603147Z"
+    },
+    "context": {
+        "customer_id": 47914465,
+        "customer_name": "Wellness Partners East",
+        "contact_id": null,
+        "contact_name": null,
+        "links": []
+    },
+    "insights": {
+        "session_start_time_utc": "2025-01-08T21:31:00Z",
+        "session_end_time_utc": "2025-01-08T23:55:00Z",
+        "session_duration_minutes": 144,
+        "source_title": "ScreenConnect Session for AdminUser",
+        "llm_generated_title": "Machine Connections List",
+        "llm_generated_category": null,
+        "generated_summaries": {
+            "default": "A 144-minute ScreenConnect session was conducted for Wellness Partners East by an AdminUser. During this session, connections were made to DEPT-PC-01, REMOTE-PC-03, DEPT-PC-02, DOMAIN-CTRL-01, and DEPT-PC-05; however, the specific problem addressed or resolution achieved was not documented in the provided log."
+        },
+        "structured_llm_results": {},
+        "user_notes": ""
+    },
+    "segments": [
+        {
+            "segment_id": "5fea9cf8-ac49-4704-9463-6853181bf087",
+            "start_time_utc": "2025-01-08T21:31:00Z",
+            "end_time_utc": "2025-01-08T23:50:00Z",
+            "type": "RemoteConnection",
+            "author": "AdminUser",
+            "content": "Connected to machine: DEPT-PC-01",
+            "metadata": {
+                "connection_id": "d6b3a2c1-c5b4-4b0d-a9c8-b1a9d7c6b5a8",
+                "process_type": "Host",
+                "session_type": "Access",
+                "duration_seconds": 8391
+            }
+        },
+        {
+            "segment_id": "4ab11d64-32ac-49f6-aed9-ad2d9a7b7f63",
+            "start_time_utc": "2025-01-08T22:23:00Z",
+            "end_time_utc": "2025-01-08T23:25:00Z",
+            "type": "RemoteConnection",
+            "author": "AdminUser",
+            "content": "Connected to machine: REMOTE-PC-03",
+            "metadata": {
+                "connection_id": "c5a2b1d0-b4c3-4a1c-98b7-a0b8c6b5a4b7",
+                "process_type": "Host",
+                "session_type": "Access",
+                "duration_seconds": 3773
+            }
+        },
+        {
+            "segment_id": "2012192e-dc3c-4ef7-a4bc-d1c6301dbff4",
+            "start_time_utc": "2025-01-08T22:26:00Z",
+            "end_time_utc": "2025-01-08T22:41:00Z",
+            "type": "RemoteConnection",
+            "author": "AdminUser",
+            "content": "Connected to machine: DEPT-PC-02",
+            "metadata": {
+                "connection_id": "b491a0c9-a3b2-490b-87a6-9fb7b5a4b3c6",
+                "process_type": "Host",
+                "session_type": "Access",
+                "duration_seconds": 929
+            }
+        },
+        {
+            "segment_id": "e0a8010b-501c-4ca6-8cdf-f35dd0bf7121",
+            "start_time_utc": "2025-01-08T22:42:00Z",
+            "end_time_utc": "2025-01-08T23:43:00Z",
+            "type": "RemoteConnection",
+            "author": "AdminUser",
+            "content": "Connected to machine: DOMAIN-CTRL-01",
+            "metadata": {
+                "connection_id": "a3809fc8-92a1-48fA-7695-8ea6a4b3c2d5",
+                "process_type": "Host",
+                "session_type": "Access",
+                "duration_seconds": 3651
+            }
+        },
+        {
+            "segment_id": "b6008fed-6666-4f6a-8f20-41d5dc51337e",
+            "start_time_utc": "2025-01-08T22:44:00Z",
+            "end_time_utc": "2025-01-08T23:55:00Z",
+            "type": "RemoteConnection",
+            "author": "AdminUser",
+            "content": "Connected to machine: DEPT-PC-05",
+            "metadata": {
+                "connection_id": "f27f8eb7-8190-4d89-6584-7d9593a2b1c4",
+                "process_type": "Host",
+                "session_type": "Access",
+                "duration_seconds": 4258
+            }
+        }
+    ]
+}

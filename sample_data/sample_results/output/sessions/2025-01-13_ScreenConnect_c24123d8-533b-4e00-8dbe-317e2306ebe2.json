@@ -1,0 +1,82 @@
+{
+    "meta": {
+        "session_id": "c24123d8-533b-4e00-8dbe-317e2306ebe2",
+        "schema_version": "2.0",
+        "source_system": "ScreenConnect",
+        "source_identifiers": [
+            "\\syncro_data_consolidator\\data\\input/screenconnect_logs\\SampleRemoteAccessLogs.csv",
+            "rows/24,25,26"
+        ],
+        "processing_status": "Linked",
+        "processing_log": [
+            "session_llm_analyzer_title_v1.1",
+            "session_llm_analyzer_summary_v1.1"
+        ],
+        "ingestion_timestamp_utc": "2025-08-13T21:01:01.373041Z",
+        "last_updated_timestamp_utc": "2025-08-13T21:03:42.577589Z"
+    },
+    "context": {
+        "customer_id": 18005432,
+        "customer_name": "Keystone Financial",
+        "contact_id": null,
+        "contact_name": null,
+        "links": []
+    },
+    "insights": {
+        "session_start_time_utc": "2025-01-13T14:40:00Z",
+        "session_end_time_utc": "2025-01-13T14:53:00Z",
+        "session_duration_minutes": 13,
+        "source_title": "ScreenConnect Session for AdminUser",
+        "llm_generated_title": "Device Connection Log",
+        "llm_generated_category": null,
+        "generated_summaries": {
+            "default": "A 13-minute ScreenConnect session was conducted for AdminUser to facilitate remote access to your systems. The session successfully established connections to FIN-DC-01 and CONF-ROOM-SB, enabling AdminUser to access these machines as required."
+        },
+        "structured_llm_results": {},
+        "user_notes": ""
+    },
+    "segments": [
+        {
+            "segment_id": "a99ac5fa-56ca-4065-8965-d87f5bc7a9bb",
+            "start_time_utc": "2025-01-13T14:40:00Z",
+            "end_time_utc": "2025-01-13T14:42:00Z",
+            "type": "RemoteConnection",
+            "author": "AdminUser",
+            "content": "Connected to machine: FIN-DC-01",
+            "metadata": {
+                "connection_id": "e9a2b1e8-b4c3-40b-98a-a0c8b7d5e4f7",
+                "process_type": "Host",
+                "session_type": "Access",
+                "duration_seconds": 98
+            }
+        },
+        {
+            "segment_id": "5a6007d3-0823-485f-aecc-2d1a661a0cfa",
+            "start_time_utc": "2025-01-13T14:46:00Z",
+            "end_time_utc": "2025-01-13T14:49:00Z",
+            "type": "RemoteConnection",
+            "author": "AdminUser",
+            "content": "Connected to machine: FIN-DC-01",
+            "metadata": {
+                "connection_id": "d891a0d7-a3b2-4fa-879-9fb7a6c4d3e6",
+                "process_type": "Host",
+                "session_type": "Access",
+                "duration_seconds": 179
+            }
+        },
+        {
+            "segment_id": "df1864f9-2e75-4de0-b275-d106e943653d",
+            "start_time_utc": "2025-01-13T14:50:00Z",
+            "end_time_utc": "2025-01-13T14:53:00Z",
+            "type": "RemoteConnection",
+            "author": "AdminUser",
+            "content": "Connected to machine: CONF-ROOM-SB",
+            "metadata": {
+                "connection_id": "c7809fc6-92a1-4e9-768-8ea695b3c2d5",
+                "process_type": "Host",
+                "session_type": "Access",
+                "duration_seconds": 150
+            }
+        }
+    ]
+}

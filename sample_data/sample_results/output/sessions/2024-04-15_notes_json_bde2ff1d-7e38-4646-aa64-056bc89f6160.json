@@ -1,0 +1,51 @@
+{
+    "meta": {
+        "session_id": "bde2ff1d-7e38-4646-aa64-056bc89f6160",
+        "schema_version": "2.0",
+        "source_system": "notes.json",
+        "source_identifiers": [
+            "\\syncro_data_consolidator\\data\\input/notes_json/notes.json",
+            "/toDoItems/1"
+        ],
+        "processing_status": "Linked",
+        "processing_log": [
+            "session_llm_analyzer_title_v1.1",
+            "session_llm_analyzer_summary_v1.1"
+        ],
+        "ingestion_timestamp_utc": "2025-08-13T21:01:01.303677Z",
+        "last_updated_timestamp_utc": "2025-08-13T21:02:35.546824Z"
+    },
+    "context": {
+        "customer_id": 51797823,
+        "customer_name": "Acme Incorporated",
+        "contact_id": null,
+        "contact_name": "Jane Roe",
+        "links": []
+    },
+    "insights": {
+        "session_start_time_utc": "2024-04-15T00:00:00Z",
+        "session_end_time_utc": "2024-04-15T00:00:00Z",
+        "session_duration_minutes": 0,
+        "source_title": "New Domain Email Setup",
+        "llm_generated_title": "New Domain Email Setup & Forwarding",
+        "llm_generated_category": null,
+        "generated_summaries": {
+            "default": "Acme Incorporated required assistance setting up email services for their new domain, new-domain.com. This was resolved by configuring the necessary mailboxes and setting up domain forwarding to their designated cloud email service."
+        },
+        "structured_llm_results": {},
+        "user_notes": ""
+    },
+    "segments": [
+        {
+            "segment_id": "d04652db-59a2-44f5-84b9-57bbdc38f72b",
+            "start_time_utc": "2024-04-15T00:00:00Z",
+            "end_time_utc": "2024-04-15T00:00:00Z",
+            "type": "StandaloneToDo",
+            "author": "Jane Roe",
+            "content": "Set up mailboxes and configure domain forwarding for new-domain.com to a cloud email service",
+            "metadata": {
+                "completed": null
+            }
+        }
+    ]
+}

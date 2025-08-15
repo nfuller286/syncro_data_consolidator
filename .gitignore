@@ -20,17 +20,6 @@
 !/data/output/
 /data/output/.gitkeep
 
-# Ignore sample_data folder contents, except for the data subfolder
-# This is to allow sample input data to be version controlled without
-# tracking other generated sample files.
-/sample_data/
-!/sample_data/data/
-
-# Keep everything in docs
-# (no rule needed if nothing is being ignored)
-
-# Keep everything in src
-# (no rule needed if nothing is being ignored)
 
 # Ignore Python bytecode files
 __pycache__/

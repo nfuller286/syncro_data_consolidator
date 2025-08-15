@@ -1,0 +1,68 @@
+{
+    "meta": {
+        "session_id": "2c4a8c5f-1860-4e84-8707-b228a70c7e4f",
+        "schema_version": "2.0",
+        "source_system": "ScreenConnect",
+        "source_identifiers": [
+            "\\syncro_data_consolidator\\data\\input/screenconnect_logs\\SampleRemoteAccessLogs.csv",
+            "rows/16,15"
+        ],
+        "processing_status": "Linked",
+        "processing_log": [
+            "session_llm_analyzer_title_v1.1",
+            "session_llm_analyzer_summary_v1.1"
+        ],
+        "ingestion_timestamp_utc": "2025-08-13T21:01:01.385143Z",
+        "last_updated_timestamp_utc": "2025-08-13T21:03:17.354742Z"
+    },
+    "context": {
+        "customer_id": 47914465,
+        "customer_name": "Wellness Partners East",
+        "contact_id": null,
+        "contact_name": null,
+        "links": []
+    },
+    "insights": {
+        "session_start_time_utc": "2025-01-09T18:21:00Z",
+        "session_end_time_utc": "2025-01-09T20:09:00Z",
+        "session_duration_minutes": 108,
+        "source_title": "ScreenConnect Session for AdminUser",
+        "llm_generated_title": "Machine Connections List",
+        "llm_generated_category": null,
+        "generated_summaries": {
+            "default": "During a 108-minute ScreenConnect session, AdminUser connected to DOMAIN-CTRL-01 and subsequently to DEPT-PC-05. The provided log does not specify the purpose of these connections or any particular problem that was addressed or resolved."
+        },
+        "structured_llm_results": {},
+        "user_notes": ""
+    },
+    "segments": [
+        {
+            "segment_id": "9e2f4cba-944c-4bbd-ad68-07ff4d09d213",
+            "start_time_utc": "2025-01-09T18:21:00Z",
+            "end_time_utc": "2025-01-09T20:09:00Z",
+            "type": "RemoteConnection",
+            "author": "AdminUser",
+            "content": "Connected to machine: DOMAIN-CTRL-01",
+            "metadata": {
+                "connection_id": "a72a3962-3c4b-4834-103f-28404e5d6c7f",
+                "process_type": "Host",
+                "session_type": "Access",
+                "duration_seconds": 6435
+            }
+        },
+        {
+            "segment_id": "0d80efc3-5fa3-4f7a-8e42-d9f3ea6cea08",
+            "start_time_utc": "2025-01-09T18:43:00Z",
+            "end_time_utc": "2025-01-09T18:46:00Z",
+            "type": "RemoteConnection",
+            "author": "AdminUser",
+            "content": "Connected to machine: DEPT-PC-05",
+            "metadata": {
+                "connection_id": "b83b4a73-4d5c-4945-2140-39515f6e7d80",
+                "process_type": "Host",
+                "session_type": "Access",
+                "duration_seconds": 181
+            }
+        }
+    ]
+}

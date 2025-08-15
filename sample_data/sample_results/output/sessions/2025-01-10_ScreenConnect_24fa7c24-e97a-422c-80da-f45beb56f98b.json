@@ -1,0 +1,54 @@
+{
+    "meta": {
+        "session_id": "24fa7c24-e97a-422c-80da-f45beb56f98b",
+        "schema_version": "2.0",
+        "source_system": "ScreenConnect",
+        "source_identifiers": [
+            "\\syncro_data_consolidator\\data\\input/screenconnect_logs\\SampleRemoteAccessLogs.csv",
+            "rows/17"
+        ],
+        "processing_status": "Linked",
+        "processing_log": [
+            "session_llm_analyzer_title_v1.1",
+            "session_llm_analyzer_summary_v1.1"
+        ],
+        "ingestion_timestamp_utc": "2025-08-13T21:01:01.387680Z",
+        "last_updated_timestamp_utc": "2025-08-13T21:03:24.598883Z"
+    },
+    "context": {
+        "customer_id": 47914465,
+        "customer_name": "Wellness Partners East",
+        "contact_id": null,
+        "contact_name": null,
+        "links": []
+    },
+    "insights": {
+        "session_start_time_utc": "2025-01-10T15:58:00Z",
+        "session_end_time_utc": "2025-01-10T18:57:00Z",
+        "session_duration_minutes": 179,
+        "source_title": "ScreenConnect Session for AdminUser",
+        "llm_generated_title": "Machine Connection: FIN-TERM-01",
+        "llm_generated_category": null,
+        "generated_summaries": {
+            "default": "A ScreenConnect session was conducted for Wellness Partners East, connecting AdminUser to the FIN-TERM-01 machine. The session lasted 179 minutes, but the specific problem addressed or the resolution achieved during this connection was not detailed in the provided log."
+        },
+        "structured_llm_results": {},
+        "user_notes": ""
+    },
+    "segments": [
+        {
+            "segment_id": "496c78a8-552a-40e0-91d4-b95c1e7adfd3",
+            "start_time_utc": "2025-01-10T15:58:00Z",
+            "end_time_utc": "2025-01-10T18:57:00Z",
+            "type": "RemoteConnection",
+            "author": "AdminUser",
+            "content": "Connected to machine: FIN-TERM-01",
+            "metadata": {
+                "connection_id": "e5081740-1a29-4612-fe1d-062e2c3b4a5d",
+                "process_type": "Host",
+                "session_type": "Access",
+                "duration_seconds": 10733
+            }
+        }
+    ]
+}

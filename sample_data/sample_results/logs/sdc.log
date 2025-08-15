@@ -1,0 +1,436 @@
+2025-08-13 17:01:01,191 - INFO - run_sdc - SDC application starting.
+2025-08-13 17:01:01,204 - INFO - run_sdc - Executing command: run with arguments: {'command': 'run', 'pipeline': 'full'}
+2025-08-13 17:01:01,205 - INFO - run_sdc - Executing 'full' pipeline...
+2025-08-13 17:01:01,205 - INFO - run_sdc - Syncro test file path is configured. Skipping live data caching.
+2025-08-13 17:01:01,205 - INFO - run_sdc - Ingesting from syncro...
+2025-08-13 17:01:01,206 - INFO - run_sdc - Starting Syncro Ticket Ingestor...
+2025-08-13 17:01:01,206 - INFO - run_sdc - Ingestor state file not found or invalid at ..\syncro_data_consolidator\data\cache\syncro_ticket_ingestor_state.json. Starting fresh.
+2025-08-13 17:01:01,207 - INFO - run_sdc - Processing Syncro tickets from test file: ..\syncro_data_consolidator\data\input\syncro_tickets_sample\rmm_tickets_response.json
+2025-08-13 17:01:01,208 - INFO - run_sdc - Loaded 2 tickets from test file.
+2025-08-13 17:01:01,214 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-29_SyncroRMM_d2b0b48f-50f3-4992-84bc-1f8971675337.json
+2025-08-13 17:01:01,217 - INFO - run_sdc - Successfully saved Session item d2b0b48f-50f3-4992-84bc-1f8971675337
+2025-08-13 17:01:01,221 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2024-12-19_SyncroRMM_68449ea3-13de-4344-84cf-a4791bd79964.json
+2025-08-13 17:01:01,224 - INFO - run_sdc - Successfully saved Session item 68449ea3-13de-4344-84cf-a4791bd79964
+2025-08-13 17:01:01,224 - INFO - run_sdc - Syncro Ticket Ingestor finished. Processed: 2, Errors: 0
+2025-08-13 17:01:01,225 - INFO - run_sdc - Ingesting from sillytavern...
+2025-08-13 17:01:01,225 - INFO - run_sdc - Starting ingestion for source: SillyTavern
+2025-08-13 17:01:01,226 - INFO - run_sdc - State file not found or invalid at ..\syncro_data_consolidator\data\cache\st_chat_ingestor_file_state.json. Using default state.
+2025-08-13 17:01:01,227 - INFO - run_sdc - Processing SillyTavern log file: ..\syncro_data_consolidator\data\input\sillytavern_chat\Test Chat - No Reasoning2025-08-06@18h48m10s.jsonl
+2025-08-13 17:01:01,227 - INFO - run_sdc - Found 12 new, unique messages in Test Chat - No Reasoning2025-08-06@18h48m10s.jsonl (out of 12 total).
+2025-08-13 17:01:01,237 - INFO - run_sdc - Segmented chat into 2 sessions.
+2025-08-13 17:01:01,240 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-08-06_SillyTavern_654879bb-60f1-4492-8961-dc5c593458ef.json
+2025-08-13 17:01:01,244 - INFO - run_sdc - Successfully saved Session item 654879bb-60f1-4492-8961-dc5c593458ef
+2025-08-13 17:01:01,251 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-08-06_SillyTavern_ec2c0659-d4f1-4954-b2fe-60c56eb4121f.json
+2025-08-13 17:01:01,254 - INFO - run_sdc - Successfully saved Session item ec2c0659-d4f1-4954-b2fe-60c56eb4121f
+2025-08-13 17:01:01,254 - INFO - run_sdc - Processing SillyTavern log file: ..\syncro_data_consolidator\data\input\sillytavern_chat\Test Chat - Reasoning 2025-8-6 @18h 39m 35s 775ms.jsonl
+2025-08-13 17:01:01,255 - INFO - run_sdc - Found 12 new, unique messages in Test Chat - Reasoning 2025-8-6 @18h 39m 35s 775ms.jsonl (out of 12 total).
+2025-08-13 17:01:01,264 - INFO - run_sdc - Segmented chat into 2 sessions.
+2025-08-13 17:01:01,268 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-08-06_SillyTavern_d5d5fc55-e721-422b-a2bd-fd5bba5ae8b7.json
+2025-08-13 17:01:01,272 - INFO - run_sdc - Successfully saved Session item d5d5fc55-e721-422b-a2bd-fd5bba5ae8b7
+2025-08-13 17:01:01,279 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-08-06_SillyTavern_f7b0666c-be94-4639-9698-486be85efdf5.json
+2025-08-13 17:01:01,283 - INFO - run_sdc - Successfully saved Session item f7b0666c-be94-4639-9698-486be85efdf5
+2025-08-13 17:01:01,283 - INFO - run_sdc - Finished SillyTavern ingestion. Processed 2 files, created 4 Session items.
+2025-08-13 17:01:01,288 - INFO - run_sdc - Ingesting from notes...
+2025-08-13 17:01:01,288 - INFO - run_sdc - Starting ingestion for source: NotesJSON
+2025-08-13 17:01:01,288 - INFO - run_sdc - State file not found or invalid at ..\syncro_data_consolidator\data\cache\notes_json_ingestor_state.json. Using default state.
+2025-08-13 17:01:01,291 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2024-12-10_notes_json_52c22b15-675c-448e-9e39-7e41d9d6f752.json
+2025-08-13 17:01:01,295 - INFO - run_sdc - Successfully saved Session item 52c22b15-675c-448e-9e39-7e41d9d6f752
+2025-08-13 17:01:01,296 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2024-10-01_notes_json_f88d24db-2f98-44e4-9019-879a59cbdd6f.json
+2025-08-13 17:01:01,299 - INFO - run_sdc - Successfully saved Session item f88d24db-2f98-44e4-9019-879a59cbdd6f
+2025-08-13 17:01:01,300 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2024-09-15_notes_json_c07f9f5e-29f7-4943-a19c-b30d7a8cb8b9.json
+2025-08-13 17:01:01,303 - INFO - run_sdc - Successfully saved Session item c07f9f5e-29f7-4943-a19c-b30d7a8cb8b9
+2025-08-13 17:01:01,304 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2024-04-15_notes_json_bde2ff1d-7e38-4646-aa64-056bc89f6160.json
+2025-08-13 17:01:01,307 - INFO - run_sdc - Successfully saved Session item bde2ff1d-7e38-4646-aa64-056bc89f6160
+2025-08-13 17:01:01,307 - INFO - run_sdc - Finished NotesJSON ingestion. Total Success: 4, Total Failed: 0
+2025-08-13 17:01:01,314 - INFO - run_sdc - Ingesting from screenconnect...
+2025-08-13 17:01:01,314 - INFO - run_sdc - Starting ScreenConnect ingestion...
+2025-08-13 17:01:01,315 - INFO - run_sdc - State file not found or invalid at ..\syncro_data_consolidator\data\cache\screenconnect_log_ingestor_state.json. Using default state.
+2025-08-13 17:01:01,323 - INFO - run_sdc - Loaded 27 events from ..\syncro_data_consolidator\data\input/screenconnect_logs\SampleRemoteAccessLogs.csv
+2025-08-13 17:01:01,353 - INFO - run_sdc - Grouped 27 events into 13 consolidated sessions.
+2025-08-13 17:01:01,354 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-04_ScreenConnect_5c303ad2-964b-45ac-a694-0d21ecc71c31.json
+2025-08-13 17:01:01,357 - INFO - run_sdc - Successfully saved Session item 5c303ad2-964b-45ac-a694-0d21ecc71c31
+2025-08-13 17:01:01,358 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-03_ScreenConnect_a519cec8-8973-46a8-abe0-38f2135fc851.json
+2025-08-13 17:01:01,362 - INFO - run_sdc - Successfully saved Session item a519cec8-8973-46a8-abe0-38f2135fc851
+2025-08-13 17:01:01,363 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-11_ScreenConnect_46998f5b-1502-4e13-8b6e-5fae45e61d78.json
+2025-08-13 17:01:01,365 - INFO - run_sdc - Successfully saved Session item 46998f5b-1502-4e13-8b6e-5fae45e61d78
+2025-08-13 17:01:01,366 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-03_ScreenConnect_ad78d05e-e32f-407f-855e-e058f314a177.json
+2025-08-13 17:01:01,368 - INFO - run_sdc - Successfully saved Session item ad78d05e-e32f-407f-855e-e058f314a177
+2025-08-13 17:01:01,370 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-03_ScreenConnect_aa29c7a3-99b4-4d08-bf66-2b8e1ba9f1f6.json
+2025-08-13 17:01:01,372 - INFO - run_sdc - Successfully saved Session item aa29c7a3-99b4-4d08-bf66-2b8e1ba9f1f6
+2025-08-13 17:01:01,373 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-13_ScreenConnect_c24123d8-533b-4e00-8dbe-317e2306ebe2.json
+2025-08-13 17:01:01,376 - INFO - run_sdc - Successfully saved Session item c24123d8-533b-4e00-8dbe-317e2306ebe2
+2025-08-13 17:01:01,377 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-08_ScreenConnect_c3ec8154-d6b9-40e2-be57-e49684a1ba46.json
+2025-08-13 17:01:01,380 - INFO - run_sdc - Successfully saved Session item c3ec8154-d6b9-40e2-be57-e49684a1ba46
+2025-08-13 17:01:01,381 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-09_ScreenConnect_adc38da5-d86d-4648-ba35-baeae10c5215.json
+2025-08-13 17:01:01,384 - INFO - run_sdc - Successfully saved Session item adc38da5-d86d-4648-ba35-baeae10c5215
+2025-08-13 17:01:01,385 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-09_ScreenConnect_2c4a8c5f-1860-4e84-8707-b228a70c7e4f.json
+2025-08-13 17:01:01,387 - INFO - run_sdc - Successfully saved Session item 2c4a8c5f-1860-4e84-8707-b228a70c7e4f
+2025-08-13 17:01:01,388 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-10_ScreenConnect_24fa7c24-e97a-422c-80da-f45beb56f98b.json
+2025-08-13 17:01:01,391 - INFO - run_sdc - Successfully saved Session item 24fa7c24-e97a-422c-80da-f45beb56f98b
+2025-08-13 17:01:01,393 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-08_ScreenConnect_d42e0380-431a-4acf-bf95-c697ece345a5.json
+2025-08-13 17:01:01,396 - INFO - run_sdc - Successfully saved Session item d42e0380-431a-4acf-bf95-c697ece345a5
+2025-08-13 17:01:01,397 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-10_ScreenConnect_a0d54a54-582c-41df-ad19-78cfd873746e.json
+2025-08-13 17:01:01,400 - INFO - run_sdc - Successfully saved Session item a0d54a54-582c-41df-ad19-78cfd873746e
+2025-08-13 17:01:01,401 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-11_ScreenConnect_639715c3-abd7-432b-bd02-403e230f6d44.json
+2025-08-13 17:01:01,404 - INFO - run_sdc - Successfully saved Session item 639715c3-abd7-432b-bd02-403e230f6d44
+2025-08-13 17:01:01,404 - INFO - run_sdc - Finished ScreenConnect ingestion. Total Success: 13, Total Failed: 0
+2025-08-13 17:01:01,408 - INFO - run_sdc - --- Starting Automated Processing ---
+2025-08-13 17:01:01,408 - INFO - run_sdc - Running Customer Linker...
+2025-08-13 17:01:01,410 - INFO - run_sdc - Starting V2 Session customer and contact linking process.
+2025-08-13 17:01:01,411 - INFO - run_sdc - Successfully loaded 31 customers from lean cache.
+2025-08-13 17:01:01,412 - INFO - run_sdc - Processing Session bde2ff1d-7e38-4646-aa64-056bc89f6160 for new guessed name: 'Acme Inc.'
+2025-08-13 17:01:01,413 - INFO - run_sdc - Found 1 ambiguous company matches for 'Acme Inc.'. Attempting LLM disambiguation.
+2025-08-13 17:01:01,413 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'lightweight', Provider: 'google_gemini', Model: 'gemini-2.5-flash-lite'
+2025-08-13 17:01:02,196 - INFO - run_sdc - LLM successfully disambiguated and selected: 'Acme Incorporated'
+2025-08-13 17:01:02,197 - INFO - run_sdc - Successfully linked Session to customer 'Acme Incorporated'
+2025-08-13 17:01:02,197 - WARNING - run_sdc - Contact linking skipped: Customer 'Acme Incorporated' has no contacts in cache.
+2025-08-13 17:01:02,199 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2024-04-15_notes_json_bde2ff1d-7e38-4646-aa64-056bc89f6160.json
+2025-08-13 17:01:02,206 - INFO - run_sdc - Successfully saved Session item bde2ff1d-7e38-4646-aa64-056bc89f6160
+2025-08-13 17:01:02,207 - INFO - run_sdc - Processing Session c07f9f5e-29f7-4943-a19c-b30d7a8cb8b9 for new guessed name: 'Sample Corp'
+2025-08-13 17:01:02,209 - INFO - run_sdc - Found 1 ambiguous company matches for 'Sample Corp'. Attempting LLM disambiguation.
+2025-08-13 17:01:02,209 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'lightweight', Provider: 'google_gemini', Model: 'gemini-2.5-flash-lite'
+2025-08-13 17:01:02,784 - INFO - run_sdc - LLM successfully disambiguated and selected: 'Test Corp'
+2025-08-13 17:01:02,784 - INFO - run_sdc - Successfully linked Session to customer 'Test Corp'
+2025-08-13 17:01:02,785 - INFO - run_sdc - Attempting to link new contact 'Dr. Smith' for customer 'Test Corp'
+2025-08-13 17:01:02,785 - WARNING - run_sdc - No plausible contact matches found for 'Dr. Smith' (best score < 60).
+2025-08-13 17:01:02,786 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2024-09-15_notes_json_c07f9f5e-29f7-4943-a19c-b30d7a8cb8b9.json
+2025-08-13 17:01:02,789 - INFO - run_sdc - Successfully saved Session item c07f9f5e-29f7-4943-a19c-b30d7a8cb8b9
+2025-08-13 17:01:02,790 - INFO - run_sdc - Processing Session f88d24db-2f98-44e4-9019-879a59cbdd6f for new guessed name: 'Innovatech Industries'
+2025-08-13 17:01:02,790 - INFO - run_sdc - Found 1 ambiguous company matches for 'Innovatech Industries'. Attempting LLM disambiguation.
+2025-08-13 17:01:02,791 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'lightweight', Provider: 'google_gemini', Model: 'gemini-2.5-flash-lite'
+2025-08-13 17:01:03,630 - INFO - run_sdc - LLM successfully disambiguated and selected: 'Innovatech Services'
+2025-08-13 17:01:03,631 - INFO - run_sdc - Successfully linked Session to customer 'Innovatech Services'
+2025-08-13 17:01:03,632 - INFO - run_sdc - Attempting to link new contact 'John Doe' for customer 'Innovatech Services'
+2025-08-13 17:01:03,632 - WARNING - run_sdc - No plausible contact matches found for 'John Doe' (best score < 60).
+2025-08-13 17:01:03,633 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2024-10-01_notes_json_f88d24db-2f98-44e4-9019-879a59cbdd6f.json
+2025-08-13 17:01:03,636 - INFO - run_sdc - Successfully saved Session item f88d24db-2f98-44e4-9019-879a59cbdd6f
+2025-08-13 17:01:03,637 - INFO - run_sdc - Processing Session 52c22b15-675c-448e-9e39-7e41d9d6f752 for new guessed name: 'Global Tech Solutions'
+2025-08-13 17:01:03,638 - INFO - run_sdc - Found single exact match for company 'Global Tech Solutions': 'Global Tech Solutions'
+2025-08-13 17:01:03,638 - INFO - run_sdc - Successfully linked Session to customer 'Global Tech Solutions'
+2025-08-13 17:01:03,638 - INFO - run_sdc - Attempting to link new contact 'Alx Ray' for customer 'Global Tech Solutions'
+2025-08-13 17:01:03,639 - INFO - run_sdc - Found 1 ambiguous contact matches for 'Alx Ray'. Attempting LLM disambiguation.
+2025-08-13 17:01:03,639 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'lightweight', Provider: 'google_gemini', Model: 'gemini-2.5-flash-lite'
+2025-08-13 17:01:04,253 - INFO - run_sdc - LLM successfully disambiguated and selected: 'Alex Ray'
+2025-08-13 17:01:04,253 - INFO - run_sdc - Successfully linked contact to 'Alex Ray' (ID: 4434870).
+2025-08-13 17:01:04,254 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2024-12-10_notes_json_52c22b15-675c-448e-9e39-7e41d9d6f752.json
+2025-08-13 17:01:04,257 - INFO - run_sdc - Successfully saved Session item 52c22b15-675c-448e-9e39-7e41d9d6f752
+2025-08-13 17:01:04,257 - INFO - run_sdc - Skipping session 68449ea3-13de-4344-84cf-a4791bd79964 because its status is 'Linked' (not 'Needs Linking').
+2025-08-13 17:01:04,258 - INFO - run_sdc - Processing Session a519cec8-8973-46a8-abe0-38f2135fc851 for new guessed name: 'HG Alpha'
+2025-08-13 17:01:04,259 - INFO - run_sdc - Found 1 ambiguous company matches for 'HG Alpha'. Attempting LLM disambiguation.
+2025-08-13 17:01:04,259 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'lightweight', Provider: 'google_gemini', Model: 'gemini-2.5-flash-lite'
+2025-08-13 17:01:05,105 - INFO - run_sdc - LLM successfully disambiguated and selected: 'HealthGroup Alpha'
+2025-08-13 17:01:05,106 - INFO - run_sdc - Successfully linked Session to customer 'HealthGroup Alpha'
+2025-08-13 17:01:05,106 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-03_ScreenConnect_a519cec8-8973-46a8-abe0-38f2135fc851.json
+2025-08-13 17:01:05,109 - INFO - run_sdc - Successfully saved Session item a519cec8-8973-46a8-abe0-38f2135fc851
+2025-08-13 17:01:05,110 - INFO - run_sdc - Processing Session aa29c7a3-99b4-4d08-bf66-2b8e1ba9f1f6 for new guessed name: 'Innovatch Services'
+2025-08-13 17:01:05,111 - INFO - run_sdc - Found single high-confidence fuzzy match for company 'Innovatch Services': 'Innovatech Services' with score 97.
+2025-08-13 17:01:05,111 - INFO - run_sdc - Successfully linked Session to customer 'Innovatech Services'
+2025-08-13 17:01:05,112 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-03_ScreenConnect_aa29c7a3-99b4-4d08-bf66-2b8e1ba9f1f6.json
+2025-08-13 17:01:05,118 - INFO - run_sdc - Successfully saved Session item aa29c7a3-99b4-4d08-bf66-2b8e1ba9f1f6
+2025-08-13 17:01:05,119 - INFO - run_sdc - Processing Session ad78d05e-e32f-407f-855e-e058f314a177 for new guessed name: 'Innovatach Services'
+2025-08-13 17:01:05,121 - INFO - run_sdc - Found single high-confidence fuzzy match for company 'Innovatach Services': 'Innovatech Services' with score 95.
+2025-08-13 17:01:05,122 - INFO - run_sdc - Successfully linked Session to customer 'Innovatech Services'
+2025-08-13 17:01:05,124 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-03_ScreenConnect_ad78d05e-e32f-407f-855e-e058f314a177.json
+2025-08-13 17:01:05,129 - INFO - run_sdc - Successfully saved Session item ad78d05e-e32f-407f-855e-e058f314a177
+2025-08-13 17:01:05,131 - INFO - run_sdc - Processing Session 5c303ad2-964b-45ac-a694-0d21ecc71c31 for new guessed name: 'Beta Wellness Group'
+2025-08-13 17:01:05,135 - INFO - run_sdc - Found 2 ambiguous company matches for 'Beta Wellness Group'. Attempting LLM disambiguation.
+2025-08-13 17:01:05,136 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'lightweight', Provider: 'google_gemini', Model: 'gemini-2.5-flash-lite'
+2025-08-13 17:01:06,065 - INFO - run_sdc - LLM successfully disambiguated and selected: 'Wellness Partners Metro'
+2025-08-13 17:01:06,066 - INFO - run_sdc - Successfully linked Session to customer 'Wellness Partners Metro'
+2025-08-13 17:01:06,066 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-04_ScreenConnect_5c303ad2-964b-45ac-a694-0d21ecc71c31.json
+2025-08-13 17:01:06,070 - INFO - run_sdc - Successfully saved Session item 5c303ad2-964b-45ac-a694-0d21ecc71c31
+2025-08-13 17:01:06,071 - INFO - run_sdc - Processing Session c3ec8154-d6b9-40e2-be57-e49684a1ba46 for new guessed name: 'Wellness Partners East'
+2025-08-13 17:01:06,071 - INFO - run_sdc - Found single exact match for company 'Wellness Partners East': 'Wellness Partners East'
+2025-08-13 17:01:06,071 - INFO - run_sdc - Successfully linked Session to customer 'Wellness Partners East'
+2025-08-13 17:01:06,072 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-08_ScreenConnect_c3ec8154-d6b9-40e2-be57-e49684a1ba46.json
+2025-08-13 17:01:06,075 - INFO - run_sdc - Successfully saved Session item c3ec8154-d6b9-40e2-be57-e49684a1ba46
+2025-08-13 17:01:06,075 - INFO - run_sdc - Processing Session d42e0380-431a-4acf-bf95-c697ece345a5 for new guessed name: 'Wellness Partners West'
+2025-08-13 17:01:06,076 - INFO - run_sdc - Found single exact match for company 'Wellness Partners West': 'Wellness Partners West'
+2025-08-13 17:01:06,076 - INFO - run_sdc - Successfully linked Session to customer 'Wellness Partners West'
+2025-08-13 17:01:06,077 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-08_ScreenConnect_d42e0380-431a-4acf-bf95-c697ece345a5.json
+2025-08-13 17:01:06,080 - INFO - run_sdc - Successfully saved Session item d42e0380-431a-4acf-bf95-c697ece345a5
+2025-08-13 17:01:06,081 - INFO - run_sdc - Using cached link for customer 'Wellness Partners East' -> 'Wellness Partners East'
+2025-08-13 17:01:06,081 - INFO - run_sdc - Successfully linked Session to customer 'Wellness Partners East'
+2025-08-13 17:01:06,082 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-09_ScreenConnect_2c4a8c5f-1860-4e84-8707-b228a70c7e4f.json
+2025-08-13 17:01:06,086 - INFO - run_sdc - Successfully saved Session item 2c4a8c5f-1860-4e84-8707-b228a70c7e4f
+2025-08-13 17:01:06,087 - INFO - run_sdc - Using cached link for customer 'Wellness Partners East' -> 'Wellness Partners East'
+2025-08-13 17:01:06,087 - INFO - run_sdc - Successfully linked Session to customer 'Wellness Partners East'
+2025-08-13 17:01:06,088 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-09_ScreenConnect_adc38da5-d86d-4648-ba35-baeae10c5215.json
+2025-08-13 17:01:06,090 - INFO - run_sdc - Successfully saved Session item adc38da5-d86d-4648-ba35-baeae10c5215
+2025-08-13 17:01:06,091 - INFO - run_sdc - Using cached link for customer 'Wellness Partners East' -> 'Wellness Partners East'
+2025-08-13 17:01:06,092 - INFO - run_sdc - Successfully linked Session to customer 'Wellness Partners East'
+2025-08-13 17:01:06,092 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-10_ScreenConnect_24fa7c24-e97a-422c-80da-f45beb56f98b.json
+2025-08-13 17:01:06,095 - INFO - run_sdc - Successfully saved Session item 24fa7c24-e97a-422c-80da-f45beb56f98b
+2025-08-13 17:01:06,097 - INFO - run_sdc - Using cached link for customer 'Wellness Partners West' -> 'Wellness Partners West'
+2025-08-13 17:01:06,097 - INFO - run_sdc - Successfully linked Session to customer 'Wellness Partners West'
+2025-08-13 17:01:06,098 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-10_ScreenConnect_a0d54a54-582c-41df-ad19-78cfd873746e.json
+2025-08-13 17:01:06,103 - INFO - run_sdc - Successfully saved Session item a0d54a54-582c-41df-ad19-78cfd873746e
+2025-08-13 17:01:06,104 - INFO - run_sdc - Processing Session 46998f5b-1502-4e13-8b6e-5fae45e61d78 for new guessed name: 'Innovahtek Services'
+2025-08-13 17:01:06,104 - INFO - run_sdc - Found 1 ambiguous company matches for 'Innovahtek Services'. Attempting LLM disambiguation.
+2025-08-13 17:01:06,105 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'lightweight', Provider: 'google_gemini', Model: 'gemini-2.5-flash-lite'
+2025-08-13 17:01:06,827 - INFO - run_sdc - LLM successfully disambiguated and selected: 'Innovatech Services'
+2025-08-13 17:01:06,827 - INFO - run_sdc - Successfully linked Session to customer 'Innovatech Services'
+2025-08-13 17:01:06,828 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-11_ScreenConnect_46998f5b-1502-4e13-8b6e-5fae45e61d78.json
+2025-08-13 17:01:06,833 - INFO - run_sdc - Successfully saved Session item 46998f5b-1502-4e13-8b6e-5fae45e61d78
+2025-08-13 17:01:06,834 - INFO - run_sdc - Using cached link for customer 'Wellness Partners West' -> 'Wellness Partners West'
+2025-08-13 17:01:06,835 - INFO - run_sdc - Successfully linked Session to customer 'Wellness Partners West'
+2025-08-13 17:01:06,836 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-11_ScreenConnect_639715c3-abd7-432b-bd02-403e230f6d44.json
+2025-08-13 17:01:06,840 - INFO - run_sdc - Successfully saved Session item 639715c3-abd7-432b-bd02-403e230f6d44
+2025-08-13 17:01:06,841 - INFO - run_sdc - Processing Session c24123d8-533b-4e00-8dbe-317e2306ebe2 for new guessed name: 'Keystone FG'
+2025-08-13 17:01:06,842 - INFO - run_sdc - Found 1 ambiguous company matches for 'Keystone FG'. Attempting LLM disambiguation.
+2025-08-13 17:01:06,842 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'lightweight', Provider: 'google_gemini', Model: 'gemini-2.5-flash-lite'
+2025-08-13 17:01:07,655 - INFO - run_sdc - LLM successfully disambiguated and selected: 'Keystone Financial'
+2025-08-13 17:01:07,656 - INFO - run_sdc - Successfully linked Session to customer 'Keystone Financial'
+2025-08-13 17:01:07,656 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-13_ScreenConnect_c24123d8-533b-4e00-8dbe-317e2306ebe2.json
+2025-08-13 17:01:07,660 - INFO - run_sdc - Successfully saved Session item c24123d8-533b-4e00-8dbe-317e2306ebe2
+2025-08-13 17:01:07,660 - INFO - run_sdc - Skipping session d2b0b48f-50f3-4992-84bc-1f8971675337 because its status is 'Linked' (not 'Needs Linking').
+2025-08-13 17:01:07,661 - INFO - run_sdc - Skipping session 654879bb-60f1-4492-8961-dc5c593458ef because its status is 'Complete' (not 'Needs Linking').
+2025-08-13 17:01:07,662 - INFO - run_sdc - Skipping session d5d5fc55-e721-422b-a2bd-fd5bba5ae8b7 because its status is 'Complete' (not 'Needs Linking').
+2025-08-13 17:01:07,663 - INFO - run_sdc - Skipping session ec2c0659-d4f1-4954-b2fe-60c56eb4121f because its status is 'Complete' (not 'Needs Linking').
+2025-08-13 17:01:07,664 - INFO - run_sdc - Skipping session f7b0666c-be94-4639-9698-486be85efdf5 because its status is 'Complete' (not 'Needs Linking').
+2025-08-13 17:01:07,664 - INFO - run_sdc - Session linking finished. Scanned: 23, Linked: 17, Errors: 0, Skipped: 6
+2025-08-13 17:01:07,665 - INFO - run_sdc - --- Full pipeline complete. ---
+2025-08-13 17:01:07,665 - INFO - run_sdc - NOTE: LLM analysis for titles/summaries must be run separately using the 'process' command (e.g., 'process --step llm_title').
+2025-08-13 17:01:07,665 - INFO - run_sdc - SDC application finished.
+2025-08-13 17:02:00,797 - INFO - run_sdc - SDC application starting.
+2025-08-13 17:02:00,810 - INFO - run_sdc - Executing command: process with arguments: {'command': 'process', 'step': 'llm_title'}
+2025-08-13 17:02:00,811 - INFO - run_sdc - Running processing step: llm_title...
+2025-08-13 17:02:00,811 - INFO - run_sdc - Starting V2 Session LLM analysis process for type: 'title'.
+2025-08-13 17:02:00,813 - INFO - run_sdc - Analyzing session bde2ff1d-7e38-4646-aa64-056bc89f6160 for title...
+2025-08-13 17:02:00,813 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'lightweight', Provider: 'google_gemini', Model: 'gemini-2.5-flash-lite'
+2025-08-13 17:02:01,538 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2024-04-15_notes_json_bde2ff1d-7e38-4646-aa64-056bc89f6160.json
+2025-08-13 17:02:01,541 - INFO - run_sdc - Successfully saved Session item bde2ff1d-7e38-4646-aa64-056bc89f6160
+2025-08-13 17:02:01,541 - INFO - run_sdc - Generated title for bde2ff1d-7e38-4646-aa64-056bc89f6160
+2025-08-13 17:02:01,542 - INFO - run_sdc - Analyzing session c07f9f5e-29f7-4943-a19c-b30d7a8cb8b9 for title...
+2025-08-13 17:02:01,543 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'lightweight', Provider: 'google_gemini', Model: 'gemini-2.5-flash-lite'
+2025-08-13 17:02:02,369 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2024-09-15_notes_json_c07f9f5e-29f7-4943-a19c-b30d7a8cb8b9.json
+2025-08-13 17:02:02,374 - INFO - run_sdc - Successfully saved Session item c07f9f5e-29f7-4943-a19c-b30d7a8cb8b9
+2025-08-13 17:02:02,374 - INFO - run_sdc - Generated title for c07f9f5e-29f7-4943-a19c-b30d7a8cb8b9
+2025-08-13 17:02:02,375 - INFO - run_sdc - Analyzing session f88d24db-2f98-44e4-9019-879a59cbdd6f for title...
+2025-08-13 17:02:02,375 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'lightweight', Provider: 'google_gemini', Model: 'gemini-2.5-flash-lite'
+2025-08-13 17:02:03,338 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2024-10-01_notes_json_f88d24db-2f98-44e4-9019-879a59cbdd6f.json
+2025-08-13 17:02:03,342 - INFO - run_sdc - Successfully saved Session item f88d24db-2f98-44e4-9019-879a59cbdd6f
+2025-08-13 17:02:03,342 - INFO - run_sdc - Generated title for f88d24db-2f98-44e4-9019-879a59cbdd6f
+2025-08-13 17:02:03,343 - INFO - run_sdc - Analyzing session 52c22b15-675c-448e-9e39-7e41d9d6f752 for title...
+2025-08-13 17:02:03,344 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'lightweight', Provider: 'google_gemini', Model: 'gemini-2.5-flash-lite'
+2025-08-13 17:02:04,299 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2024-12-10_notes_json_52c22b15-675c-448e-9e39-7e41d9d6f752.json
+2025-08-13 17:02:04,302 - INFO - run_sdc - Successfully saved Session item 52c22b15-675c-448e-9e39-7e41d9d6f752
+2025-08-13 17:02:04,302 - INFO - run_sdc - Generated title for 52c22b15-675c-448e-9e39-7e41d9d6f752
+2025-08-13 17:02:04,303 - INFO - run_sdc - Analyzing session 68449ea3-13de-4344-84cf-a4791bd79964 for title...
+2025-08-13 17:02:04,304 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'lightweight', Provider: 'google_gemini', Model: 'gemini-2.5-flash-lite'
+2025-08-13 17:02:05,249 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2024-12-19_SyncroRMM_68449ea3-13de-4344-84cf-a4791bd79964.json
+2025-08-13 17:02:05,252 - INFO - run_sdc - Successfully saved Session item 68449ea3-13de-4344-84cf-a4791bd79964
+2025-08-13 17:02:05,253 - INFO - run_sdc - Generated title for 68449ea3-13de-4344-84cf-a4791bd79964
+2025-08-13 17:02:05,253 - INFO - run_sdc - Analyzing session a519cec8-8973-46a8-abe0-38f2135fc851 for title...
+2025-08-13 17:02:05,254 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'lightweight', Provider: 'google_gemini', Model: 'gemini-2.5-flash-lite'
+2025-08-13 17:02:05,978 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-03_ScreenConnect_a519cec8-8973-46a8-abe0-38f2135fc851.json
+2025-08-13 17:02:05,982 - INFO - run_sdc - Successfully saved Session item a519cec8-8973-46a8-abe0-38f2135fc851
+2025-08-13 17:02:05,982 - INFO - run_sdc - Generated title for a519cec8-8973-46a8-abe0-38f2135fc851
+2025-08-13 17:02:05,983 - INFO - run_sdc - Analyzing session aa29c7a3-99b4-4d08-bf66-2b8e1ba9f1f6 for title...
+2025-08-13 17:02:05,983 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'lightweight', Provider: 'google_gemini', Model: 'gemini-2.5-flash-lite'
+2025-08-13 17:02:06,739 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-03_ScreenConnect_aa29c7a3-99b4-4d08-bf66-2b8e1ba9f1f6.json
+2025-08-13 17:02:06,742 - INFO - run_sdc - Successfully saved Session item aa29c7a3-99b4-4d08-bf66-2b8e1ba9f1f6
+2025-08-13 17:02:06,742 - INFO - run_sdc - Generated title for aa29c7a3-99b4-4d08-bf66-2b8e1ba9f1f6
+2025-08-13 17:02:06,743 - INFO - run_sdc - Analyzing session ad78d05e-e32f-407f-855e-e058f314a177 for title...
+2025-08-13 17:02:06,743 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'lightweight', Provider: 'google_gemini', Model: 'gemini-2.5-flash-lite'
+2025-08-13 17:02:07,560 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-03_ScreenConnect_ad78d05e-e32f-407f-855e-e058f314a177.json
+2025-08-13 17:02:07,563 - INFO - run_sdc - Successfully saved Session item ad78d05e-e32f-407f-855e-e058f314a177
+2025-08-13 17:02:07,564 - INFO - run_sdc - Generated title for ad78d05e-e32f-407f-855e-e058f314a177
+2025-08-13 17:02:07,565 - INFO - run_sdc - Analyzing session 5c303ad2-964b-45ac-a694-0d21ecc71c31 for title...
+2025-08-13 17:02:07,565 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'lightweight', Provider: 'google_gemini', Model: 'gemini-2.5-flash-lite'
+2025-08-13 17:02:08,458 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-04_ScreenConnect_5c303ad2-964b-45ac-a694-0d21ecc71c31.json
+2025-08-13 17:02:08,461 - INFO - run_sdc - Successfully saved Session item 5c303ad2-964b-45ac-a694-0d21ecc71c31
+2025-08-13 17:02:08,461 - INFO - run_sdc - Generated title for 5c303ad2-964b-45ac-a694-0d21ecc71c31
+2025-08-13 17:02:08,462 - INFO - run_sdc - Analyzing session c3ec8154-d6b9-40e2-be57-e49684a1ba46 for title...
+2025-08-13 17:02:08,463 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'lightweight', Provider: 'google_gemini', Model: 'gemini-2.5-flash-lite'
+2025-08-13 17:02:09,206 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-08_ScreenConnect_c3ec8154-d6b9-40e2-be57-e49684a1ba46.json
+2025-08-13 17:02:09,209 - INFO - run_sdc - Successfully saved Session item c3ec8154-d6b9-40e2-be57-e49684a1ba46
+2025-08-13 17:02:09,209 - INFO - run_sdc - Generated title for c3ec8154-d6b9-40e2-be57-e49684a1ba46
+2025-08-13 17:02:09,210 - INFO - run_sdc - Analyzing session d42e0380-431a-4acf-bf95-c697ece345a5 for title...
+2025-08-13 17:02:09,210 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'lightweight', Provider: 'google_gemini', Model: 'gemini-2.5-flash-lite'
+2025-08-13 17:02:10,082 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-08_ScreenConnect_d42e0380-431a-4acf-bf95-c697ece345a5.json
+2025-08-13 17:02:10,086 - INFO - run_sdc - Successfully saved Session item d42e0380-431a-4acf-bf95-c697ece345a5
+2025-08-13 17:02:10,086 - INFO - run_sdc - Generated title for d42e0380-431a-4acf-bf95-c697ece345a5
+2025-08-13 17:02:10,087 - INFO - run_sdc - Analyzing session 2c4a8c5f-1860-4e84-8707-b228a70c7e4f for title...
+2025-08-13 17:02:10,087 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'lightweight', Provider: 'google_gemini', Model: 'gemini-2.5-flash-lite'
+2025-08-13 17:02:10,782 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-09_ScreenConnect_2c4a8c5f-1860-4e84-8707-b228a70c7e4f.json
+2025-08-13 17:02:10,786 - INFO - run_sdc - Successfully saved Session item 2c4a8c5f-1860-4e84-8707-b228a70c7e4f
+2025-08-13 17:02:10,786 - INFO - run_sdc - Generated title for 2c4a8c5f-1860-4e84-8707-b228a70c7e4f
+2025-08-13 17:02:10,787 - INFO - run_sdc - Analyzing session adc38da5-d86d-4648-ba35-baeae10c5215 for title...
+2025-08-13 17:02:10,787 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'lightweight', Provider: 'google_gemini', Model: 'gemini-2.5-flash-lite'
+2025-08-13 17:02:11,547 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-09_ScreenConnect_adc38da5-d86d-4648-ba35-baeae10c5215.json
+2025-08-13 17:02:11,550 - INFO - run_sdc - Successfully saved Session item adc38da5-d86d-4648-ba35-baeae10c5215
+2025-08-13 17:02:11,550 - INFO - run_sdc - Generated title for adc38da5-d86d-4648-ba35-baeae10c5215
+2025-08-13 17:02:11,550 - INFO - run_sdc - Analyzing session 24fa7c24-e97a-422c-80da-f45beb56f98b for title...
+2025-08-13 17:02:11,551 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'lightweight', Provider: 'google_gemini', Model: 'gemini-2.5-flash-lite'
+2025-08-13 17:02:12,888 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-10_ScreenConnect_24fa7c24-e97a-422c-80da-f45beb56f98b.json
+2025-08-13 17:02:12,891 - INFO - run_sdc - Successfully saved Session item 24fa7c24-e97a-422c-80da-f45beb56f98b
+2025-08-13 17:02:12,891 - INFO - run_sdc - Generated title for 24fa7c24-e97a-422c-80da-f45beb56f98b
+2025-08-13 17:02:12,892 - INFO - run_sdc - Analyzing session a0d54a54-582c-41df-ad19-78cfd873746e for title...
+2025-08-13 17:02:12,892 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'lightweight', Provider: 'google_gemini', Model: 'gemini-2.5-flash-lite'
+2025-08-13 17:02:13,502 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-10_ScreenConnect_a0d54a54-582c-41df-ad19-78cfd873746e.json
+2025-08-13 17:02:13,506 - INFO - run_sdc - Successfully saved Session item a0d54a54-582c-41df-ad19-78cfd873746e
+2025-08-13 17:02:13,506 - INFO - run_sdc - Generated title for a0d54a54-582c-41df-ad19-78cfd873746e
+2025-08-13 17:02:13,507 - INFO - run_sdc - Analyzing session 46998f5b-1502-4e13-8b6e-5fae45e61d78 for title...
+2025-08-13 17:02:13,507 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'lightweight', Provider: 'google_gemini', Model: 'gemini-2.5-flash-lite'
+2025-08-13 17:02:14,336 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-11_ScreenConnect_46998f5b-1502-4e13-8b6e-5fae45e61d78.json
+2025-08-13 17:02:14,340 - INFO - run_sdc - Successfully saved Session item 46998f5b-1502-4e13-8b6e-5fae45e61d78
+2025-08-13 17:02:14,340 - INFO - run_sdc - Generated title for 46998f5b-1502-4e13-8b6e-5fae45e61d78
+2025-08-13 17:02:14,341 - INFO - run_sdc - Analyzing session 639715c3-abd7-432b-bd02-403e230f6d44 for title...
+2025-08-13 17:02:14,342 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'lightweight', Provider: 'google_gemini', Model: 'gemini-2.5-flash-lite'
+2025-08-13 17:02:15,177 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-11_ScreenConnect_639715c3-abd7-432b-bd02-403e230f6d44.json
+2025-08-13 17:02:15,180 - INFO - run_sdc - Successfully saved Session item 639715c3-abd7-432b-bd02-403e230f6d44
+2025-08-13 17:02:15,181 - INFO - run_sdc - Generated title for 639715c3-abd7-432b-bd02-403e230f6d44
+2025-08-13 17:02:15,182 - INFO - run_sdc - Analyzing session c24123d8-533b-4e00-8dbe-317e2306ebe2 for title...
+2025-08-13 17:02:15,182 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'lightweight', Provider: 'google_gemini', Model: 'gemini-2.5-flash-lite'
+2025-08-13 17:02:15,814 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-13_ScreenConnect_c24123d8-533b-4e00-8dbe-317e2306ebe2.json
+2025-08-13 17:02:15,817 - INFO - run_sdc - Successfully saved Session item c24123d8-533b-4e00-8dbe-317e2306ebe2
+2025-08-13 17:02:15,817 - INFO - run_sdc - Generated title for c24123d8-533b-4e00-8dbe-317e2306ebe2
+2025-08-13 17:02:15,818 - INFO - run_sdc - Analyzing session d2b0b48f-50f3-4992-84bc-1f8971675337 for title...
+2025-08-13 17:02:15,818 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'lightweight', Provider: 'google_gemini', Model: 'gemini-2.5-flash-lite'
+2025-08-13 17:02:16,754 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-29_SyncroRMM_d2b0b48f-50f3-4992-84bc-1f8971675337.json
+2025-08-13 17:02:16,757 - INFO - run_sdc - Successfully saved Session item d2b0b48f-50f3-4992-84bc-1f8971675337
+2025-08-13 17:02:16,757 - INFO - run_sdc - Generated title for d2b0b48f-50f3-4992-84bc-1f8971675337
+2025-08-13 17:02:16,758 - INFO - run_sdc - Analyzing session 654879bb-60f1-4492-8961-dc5c593458ef for title...
+2025-08-13 17:02:16,758 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'lightweight', Provider: 'google_gemini', Model: 'gemini-2.5-flash-lite'
+2025-08-13 17:02:17,368 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-08-06_SillyTavern_654879bb-60f1-4492-8961-dc5c593458ef.json
+2025-08-13 17:02:17,371 - INFO - run_sdc - Successfully saved Session item 654879bb-60f1-4492-8961-dc5c593458ef
+2025-08-13 17:02:17,371 - INFO - run_sdc - Generated title for 654879bb-60f1-4492-8961-dc5c593458ef
+2025-08-13 17:02:17,372 - INFO - run_sdc - Analyzing session d5d5fc55-e721-422b-a2bd-fd5bba5ae8b7 for title...
+2025-08-13 17:02:17,373 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'lightweight', Provider: 'google_gemini', Model: 'gemini-2.5-flash-lite'
+2025-08-13 17:02:18,374 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-08-06_SillyTavern_d5d5fc55-e721-422b-a2bd-fd5bba5ae8b7.json
+2025-08-13 17:02:18,377 - INFO - run_sdc - Successfully saved Session item d5d5fc55-e721-422b-a2bd-fd5bba5ae8b7
+2025-08-13 17:02:18,378 - INFO - run_sdc - Generated title for d5d5fc55-e721-422b-a2bd-fd5bba5ae8b7
+2025-08-13 17:02:18,378 - INFO - run_sdc - Analyzing session ec2c0659-d4f1-4954-b2fe-60c56eb4121f for title...
+2025-08-13 17:02:18,378 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'lightweight', Provider: 'google_gemini', Model: 'gemini-2.5-flash-lite'
+2025-08-13 17:02:19,204 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-08-06_SillyTavern_ec2c0659-d4f1-4954-b2fe-60c56eb4121f.json
+2025-08-13 17:02:19,207 - INFO - run_sdc - Successfully saved Session item ec2c0659-d4f1-4954-b2fe-60c56eb4121f
+2025-08-13 17:02:19,208 - INFO - run_sdc - Generated title for ec2c0659-d4f1-4954-b2fe-60c56eb4121f
+2025-08-13 17:02:19,208 - INFO - run_sdc - Analyzing session f7b0666c-be94-4639-9698-486be85efdf5 for title...
+2025-08-13 17:02:19,208 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'lightweight', Provider: 'google_gemini', Model: 'gemini-2.5-flash-lite'
+2025-08-13 17:02:20,293 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-08-06_SillyTavern_f7b0666c-be94-4639-9698-486be85efdf5.json
+2025-08-13 17:02:20,296 - INFO - run_sdc - Successfully saved Session item f7b0666c-be94-4639-9698-486be85efdf5
+2025-08-13 17:02:20,297 - INFO - run_sdc - Generated title for f7b0666c-be94-4639-9698-486be85efdf5
+2025-08-13 17:02:20,297 - INFO - run_sdc - LLM analysis for 'title' finished. Scanned: 23, Analyzed: 23, Errors: 0, Skipped: 0
+2025-08-13 17:02:20,298 - INFO - run_sdc - SDC application finished.
+2025-08-13 17:02:33,673 - INFO - run_sdc - SDC application starting.
+2025-08-13 17:02:33,687 - INFO - run_sdc - Executing command: process with arguments: {'command': 'process', 'step': 'llm_summary'}
+2025-08-13 17:02:33,687 - INFO - run_sdc - Running processing step: llm_summary...
+2025-08-13 17:02:33,688 - INFO - run_sdc - Starting V2 Session LLM analysis process for type: 'summary'.
+2025-08-13 17:02:33,689 - INFO - run_sdc - Analyzing session bde2ff1d-7e38-4646-aa64-056bc89f6160 for summary...
+2025-08-13 17:02:33,690 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'general', Provider: 'google_gemini', Model: 'gemini-2.5-flash'
+2025-08-13 17:02:35,547 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2024-04-15_notes_json_bde2ff1d-7e38-4646-aa64-056bc89f6160.json
+2025-08-13 17:02:35,550 - INFO - run_sdc - Successfully saved Session item bde2ff1d-7e38-4646-aa64-056bc89f6160
+2025-08-13 17:02:35,550 - INFO - run_sdc - Generated summary for bde2ff1d-7e38-4646-aa64-056bc89f6160
+2025-08-13 17:02:35,551 - INFO - run_sdc - Analyzing session c07f9f5e-29f7-4943-a19c-b30d7a8cb8b9 for summary...
+2025-08-13 17:02:35,552 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'general', Provider: 'google_gemini', Model: 'gemini-2.5-flash'
+2025-08-13 17:02:38,767 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2024-09-15_notes_json_c07f9f5e-29f7-4943-a19c-b30d7a8cb8b9.json
+2025-08-13 17:02:38,771 - INFO - run_sdc - Successfully saved Session item c07f9f5e-29f7-4943-a19c-b30d7a8cb8b9
+2025-08-13 17:02:38,771 - INFO - run_sdc - Generated summary for c07f9f5e-29f7-4943-a19c-b30d7a8cb8b9
+2025-08-13 17:02:38,772 - INFO - run_sdc - Analyzing session f88d24db-2f98-44e4-9019-879a59cbdd6f for summary...
+2025-08-13 17:02:38,773 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'general', Provider: 'google_gemini', Model: 'gemini-2.5-flash'
+2025-08-13 17:02:43,545 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2024-10-01_notes_json_f88d24db-2f98-44e4-9019-879a59cbdd6f.json
+2025-08-13 17:02:43,548 - INFO - run_sdc - Successfully saved Session item f88d24db-2f98-44e4-9019-879a59cbdd6f
+2025-08-13 17:02:43,549 - INFO - run_sdc - Generated summary for f88d24db-2f98-44e4-9019-879a59cbdd6f
+2025-08-13 17:02:43,550 - INFO - run_sdc - Analyzing session 52c22b15-675c-448e-9e39-7e41d9d6f752 for summary...
+2025-08-13 17:02:43,551 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'general', Provider: 'google_gemini', Model: 'gemini-2.5-flash'
+2025-08-13 17:02:45,898 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2024-12-10_notes_json_52c22b15-675c-448e-9e39-7e41d9d6f752.json
+2025-08-13 17:02:45,902 - INFO - run_sdc - Successfully saved Session item 52c22b15-675c-448e-9e39-7e41d9d6f752
+2025-08-13 17:02:45,902 - INFO - run_sdc - Generated summary for 52c22b15-675c-448e-9e39-7e41d9d6f752
+2025-08-13 17:02:45,904 - INFO - run_sdc - Analyzing session 68449ea3-13de-4344-84cf-a4791bd79964 for summary...
+2025-08-13 17:02:45,904 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'general', Provider: 'google_gemini', Model: 'gemini-2.5-flash'
+2025-08-13 17:02:47,484 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2024-12-19_SyncroRMM_68449ea3-13de-4344-84cf-a4791bd79964.json
+2025-08-13 17:02:47,488 - INFO - run_sdc - Successfully saved Session item 68449ea3-13de-4344-84cf-a4791bd79964
+2025-08-13 17:02:47,488 - INFO - run_sdc - Generated summary for 68449ea3-13de-4344-84cf-a4791bd79964
+2025-08-13 17:02:47,489 - INFO - run_sdc - Analyzing session a519cec8-8973-46a8-abe0-38f2135fc851 for summary...
+2025-08-13 17:02:47,489 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'general', Provider: 'google_gemini', Model: 'gemini-2.5-flash'
+2025-08-13 17:02:51,554 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-03_ScreenConnect_a519cec8-8973-46a8-abe0-38f2135fc851.json
+2025-08-13 17:02:51,559 - INFO - run_sdc - Successfully saved Session item a519cec8-8973-46a8-abe0-38f2135fc851
+2025-08-13 17:02:51,559 - INFO - run_sdc - Generated summary for a519cec8-8973-46a8-abe0-38f2135fc851
+2025-08-13 17:02:51,561 - INFO - run_sdc - Analyzing session aa29c7a3-99b4-4d08-bf66-2b8e1ba9f1f6 for summary...
+2025-08-13 17:02:51,561 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'general', Provider: 'google_gemini', Model: 'gemini-2.5-flash'
+2025-08-13 17:02:54,634 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-03_ScreenConnect_aa29c7a3-99b4-4d08-bf66-2b8e1ba9f1f6.json
+2025-08-13 17:02:54,637 - INFO - run_sdc - Successfully saved Session item aa29c7a3-99b4-4d08-bf66-2b8e1ba9f1f6
+2025-08-13 17:02:54,637 - INFO - run_sdc - Generated summary for aa29c7a3-99b4-4d08-bf66-2b8e1ba9f1f6
+2025-08-13 17:02:54,639 - INFO - run_sdc - Analyzing session ad78d05e-e32f-407f-855e-e058f314a177 for summary...
+2025-08-13 17:02:54,640 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'general', Provider: 'google_gemini', Model: 'gemini-2.5-flash'
+2025-08-13 17:02:59,336 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-03_ScreenConnect_ad78d05e-e32f-407f-855e-e058f314a177.json
+2025-08-13 17:02:59,341 - INFO - run_sdc - Successfully saved Session item ad78d05e-e32f-407f-855e-e058f314a177
+2025-08-13 17:02:59,341 - INFO - run_sdc - Generated summary for ad78d05e-e32f-407f-855e-e058f314a177
+2025-08-13 17:02:59,342 - INFO - run_sdc - Analyzing session 5c303ad2-964b-45ac-a694-0d21ecc71c31 for summary...
+2025-08-13 17:02:59,343 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'general', Provider: 'google_gemini', Model: 'gemini-2.5-flash'
+2025-08-13 17:03:03,148 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-04_ScreenConnect_5c303ad2-964b-45ac-a694-0d21ecc71c31.json
+2025-08-13 17:03:03,151 - INFO - run_sdc - Successfully saved Session item 5c303ad2-964b-45ac-a694-0d21ecc71c31
+2025-08-13 17:03:03,152 - INFO - run_sdc - Generated summary for 5c303ad2-964b-45ac-a694-0d21ecc71c31
+2025-08-13 17:03:03,152 - INFO - run_sdc - Analyzing session c3ec8154-d6b9-40e2-be57-e49684a1ba46 for summary...
+2025-08-13 17:03:03,153 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'general', Provider: 'google_gemini', Model: 'gemini-2.5-flash'
+2025-08-13 17:03:10,603 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-08_ScreenConnect_c3ec8154-d6b9-40e2-be57-e49684a1ba46.json
+2025-08-13 17:03:10,606 - INFO - run_sdc - Successfully saved Session item c3ec8154-d6b9-40e2-be57-e49684a1ba46
+2025-08-13 17:03:10,606 - INFO - run_sdc - Generated summary for c3ec8154-d6b9-40e2-be57-e49684a1ba46
+2025-08-13 17:03:10,607 - INFO - run_sdc - Analyzing session d42e0380-431a-4acf-bf95-c697ece345a5 for summary...
+2025-08-13 17:03:10,607 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'general', Provider: 'google_gemini', Model: 'gemini-2.5-flash'
+2025-08-13 17:03:14,047 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-08_ScreenConnect_d42e0380-431a-4acf-bf95-c697ece345a5.json
+2025-08-13 17:03:14,051 - INFO - run_sdc - Successfully saved Session item d42e0380-431a-4acf-bf95-c697ece345a5
+2025-08-13 17:03:14,052 - INFO - run_sdc - Generated summary for d42e0380-431a-4acf-bf95-c697ece345a5
+2025-08-13 17:03:14,052 - INFO - run_sdc - Analyzing session 2c4a8c5f-1860-4e84-8707-b228a70c7e4f for summary...
+2025-08-13 17:03:14,053 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'general', Provider: 'google_gemini', Model: 'gemini-2.5-flash'
+2025-08-13 17:03:17,355 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-09_ScreenConnect_2c4a8c5f-1860-4e84-8707-b228a70c7e4f.json
+2025-08-13 17:03:17,358 - INFO - run_sdc - Successfully saved Session item 2c4a8c5f-1860-4e84-8707-b228a70c7e4f
+2025-08-13 17:03:17,359 - INFO - run_sdc - Generated summary for 2c4a8c5f-1860-4e84-8707-b228a70c7e4f
+2025-08-13 17:03:17,360 - INFO - run_sdc - Analyzing session adc38da5-d86d-4648-ba35-baeae10c5215 for summary...
+2025-08-13 17:03:17,360 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'general', Provider: 'google_gemini', Model: 'gemini-2.5-flash'
+2025-08-13 17:03:21,136 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-09_ScreenConnect_adc38da5-d86d-4648-ba35-baeae10c5215.json
+2025-08-13 17:03:21,140 - INFO - run_sdc - Successfully saved Session item adc38da5-d86d-4648-ba35-baeae10c5215
+2025-08-13 17:03:21,141 - INFO - run_sdc - Generated summary for adc38da5-d86d-4648-ba35-baeae10c5215
+2025-08-13 17:03:21,141 - INFO - run_sdc - Analyzing session 24fa7c24-e97a-422c-80da-f45beb56f98b for summary...
+2025-08-13 17:03:21,142 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'general', Provider: 'google_gemini', Model: 'gemini-2.5-flash'
+2025-08-13 17:03:24,599 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-10_ScreenConnect_24fa7c24-e97a-422c-80da-f45beb56f98b.json
+2025-08-13 17:03:24,602 - INFO - run_sdc - Successfully saved Session item 24fa7c24-e97a-422c-80da-f45beb56f98b
+2025-08-13 17:03:24,603 - INFO - run_sdc - Generated summary for 24fa7c24-e97a-422c-80da-f45beb56f98b
+2025-08-13 17:03:24,604 - INFO - run_sdc - Analyzing session a0d54a54-582c-41df-ad19-78cfd873746e for summary...
+2025-08-13 17:03:24,604 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'general', Provider: 'google_gemini', Model: 'gemini-2.5-flash'
+2025-08-13 17:03:29,144 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-10_ScreenConnect_a0d54a54-582c-41df-ad19-78cfd873746e.json
+2025-08-13 17:03:29,147 - INFO - run_sdc - Successfully saved Session item a0d54a54-582c-41df-ad19-78cfd873746e
+2025-08-13 17:03:29,147 - INFO - run_sdc - Generated summary for a0d54a54-582c-41df-ad19-78cfd873746e
+2025-08-13 17:03:29,148 - INFO - run_sdc - Analyzing session 46998f5b-1502-4e13-8b6e-5fae45e61d78 for summary...
+2025-08-13 17:03:29,148 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'general', Provider: 'google_gemini', Model: 'gemini-2.5-flash'
+2025-08-13 17:03:33,537 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-11_ScreenConnect_46998f5b-1502-4e13-8b6e-5fae45e61d78.json
+2025-08-13 17:03:33,539 - INFO - run_sdc - Successfully saved Session item 46998f5b-1502-4e13-8b6e-5fae45e61d78
+2025-08-13 17:03:33,540 - INFO - run_sdc - Generated summary for 46998f5b-1502-4e13-8b6e-5fae45e61d78
+2025-08-13 17:03:33,541 - INFO - run_sdc - Analyzing session 639715c3-abd7-432b-bd02-403e230f6d44 for summary...
+2025-08-13 17:03:33,541 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'general', Provider: 'google_gemini', Model: 'gemini-2.5-flash'
+2025-08-13 17:03:36,499 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-11_ScreenConnect_639715c3-abd7-432b-bd02-403e230f6d44.json
+2025-08-13 17:03:36,503 - INFO - run_sdc - Successfully saved Session item 639715c3-abd7-432b-bd02-403e230f6d44
+2025-08-13 17:03:36,503 - INFO - run_sdc - Generated summary for 639715c3-abd7-432b-bd02-403e230f6d44
+2025-08-13 17:03:36,504 - INFO - run_sdc - Analyzing session c24123d8-533b-4e00-8dbe-317e2306ebe2 for summary...
+2025-08-13 17:03:36,504 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'general', Provider: 'google_gemini', Model: 'gemini-2.5-flash'
+2025-08-13 17:03:42,578 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-13_ScreenConnect_c24123d8-533b-4e00-8dbe-317e2306ebe2.json
+2025-08-13 17:03:42,581 - INFO - run_sdc - Successfully saved Session item c24123d8-533b-4e00-8dbe-317e2306ebe2
+2025-08-13 17:03:42,581 - INFO - run_sdc - Generated summary for c24123d8-533b-4e00-8dbe-317e2306ebe2
+2025-08-13 17:03:42,582 - INFO - run_sdc - Analyzing session d2b0b48f-50f3-4992-84bc-1f8971675337 for summary...
+2025-08-13 17:03:42,583 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'general', Provider: 'google_gemini', Model: 'gemini-2.5-flash'
+2025-08-13 17:03:45,534 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-01-29_SyncroRMM_d2b0b48f-50f3-4992-84bc-1f8971675337.json
+2025-08-13 17:03:45,537 - INFO - run_sdc - Successfully saved Session item d2b0b48f-50f3-4992-84bc-1f8971675337
+2025-08-13 17:03:45,538 - INFO - run_sdc - Generated summary for d2b0b48f-50f3-4992-84bc-1f8971675337
+2025-08-13 17:03:45,538 - INFO - run_sdc - Analyzing session 654879bb-60f1-4492-8961-dc5c593458ef for summary...
+2025-08-13 17:03:45,539 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'general', Provider: 'google_gemini', Model: 'gemini-2.5-flash'
+2025-08-13 17:03:47,004 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-08-06_SillyTavern_654879bb-60f1-4492-8961-dc5c593458ef.json
+2025-08-13 17:03:47,007 - INFO - run_sdc - Successfully saved Session item 654879bb-60f1-4492-8961-dc5c593458ef
+2025-08-13 17:03:47,007 - INFO - run_sdc - Generated summary for 654879bb-60f1-4492-8961-dc5c593458ef
+2025-08-13 17:03:47,007 - INFO - run_sdc - Analyzing session d5d5fc55-e721-422b-a2bd-fd5bba5ae8b7 for summary...
+2025-08-13 17:03:47,008 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'general', Provider: 'google_gemini', Model: 'gemini-2.5-flash'
+2025-08-13 17:03:48,542 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-08-06_SillyTavern_d5d5fc55-e721-422b-a2bd-fd5bba5ae8b7.json
+2025-08-13 17:03:48,545 - INFO - run_sdc - Successfully saved Session item d5d5fc55-e721-422b-a2bd-fd5bba5ae8b7
+2025-08-13 17:03:48,545 - INFO - run_sdc - Generated summary for d5d5fc55-e721-422b-a2bd-fd5bba5ae8b7
+2025-08-13 17:03:48,546 - INFO - run_sdc - Analyzing session ec2c0659-d4f1-4954-b2fe-60c56eb4121f for summary...
+2025-08-13 17:03:48,546 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'general', Provider: 'google_gemini', Model: 'gemini-2.5-flash'
+2025-08-13 17:03:51,484 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-08-06_SillyTavern_ec2c0659-d4f1-4954-b2fe-60c56eb4121f.json
+2025-08-13 17:03:51,488 - INFO - run_sdc - Successfully saved Session item ec2c0659-d4f1-4954-b2fe-60c56eb4121f
+2025-08-13 17:03:51,488 - INFO - run_sdc - Generated summary for ec2c0659-d4f1-4954-b2fe-60c56eb4121f
+2025-08-13 17:03:51,489 - INFO - run_sdc - Analyzing session f7b0666c-be94-4639-9698-486be85efdf5 for summary...
+2025-08-13 17:03:51,489 - INFO - run_sdc - [AUDIT] LLM client instantiated successfully. Capability: 'general', Provider: 'google_gemini', Model: 'gemini-2.5-flash'
+2025-08-13 17:03:54,332 - INFO - run_sdc - Saving Session item to: ..\syncro_data_consolidator\data\output\sessions\2025-08-06_SillyTavern_f7b0666c-be94-4639-9698-486be85efdf5.json
+2025-08-13 17:03:54,337 - INFO - run_sdc - Successfully saved Session item f7b0666c-be94-4639-9698-486be85efdf5
+2025-08-13 17:03:54,337 - INFO - run_sdc - Generated summary for f7b0666c-be94-4639-9698-486be85efdf5
+2025-08-13 17:03:54,338 - INFO - run_sdc - LLM analysis for 'summary' finished. Scanned: 23, Analyzed: 23, Errors: 0, Skipped: 0
+2025-08-13 17:03:54,338 - INFO - run_sdc - SDC application finished.

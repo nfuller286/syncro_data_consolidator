@@ -1,0 +1,68 @@
+{
+    "meta": {
+        "session_id": "a519cec8-8973-46a8-abe0-38f2135fc851",
+        "schema_version": "2.0",
+        "source_system": "ScreenConnect",
+        "source_identifiers": [
+            "\\syncro_data_consolidator\\data\\input/screenconnect_logs\\SampleRemoteAccessLogs.csv",
+            "rows/0,1"
+        ],
+        "processing_status": "Linked",
+        "processing_log": [
+            "session_llm_analyzer_title_v1.1",
+            "session_llm_analyzer_summary_v1.1"
+        ],
+        "ingestion_timestamp_utc": "2025-08-13T21:01:01.357333Z",
+        "last_updated_timestamp_utc": "2025-08-13T21:02:51.554398Z"
+    },
+    "context": {
+        "customer_id": 48222713,
+        "customer_name": "HealthGroup Alpha",
+        "contact_id": null,
+        "contact_name": null,
+        "links": []
+    },
+    "insights": {
+        "session_start_time_utc": "2025-01-03T17:43:00Z",
+        "session_end_time_utc": "2025-01-03T18:37:00Z",
+        "session_duration_minutes": 54,
+        "source_title": "ScreenConnect Session for AdminUser",
+        "llm_generated_title": "Machine Connections",
+        "llm_generated_category": null,
+        "generated_summaries": {
+            "default": "During a 54-minute ScreenConnect session for HealthGroup Alpha, AdminUser connected to WKSTN-02 and SRV-MAIN. The provided conversation log is limited to connection events and does not specify the problem addressed or the resolution achieved."
+        },
+        "structured_llm_results": {},
+        "user_notes": ""
+    },
+    "segments": [
+        {
+            "segment_id": "0530f1b3-4457-4e94-93ab-02acc6218673",
+            "start_time_utc": "2025-01-03T17:43:00Z",
+            "end_time_utc": "2025-01-03T17:45:00Z",
+            "type": "RemoteConnection",
+            "author": "AdminUser",
+            "content": "Connected to machine: WKSTN-02",
+            "metadata": {
+                "connection_id": "f5b82a1a-c87d-4e9f-8d2a-9e6b3c1f0a9b",
+                "process_type": "Host",
+                "session_type": "Access",
+                "duration_seconds": 132
+            }
+        },
+        {
+            "segment_id": "e6bdc4a9-c00a-42e4-a7d0-395f737b7ebf",
+            "start_time_utc": "2025-01-03T17:44:00Z",
+            "end_time_utc": "2025-01-03T18:37:00Z",
+            "type": "RemoteConnection",
+            "author": "AdminUser",
+            "content": "Connected to machine: SRV-MAIN",
+            "metadata": {
+                "connection_id": "a3d9e8c7-b2a1-4f0e-9c8d-7b2a9e3d1c8e",
+                "process_type": "Host",
+                "session_type": "Access",
+                "duration_seconds": 3184
+            }
+        }
+    ]
+}

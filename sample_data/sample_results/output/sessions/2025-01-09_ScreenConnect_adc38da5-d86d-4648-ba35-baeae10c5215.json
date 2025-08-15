@@ -1,0 +1,82 @@
+{
+    "meta": {
+        "session_id": "adc38da5-d86d-4648-ba35-baeae10c5215",
+        "schema_version": "2.0",
+        "source_system": "ScreenConnect",
+        "source_identifiers": [
+            "\\syncro_data_consolidator\\data\\input/screenconnect_logs\\SampleRemoteAccessLogs.csv",
+            "rows/12,13,14"
+        ],
+        "processing_status": "Linked",
+        "processing_log": [
+            "session_llm_analyzer_title_v1.1",
+            "session_llm_analyzer_summary_v1.1"
+        ],
+        "ingestion_timestamp_utc": "2025-08-13T21:01:01.381145Z",
+        "last_updated_timestamp_utc": "2025-08-13T21:03:21.135995Z"
+    },
+    "context": {
+        "customer_id": 47914465,
+        "customer_name": "Wellness Partners East",
+        "contact_id": null,
+        "contact_name": null,
+        "links": []
+    },
+    "insights": {
+        "session_start_time_utc": "2025-01-09T03:50:00Z",
+        "session_end_time_utc": "2025-01-09T04:59:00Z",
+        "session_duration_minutes": 69,
+        "source_title": "ScreenConnect Session for AdminUser",
+        "llm_generated_title": "Machine Connections Report",
+        "llm_generated_category": null,
+        "generated_summaries": {
+            "default": "A 69-minute ScreenConnect session for Wellness Partners East involved an AdminUser connecting to FIN-TERM-01, DEPT-PC-05, and DEPT-PC-04. The provided log does not detail the specific issue being addressed or its resolution, only the successful connections made to these machines."
+        },
+        "structured_llm_results": {},
+        "user_notes": ""
+    },
+    "segments": [
+        {
+            "segment_id": "8106b2f3-399e-4c12-a334-5f2e3f6bea3b",
+            "start_time_utc": "2025-01-09T03:50:00Z",
+            "end_time_utc": "2025-01-09T04:55:00Z",
+            "type": "RemoteConnection",
+            "author": "AdminUser",
+            "content": "Connected to machine: FIN-TERM-01",
+            "metadata": {
+                "connection_id": "e16e7da6-708f-4c78-5473-6c848291a0b3",
+                "process_type": "Host",
+                "session_type": "Access",
+                "duration_seconds": 3919
+            }
+        },
+        {
+            "segment_id": "bdb2f9c7-5bd3-4511-bc30-dd9d54a3e666",
+            "start_time_utc": "2025-01-09T03:58:00Z",
+            "end_time_utc": "2025-01-09T04:59:00Z",
+            "type": "RemoteConnection",
+            "author": "AdminUser",
+            "content": "Connected to machine: DEPT-PC-05",
+            "metadata": {
+                "connection_id": "d05d6c95-6f7e-4b67-4362-5b7371809fa2",
+                "process_type": "Host",
+                "session_type": "Access",
+                "duration_seconds": 3705
+            }
+        },
+        {
+            "segment_id": "cc881db4-c165-452a-80c1-3caf626e53de",
+            "start_time_utc": "2025-01-09T04:18:00Z",
+            "end_time_utc": "2025-01-09T04:19:00Z",
+            "type": "RemoteConnection",
+            "author": "AdminUser",
+            "content": "Connected to machine: DEPT-PC-04",
+            "metadata": {
+                "connection_id": "c94c5b84-5e6d-4a56-3251-4a62607f8e91",
+                "process_type": "Host",
+                "session_type": "Access",
+                "duration_seconds": 14
+            }
+        }
+    ]
+}

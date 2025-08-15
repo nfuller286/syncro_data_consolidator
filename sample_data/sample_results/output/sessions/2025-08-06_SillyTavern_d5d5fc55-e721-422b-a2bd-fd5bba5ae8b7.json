@@ -1,0 +1,107 @@
+{
+    "meta": {
+        "session_id": "d5d5fc55-e721-422b-a2bd-fd5bba5ae8b7",
+        "schema_version": "2.0",
+        "source_system": "SillyTavern",
+        "source_identifiers": [
+            "\\syncro_data_consolidator\\data\\input\\sillytavern_chat\\Test Chat - Reasoning 2025-8-6 @18h 39m 35s 775ms.jsonl"
+        ],
+        "processing_status": "Complete",
+        "processing_log": [
+            "session_llm_analyzer_title_v1.1",
+            "session_llm_analyzer_summary_v1.1"
+        ],
+        "ingestion_timestamp_utc": "2025-08-13T21:01:01.268734Z",
+        "last_updated_timestamp_utc": "2025-08-13T21:03:48.541988Z"
+    },
+    "context": {
+        "customer_id": null,
+        "customer_name": null,
+        "contact_id": null,
+        "contact_name": null,
+        "links": [
+            "st_chat_id:1458651980830152"
+        ]
+    },
+    "insights": {
+        "session_start_time_utc": "2025-08-06T18:40:00Z",
+        "session_end_time_utc": "2025-08-06T18:46:00Z",
+        "session_duration_minutes": 6,
+        "source_title": "SillyTavern Chat with Test Chat",
+        "llm_generated_title": "Laptop Repair and Invoicing",
+        "llm_generated_category": null,
+        "generated_summaries": {
+            "default": "Nick Info required assistance creating an invoice for Bob, specifically needing to calculate the cost for 20 minutes of laptop servicing (password reset and coffee vent cleaning) at his $2/hour rate. Test Chat calculated the total labor cost as $0.67 and provided a complete, structured invoice template for Nick to use."
+        },
+        "structured_llm_results": {},
+        "user_notes": ""
+    },
+    "segments": [
+        {
+            "segment_id": "4e6a5eb6-723d-4174-8740-1d91946b1e88",
+            "start_time_utc": "2025-08-06T18:40:00Z",
+            "end_time_utc": "2025-08-06T18:40:00Z",
+            "type": "ChatMessage",
+            "author": "Nick Info",
+            "content": "So I just did some work on Bob's laptop",
+            "metadata": {
+                "is_user": true
+            }
+        },
+        {
+            "segment_id": "fa88a676-d7e6-4811-878a-5de9344b2e5b",
+            "start_time_utc": "2025-08-06T18:40:00Z",
+            "end_time_utc": "2025-08-06T18:40:00Z",
+            "type": "ChatMessage",
+            "author": "Test Chat",
+            "content": "Alright. Hopefully, it was a simple fix. What was going on with it?",
+            "metadata": {
+                "is_user": false
+            }
+        },
+        {
+            "segment_id": "3f68cd28-0881-45c2-9bab-b672c4995fed",
+            "start_time_utc": "2025-08-06T18:41:00Z",
+            "end_time_utc": "2025-08-06T18:41:00Z",
+            "type": "ChatMessage",
+            "author": "Nick Info",
+            "content": "I needed to reset Crimson Creek's password and get the coffee out of the vent. I started 20 minutes ago and just finished. I need to invoice for the work.",
+            "metadata": {
+                "is_user": true
+            }
+        },
+        {
+            "segment_id": "2412e8a8-171b-4903-ac81-d9e05692091c",
+            "start_time_utc": "2025-08-06T18:44:00Z",
+            "end_time_utc": "2025-08-06T18:44:00Z",
+            "type": "ChatMessage",
+            "author": "Test Chat",
+            "content": "Got it. 20 minutes of work for a password reset and cleaning out the vents. To put together an invoice, I'll need a little more information. What's your hourly rate for this kind of work?",
+            "metadata": {
+                "is_user": false
+            }
+        },
+        {
+            "segment_id": "7b1e6fa4-d26b-4680-b6af-9107a70834fa",
+            "start_time_utc": "2025-08-06T18:46:00Z",
+            "end_time_utc": "2025-08-06T18:46:00Z",
+            "type": "ChatMessage",
+            "author": "Nick Info",
+            "content": "It's $2 an hour",
+            "metadata": {
+                "is_user": true
+            }
+        },
+        {
+            "segment_id": "df169f8b-7087-481a-981a-e1ca0685916e",
+            "start_time_utc": "2025-08-06T18:46:00Z",
+            "end_time_utc": "2025-08-06T18:46:00Z",
+            "type": "ChatMessage",
+            "author": "Test Chat",
+            "content": "Alright, at $2 an hour, the math is pretty straightforward.\n\n20 minutes is 1/3 of an hour, so the total for your labor comes out to about $0.67.\n\nHere’s a basic invoice structure you can use:\n\n***\n\n**Invoice**\n\n**To:** Bob\n**From:** Nick Info\n**Date:** August 6, 2025\n\n---\n\n**Services Rendered:**\n\n*   **Description:** Laptop servicing: Password reset and coffee spill cleaning from vent.\n*   **Date of Service:** August 6, 2025\n\n---\n\n**Charges:**\n\n*   **Labor:** 20 minutes at $2.00/hour\n*   **Total:** $0.67\n\n---\n\n**Amount Due:** $0.67\n\n***\n\nYou can just copy and paste that into an email or a document for him.",
+            "metadata": {
+                "is_user": false
+            }
+        }
+    ]
+}

@@ -1,0 +1,54 @@
+{
+    "meta": {
+        "session_id": "639715c3-abd7-432b-bd02-403e230f6d44",
+        "schema_version": "2.0",
+        "source_system": "ScreenConnect",
+        "source_identifiers": [
+            "\\syncro_data_consolidator\\data\\input/screenconnect_logs\\SampleRemoteAccessLogs.csv",
+            "rows/23"
+        ],
+        "processing_status": "Linked",
+        "processing_log": [
+            "session_llm_analyzer_title_v1.1",
+            "session_llm_analyzer_summary_v1.1"
+        ],
+        "ingestion_timestamp_utc": "2025-08-13T21:01:01.400666Z",
+        "last_updated_timestamp_utc": "2025-08-13T21:03:36.499867Z"
+    },
+    "context": {
+        "customer_id": 48222716,
+        "customer_name": "Wellness Partners West",
+        "contact_id": null,
+        "contact_name": null,
+        "links": []
+    },
+    "insights": {
+        "session_start_time_utc": "2025-01-11T22:01:00Z",
+        "session_end_time_utc": "2025-01-11T22:26:00Z",
+        "session_duration_minutes": 25,
+        "source_title": "ScreenConnect Session for AdminUser",
+        "llm_generated_title": "Office PC Connection",
+        "llm_generated_category": null,
+        "generated_summaries": {
+            "default": "A 25-minute ScreenConnect session was initiated for Wellness Partners West, connecting to 'OFFICE-PC'. The provided log does not detail the specific problem addressed or the resolution achieved during this session."
+        },
+        "structured_llm_results": {},
+        "user_notes": ""
+    },
+    "segments": [
+        {
+            "segment_id": "51db6ad6-8789-4ec4-b9f0-1128596501b6",
+            "start_time_utc": "2025-01-11T22:01:00Z",
+            "end_time_utc": "2025-01-11T22:26:00Z",
+            "type": "RemoteConnection",
+            "author": "AdminUser",
+            "content": "Connected to machine: OFFICE-PC",
+            "metadata": {
+                "connection_id": "f0b3c2f9-c5d4-41c-a9b-b1d9c8e6f508",
+                "process_type": "Host",
+                "session_type": "Access",
+                "duration_seconds": 1504
+            }
+        }
+    ]
+}

@@ -1,0 +1,102 @@
+{
+    "meta": {
+        "session_id": "a753a130-4bd1-4f6b-98d8-4b2d1e67fa2b",
+        "schema_version": "2.0",
+        "source_system": "SyncroRMM",
+        "source_identifiers": [
+            "/tickets/78677614"
+        ],
+        "processing_status": "Linked",
+        "processing_log": [
+            "session_llm_analyzer_title_v1.1",
+            "session_llm_analyzer_summary_v1.1"
+        ],
+        "ingestion_timestamp_utc": "2025-08-13T21:37:51.086552Z",
+        "last_updated_timestamp_utc": "2025-08-13T21:39:24.723843Z"
+    },
+    "context": {
+        "customer_id": 18005432,
+        "customer_name": "Keystone Financial",
+        "contact_id": 1558811,
+        "contact_name": "Jane Doe",
+        "links": []
+    },
+    "insights": {
+        "session_start_time_utc": "2024-12-19T16:23:55.715000Z",
+        "session_end_time_utc": "2024-12-19T16:27:24.884000Z",
+        "session_duration_minutes": 3,
+        "source_title": "Need to get into accounting software for new user",
+        "llm_generated_title": "New User Accounting Software Access",
+        "llm_generated_category": null,
+        "generated_summaries": {
+            "default": "Keystone Financial needed to provide a new employee access to their accounting software, specifically to an existing user's profile. The issue was resolved by resetting the password for the previous user's profile and restoring the application shortcut, successfully granting the new employee access."
+        },
+        "structured_llm_results": {},
+        "user_notes": ""
+    },
+    "segments": [
+        {
+            "segment_id": "1ab57e20-4ddc-4a0c-bcab-f19a11cff3a4",
+            "start_time_utc": "2024-12-19T16:23:55.715000Z",
+            "end_time_utc": "2024-12-19T16:23:55.715000Z",
+            "type": "TicketCreation",
+            "author": "Admin User",
+            "content": "Need to get into accounting software for new user",
+            "metadata": {
+                "syncro_ticket_number": 1002,
+                "syncro_problem_type": "Remote Support",
+                "syncro_status": "Resolved",
+                "syncro_priority": null,
+                "syncro_tag_list": []
+            }
+        },
+        {
+            "segment_id": "20022d90-f1d5-42f8-80b2-5813689c61de",
+            "start_time_utc": "2024-12-19T16:33:44.547000Z",
+            "end_time_utc": "2024-12-19T16:33:44.547000Z",
+            "type": "Email",
+            "author": null,
+            "content": "Invoice emailed to accounting@keystonefinancial.com by user:",
+            "metadata": {
+                "syncro_comment_id": 221235833,
+                "syncro_user_id": null
+            }
+        },
+        {
+            "segment_id": "c90f1378-03da-48cc-aff4-b0f4615e9a2d",
+            "start_time_utc": "2024-12-19T16:27:46.444000Z",
+            "end_time_utc": "2024-12-19T16:27:46.444000Z",
+            "type": "Email",
+            "author": null,
+            "content": "Invoice emailed to accounting@keystonefinancial.com by user: Admin User",
+            "metadata": {
+                "syncro_comment_id": 221234479,
+                "syncro_user_id": null
+            }
+        },
+        {
+            "segment_id": "251207ec-68ad-4751-b110-e647ab371451",
+            "start_time_utc": "2024-12-19T16:26:40.633000Z",
+            "end_time_utc": "2024-12-19T16:26:40.633000Z",
+            "type": "Email",
+            "author": null,
+            "content": "Reset password and restored application shortcut",
+            "metadata": {
+                "syncro_comment_id": 221234290,
+                "syncro_user_id": 101202
+            }
+        },
+        {
+            "segment_id": "fe915d8f-e086-461a-b7f9-12bf6248e92b",
+            "start_time_utc": "2024-12-19T16:23:55.675000Z",
+            "end_time_utc": "2024-12-19T16:23:55.675000Z",
+            "type": "Email",
+            "author": null,
+            "content": "They have a new employee that will be taking over an existing role. Needed to provide access to the previous user's profile.",
+            "metadata": {
+                "syncro_comment_id": 221233801,
+                "syncro_user_id": 101202
+            }
+        }
+    ]
+}

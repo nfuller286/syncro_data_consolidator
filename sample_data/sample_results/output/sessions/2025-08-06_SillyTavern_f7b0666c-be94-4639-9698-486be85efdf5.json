@@ -1,0 +1,107 @@
+{
+    "meta": {
+        "session_id": "f7b0666c-be94-4639-9698-486be85efdf5",
+        "schema_version": "2.0",
+        "source_system": "SillyTavern",
+        "source_identifiers": [
+            "\\syncro_data_consolidator\\data\\input\\sillytavern_chat\\Test Chat - Reasoning 2025-8-6 @18h 39m 35s 775ms.jsonl"
+        ],
+        "processing_status": "Complete",
+        "processing_log": [
+            "session_llm_analyzer_title_v1.1",
+            "session_llm_analyzer_summary_v1.1"
+        ],
+        "ingestion_timestamp_utc": "2025-08-13T21:01:01.278247Z",
+        "last_updated_timestamp_utc": "2025-08-13T21:03:54.332350Z"
+    },
+    "context": {
+        "customer_id": null,
+        "customer_name": null,
+        "contact_id": null,
+        "contact_name": null,
+        "links": [
+            "st_chat_id:1458651980830152"
+        ]
+    },
+    "insights": {
+        "session_start_time_utc": "2025-08-06T19:04:00Z",
+        "session_end_time_utc": "2025-08-06T19:05:00Z",
+        "session_duration_minutes": 1,
+        "source_title": "SillyTavern Chat with Test Chat",
+        "llm_generated_title": "Remote Potato Inspection Fails",
+        "llm_generated_category": null,
+        "generated_summaries": {
+            "default": "The user initiated a test chat by pretending to remotely inspect a fictional \"flux capacitor,\" which predictably failed. When prompted to invent a silly reason for the failure, the AI humorously diagnosed the computer as a \"highly advanced potato running on Spud OS\" with an aluminum foil network card, successfully completing the test scenario."
+        },
+        "structured_llm_results": {},
+        "user_notes": ""
+    },
+    "segments": [
+        {
+            "segment_id": "936ee07e-645a-4016-8587-fb6b66e30a6c",
+            "start_time_utc": "2025-08-06T19:04:00Z",
+            "end_time_utc": "2025-08-06T19:04:00Z",
+            "type": "ChatMessage",
+            "author": "User Character",
+            "content": "Ok, it's a while later and I just remoted into a computer to try to inspect the flux capacitor",
+            "metadata": {
+                "is_user": true
+            }
+        },
+        {
+            "segment_id": "8b040686-10e7-4281-9b84-929e42a00731",
+            "start_time_utc": "2025-08-06T19:04:00Z",
+            "end_time_utc": "2025-08-06T19:04:00Z",
+            "type": "ChatMessage",
+            "author": "Test Chat",
+            "content": "A flux capacitor, you say? That's a new one for me. How did that go?",
+            "metadata": {
+                "is_user": false
+            }
+        },
+        {
+            "segment_id": "44c71ed3-7e21-4cbb-a801-0ac3824c12d1",
+            "start_time_utc": "2025-08-06T19:04:00Z",
+            "end_time_utc": "2025-08-06T19:04:00Z",
+            "type": "ChatMessage",
+            "author": "User Character",
+            "content": "Well, it was difficult. turns out you can't actually inspect one remotely.",
+            "metadata": {
+                "is_user": true
+            }
+        },
+        {
+            "segment_id": "f0d27132-4947-4151-9712-2b5c0f6fc0e5",
+            "start_time_utc": "2025-08-06T19:04:00Z",
+            "end_time_utc": "2025-08-06T19:04:00Z",
+            "type": "ChatMessage",
+            "author": "Test Chat",
+            "content": "That makes sense. Given that the flux capacitor is a fictional piece of technology from the *Back to the Future* movies, I'm not surprised a remote inspection didn't work.\n\nWhat was the actual issue you were trying to diagnose on the computer?",
+            "metadata": {
+                "is_user": false
+            }
+        },
+        {
+            "segment_id": "10216bea-2a63-4d8a-abd3-805dc8befd5f",
+            "start_time_utc": "2025-08-06T19:05:00Z",
+            "end_time_utc": "2025-08-06T19:05:00Z",
+            "type": "ChatMessage",
+            "author": "User Character",
+            "content": "Not sure. Come up with something silly. This is just a test.",
+            "metadata": {
+                "is_user": true
+            }
+        },
+        {
+            "segment_id": "de10fd32-1339-4113-be2b-0546f69c3d88",
+            "start_time_utc": "2025-08-06T19:05:00Z",
+            "end_time_utc": "2025-08-06T19:05:00Z",
+            "type": "ChatMessage",
+            "author": "Test Chat",
+            "content": "Understood. The remote inspection failed because the user's computer was actually a highly advanced potato running on a beta version of \"Spud OS.\" The network interface card was just a piece of aluminum foil, which doesn't support standard remote desktop protocols.",
+            "metadata": {
+                "is_user": false
+            }
+        }
+    ]
+}

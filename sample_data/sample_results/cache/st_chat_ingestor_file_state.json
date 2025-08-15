@@ -1,0 +1,38 @@
+{
+    "processed_files": {
+        "C:\\Users\\nick\\Documents\\VS Code\\SDC Github Sample Data\\syncro_data_consolidator\\data\\input\\sillytavern_chat\\Test Chat - No Reasoning2025-08-06@18h48m10s.jsonl": {
+            "size": 9196,
+            "mtime": 1754589808.0359366
+        },
+        "C:\\Users\\nick\\Documents\\VS Code\\SDC Github Sample Data\\syncro_data_consolidator\\data\\input\\sillytavern_chat\\Test Chat - Reasoning 2025-8-6 @18h 39m 35s 775ms.jsonl": {
+            "size": 19049,
+            "mtime": 1754589318.9556668
+        }
+    },
+    "seen_message_fingerprints": [
+        "0650704768ec30b19976b000adbdedb21cd0ef332a38a0b074930064ac7df1ef",
+        "0c8e6b1efc07f0be5a4d495e48e7c890ddc5688bd5a59754c5bae1f8ab592047",
+        "177f342139a6d99f59c7dc63ae2ee376390b5667f05616b315b0d394250913a2",
+        "19a398aef90f09d0d30c40268224580084997ee5bffebfeb77ec956ccc3cdc45",
+        "1ae2f3bd278bfa658ac7945303117322b90127e717e07a1e136e676797b6a167",
+        "213d3df4ad855cb8966cee88fd5f854c5ef7167bedf8e253a15588c44530cf1f",
+        "2e414b25f6b9f707916510b8146062b05d500df27454e86b3ca9cbd5ca6d5e90",
+        "3fbe907e0372adf7e776fda7c17256c916cf9c7796b74be2b3d113827827f26f",
+        "482698f2f3b7ad3841d225c215418ab7fcb6436f6fbb6388e90118d1efa9ef0b",
+        "522b36ed25e89cea0fd9dece8b2e53a555283a14a9ec3b1c1195020c87a0b7d6",
+        "5646cd7680dec8340f8bad988a5dfb9ed824e6740a4b3996bc59d34dbd39b818",
+        "6004e6bed877b6cdfa8b0f0bf8755d76922f3726e3ab438cba5adc6a7180b397",
+        "7771a6da6c97a542bbc53579989dfaa171b3521430ab35acc8282bb26fcba41e",
+        "8178860769bf7ce321aa789768f75193243ca74ab2261c4c9e426ab4272cb1f2",
+        "8ca33f02c1a36becaa1b0ae5e162c8eafba15a76c231d3a1f3ab088a98313509",
+        "98b865d3cdc0b6322781f226b52a70fcb2e31a3d3f6e5f238f4d87fa16797ec0",
+        "b7db3445477b58cb01e8ebf17db147baeb1290be211cce7ff528aac7c4eef279",
+        "c42859311f882741dc89698b132dc46f42bf366b00dbaae3f60a91e93251274f",
+        "c93a8daa6436047f7ce3ba8a8b69e8f5dd6a1d179a9575587889d698d62b9f76",
+        "cb18882430761698d2c9e00662f1a050cc57111888e0d95941d780717c979c4a",
+        "e0c87827019b7ebdfd18d58c9e3b16896505f9ff6d4e53a43b877de779c12398",
+        "eb740d79fd2018901ea50c02a63e7fbaad87c1b4c16ea053dbec6364be3d7ab8",
+        "f31b3ee1d8411b7b66326b9dc1d5f505f36ccfb1c58b342c88e2e2141645b149",
+        "f4fce518deef828596ba46743b527bb71022ce50a09cea81c58011689422ecc2"
+    ]
+}
