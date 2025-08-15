@@ -20,67 +20,111 @@ A key feature of this project is its integration with Large Language Models (LLM
 The project follows a logical ETL pattern, orchestrated by a main execution script. The flow can be visualized as follows:
 
 ```mermaid
+%%{init: {
+  "theme": "default",
+  "securityLevel": "loose",
+  "flowchart": { "htmlLabels": true }
+}}%%
 graph TD
-    subgraph "A: Data Sources (Inputs)"
-        direction LR
-        S1[Syncro API]
-        S2[ScreenConnect CSVs]
-        S3[SillyTavern JSONL]
-        S4[Legacy Notes JSON]
+
+  %% =======================================================
+  %% Row 1 — Sources, Ingestion, Normalization & Matching
+  %% (kept in a single row using direction LR)
+  %% =======================================================
+  subgraph "Sources & Pipelines"
+    direction LR
+
+    %% 1. Network Source (Far Left)
+    subgraph "Network Source"
+      S1[Syncro API]
     end
 
-    subgraph "B: Ingestion & Standardization Pipeline"
-        direction LR
-        I1(syncro_ticket_ingestor)
-        I2(screenconnect_log_ingestor)
-        I3(st_chat_ingestor)
-        I4(notes_json_ingestor)
+    %% 2. File Sources (Inputs)
+    subgraph "A: File Sources (Inputs)"
+      direction LR
+      S2[ScreenConnect CSVs]
+      S3[SillyTavern JSONL]
+      S4[Legacy Notes JSON]
     end
 
-    subgraph "C: Stored Data Artifacts"
-        F1["fa:fa-folder Raw Session Files<br/>(Status: 'Needs Linking')"]
-        F2["fa:fa-file-alt Customer Cache File"]
+    %% 3. Pipelines (Ordered as requested)
+    subgraph "B: Pipelines"
+      direction LR
+      CC1(Customer Cacher)
+      I1(Ticket Ingestor)
+      I2(ScreenConnect Log Ingestor)
+      I3(ST Chat Ingestor)
+      I4(Notes Json Ingestor)
     end
 
-    subgraph "D: Processing & Enrichment Pipeline"
-        P1(session_customer_linker)
-        P2(session_llm_analyzer)
+    %% 4. Supporting cache file
+    F2["fa:fa-file-alt Customer Cache File"]
+
+    %% 5. Session Normalization & Customer Matching
+    subgraph "C:           Session Normalization"
+      direction LR
+      N1["fa:fa-folder Sessions Raw"]
+      P1(session_customer_linker)
+    end
+  end
+
+  %% =======================================================
+  %% Row 2 — Linked Sessions + LLM Prompting loop (below)
+  %% =======================================================
+  subgraph "Linked Sessions & LLM Prompting"
+    direction LR
+
+    %% Final output & working store (enhanced in place)
+    L0["fa:fa-folder Linked Sessions<br/>(Final Output & Enhanced In-Place)"]
+
+    %% External LLM sits to the LEFT of the prompting section
+    subgraph "External Service"
+      direction LR
+      LLM[LLM API]
     end
 
-    subgraph "E: Final Output"
-        O1["fa:fa-folder-open Enriched Session Files<br/>(Status: 'Analyzed')"]
+    %% Prompting & Analysis (Analyzer first)
+    subgraph "D: LLM Prompting"
+      direction LR
+      P2(session_llm_analyzer)
+      G1(generate_prompts_and_model)
     end
+  end
 
-    %% Define the flow
-    S1 --> I1
-    S2 --> I2
-    S3 --> I3
-    S4 --> I4
+  %% =========================
+  %% Flows
+  %% =========================
 
-    I1 -- Transforms & Saves --> F1
-    I2 -- Transforms & Saves --> F1
-    I3 -- Transforms & Saves --> F1
-    I4 -- Transforms & Saves --> F1
+  %% 1. Customer Caching Flow (Syncro API -> Cacher -> Cache File)
+  S1 --> CC1
+  CC1 ==> F2
 
-    %% Caching Flow
-    S1 -- Fetches Customers --> F2
+  %% 2. Main Ingestion Flow (Sources -> Ingestors)
+  S1 --> I1
+  S2 --> I2
+  S3 --> I3
+  S4 --> I4
 
-    %% Processing Flow
-    F1 -- "Loads Sessions" --> P1
-    F2 -- "Reads Customers" --> P1
-    P1 -- "Updates & Saves Sessions" --> F1
+  %% 3. Ingestors write to the "Sessions Raw" folder
+  I1 ==> N1
+  I2 ==> N1
+  I3 ==> N1
+  I4 ==> N1
 
-    F1 -- "Loads Linked Sessions" --> P2
-    P2 -- Interacts with --> LLM[LLM API]
-    P2 -- "Updates & Saves Sessions" --> O1
+  %% 4. The Linker reads from "Sessions Raw" and the "Customer Cache"
+  N1 --> P1
+  F2 -. Reads Customers .-> P1
 
-    %% Annotations
-    linkStyle 10 stroke-width:2px,fill:none,stroke:green;
-    linkStyle 11 stroke-width:2px,fill:none,stroke:green;
-    linkStyle 12 stroke-width:2px,fill:none,stroke:orange;
-    linkStyle 13 stroke-width:2px,fill:none,stroke:blue;
-    linkStyle 14 stroke-width:2px,fill:none,stroke:blue;
-```
+  %% 5. The Linker produces the final "Linked Sessions" output for Row 1
+  P1 ==> L0
+
+  %% Analyzer-driven prompting & LLM loop (LLM is outside, to the left of D)
+  L0 --> P2
+  P2 --> G1
+  G1 -. Sends Request .-> LLM
+  LLM --> P2
+  P2 ==> L0 
+  ```
 
 **The process unfolds in these stages:**
 
