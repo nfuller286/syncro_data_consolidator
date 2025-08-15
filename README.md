@@ -4,7 +4,7 @@
 
 ## Overview
 
-The Syncro Data Consolidator (SDC) is a Python-based tool designed to create a unified view of work performed across various systems like **Syncro RMM**, ScreenConnect, and other data sources. It ingests, **standardizes, and normalizes** raw data from diverse formats—including API calls, JSON, CSV, and JSONL files—into a structured canonical data model called a "Session" format. This uses a customizable way to interact within the backend of various LLM providers, offering enhanced security and privacy over popular chat agent frameworks. 
+The Syncro Data Consolidator (SDC) is a Python-based tool designed to create a unified view of work performed across various systems like **Syncro RMM**, ScreenConnect, and other data sources. It ingests, **standardizes, and normalizes** raw data from diverse formats—including API calls, JSON, CSV, and JSONL files—into a structured canonical data model called a "Session" format. This uses a customizable way to interact within the backend of various LLM providers, offering increased security, privacy and **transparency** over popular chat agent frameworks. 
 
 A key strength of this project is its intelligent, cost-effective approach to data processing. To link sessions to the correct customer, it employs a **local-first strategy**, using high-accuracy fuzzy matching before falling back on an LLM for only the most ambiguous cases. This dramatically reduces API costs and processing time.
 
