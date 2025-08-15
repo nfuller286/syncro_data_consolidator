@@ -43,7 +43,7 @@ def ingest_syncro_tickets(config: Dict[str, Any], logger) -> None:
     logger.info("Starting Syncro Ticket Ingestor...")
 
     api_config = config.get('syncro_api', {})
-    test_file_path = api_config.get('test_file_path')
+    syncro_test_ticket_file = api_config.get('syncro_test_ticket_file')
 
     tickets_data = []
     state_file_path = os.path.join(config['project_paths']['cache_folder'], STATE_FILE_NAME)
@@ -55,28 +55,28 @@ def ingest_syncro_tickets(config: Dict[str, Any], logger) -> None:
     state_needs_saving = False  # Flag to track if we need to save state at the end
     last_updated_at_str = None  # Initialize to handle unbound variable case
 
-    if test_file_path:
-        logger.info(f"Processing Syncro tickets from test file: {test_file_path}")
+    if syncro_test_ticket_file:
+        logger.info(f"Processing Syncro tickets from test file: {syncro_test_ticket_file}")
         try:
-            current_metadata = state_handler.get_file_metadata(test_file_path)
-            if ingestor_state.get('files', {}).get(test_file_path) == current_metadata:
-                logger.info(f"Test file '{test_file_path}' unchanged. Skipping re-ingestion.")
+            current_metadata = state_handler.get_file_metadata(syncro_test_ticket_file)
+            if ingestor_state.get('files', {}).get(syncro_test_ticket_file) == current_metadata:
+                logger.info(f"Test file '{syncro_test_ticket_file}' unchanged. Skipping re-ingestion.")
                 return
 
-            with open(test_file_path, 'r', encoding='utf-8') as f:
+            with open(syncro_test_ticket_file, 'r', encoding='utf-8') as f:
                 data = json.load(f)
                 tickets_data = data.get('tickets', [])
 
-            ingestor_state['files'][test_file_path] = current_metadata
+            ingestor_state['files'][syncro_test_ticket_file] = current_metadata
             state_needs_saving = True  # We will process this file, so state should be saved on success
             logger.info(f"Loaded {len(tickets_data)} tickets from test file.")
 
         except FileNotFoundError:
-            logger.error(f"Test file not found: {test_file_path}")
+            logger.error(f"Test file not found: {syncro_test_ticket_file}")
             processed_successfully = False
             return
         except json.JSONDecodeError:
-            logger.error(f"Error decoding JSON from test file: {test_file_path}")
+            logger.error(f"Error decoding JSON from test file: {syncro_test_ticket_file}")
             processed_successfully = False
             return
     else:
@@ -107,7 +107,7 @@ def ingest_syncro_tickets(config: Dict[str, Any], logger) -> None:
 
     last_updated_at_from_state = None  # Initialize here to ensure it's always bound
     # Perform client-side filtering only if we have a valid timestamp from a previous API run
-    if not test_file_path and last_updated_at_str:
+    if not syncro_test_ticket_file and last_updated_at_str:
         try:
             last_updated_at_from_state = parse_datetime_utc(last_updated_at_str, config)
         except (ValueError, TypeError):
@@ -234,7 +234,7 @@ def ingest_syncro_tickets(config: Dict[str, Any], logger) -> None:
         return
 
     # If it was an API run, update the timestamp
-    if not test_file_path and latest_timestamp_this_run:
+    if not syncro_test_ticket_file and latest_timestamp_this_run:
         final_timestamp = latest_timestamp_this_run + timedelta(seconds=1)
         ingestor_state['api']['last_updated_at'] = final_timestamp.strftime('%Y-%m-%dT%H:%M:%SZ')
         logger.info(f"Updating last_updated_at timestamp to: {ingestor_state['api']['last_updated_at']}")
