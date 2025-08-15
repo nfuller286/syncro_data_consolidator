@@ -1,6 +1,7 @@
 /config/*
 !.gitkeep
 !/config/sampleconfig.json
+!/config/llm_configs.json
 /config/config.json
 
 /data/*
