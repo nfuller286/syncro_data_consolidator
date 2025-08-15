@@ -3,16 +3,13 @@
 !/config/sampleconfig.json
 /config/config.json
 
-# Ignore contents of each subfolder in data, but keep the folders themselves
-/data/cache/*
-# /data/input/* ← removed to allow input data
-/data/logs/*
-/data/output/*
+/data/*
 
 # Keep the folders themselves
 !/data/cache/
 /data/cache/.gitkeep
-#!/data/input/
+!/data/input/
+/data/input/.gitkeep
 #/data/input/.gitkeep
 !/data/logs/
 /data/logs/.gitkeep
