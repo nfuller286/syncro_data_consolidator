@@ -1,0 +1,90 @@
+{
+    "meta": {
+        "session_id": "af751405-4b6d-4ef1-ae2f-e6078c825c48",
+        "schema_version": "2.0",
+        "source_system": "SyncroRMM",
+        "source_identifiers": [
+            "/tickets/82012345"
+        ],
+        "processing_status": "Linked",
+        "processing_log": [
+            "session_llm_analyzer_title_v1.1",
+            "session_llm_analyzer_summary_v1.1"
+        ],
+        "ingestion_timestamp_utc": "2025-08-13T21:37:51.082009Z",
+        "last_updated_timestamp_utc": "2025-08-13T21:39:25.872620Z"
+    },
+    "context": {
+        "customer_id": 18005432,
+        "customer_name": "Keystone Financial",
+        "contact_id": 1751247,
+        "contact_name": "John Smith",
+        "links": []
+    },
+    "insights": {
+        "session_start_time_utc": "2025-01-29T18:31:46.716000Z",
+        "session_end_time_utc": "2025-01-29T19:17:39.380000Z",
+        "session_duration_minutes": 45,
+        "source_title": "User is unable to print.",
+        "llm_generated_title": "**Printing Issues Resolved: Network & Email Fixes**",
+        "llm_generated_category": null,
+        "generated_summaries": {
+            "default": "Keystone Financial's user was unable to print from their laptop and the conference room device, and also experienced email client connectivity issues. The printing problem was resolved by moving the laptop from the guest network to the main network, granting it printer access. Additionally, the user's email client's connection to the mail server was repaired."
+        },
+        "structured_llm_results": {},
+        "user_notes": ""
+    },
+    "segments": [
+        {
+            "segment_id": "537318d6-7dc9-4b0e-a128-5ebef174c700",
+            "start_time_utc": "2025-01-29T18:31:46.716000Z",
+            "end_time_utc": "2025-01-29T18:31:46.716000Z",
+            "type": "TicketCreation",
+            "author": "Admin User",
+            "content": "User is unable to print.",
+            "metadata": {
+                "syncro_ticket_number": 1001,
+                "syncro_problem_type": "Remote Support",
+                "syncro_status": "Resolved",
+                "syncro_priority": null,
+                "syncro_tag_list": []
+            }
+        },
+        {
+            "segment_id": "bf293f4a-5e52-4398-9fad-9c4bcd598049",
+            "start_time_utc": "2025-01-29T19:17:49.124000Z",
+            "end_time_utc": "2025-01-29T19:17:49.124000Z",
+            "type": "Email",
+            "author": null,
+            "content": "Invoice emailed to accounting@keystonefinancial.com by user: Admin User",
+            "metadata": {
+                "syncro_comment_id": 226366854,
+                "syncro_user_id": null
+            }
+        },
+        {
+            "segment_id": "94cd260d-ca79-4459-ac2b-03025b2c7a1e",
+            "start_time_utc": "2025-01-29T19:17:23.984000Z",
+            "end_time_utc": "2025-01-29T19:17:23.984000Z",
+            "type": "Email",
+            "author": null,
+            "content": "Laptop was on the guest network and didn't have access to the printer.\nRepaired email client's connection to the mail server.",
+            "metadata": {
+                "syncro_comment_id": 226366771,
+                "syncro_user_id": 101202
+            }
+        },
+        {
+            "segment_id": "61a04b61-8219-4f83-9e4f-ca5f1e46e8d8",
+            "start_time_utc": "2025-01-29T18:31:46.673000Z",
+            "end_time_utc": "2025-01-29T18:31:46.673000Z",
+            "type": "Email",
+            "author": null,
+            "content": "User is unable to print from his laptop and from the conference room device.",
+            "metadata": {
+                "syncro_comment_id": 226356559,
+                "syncro_user_id": 101202
+            }
+        }
+    ]
+}

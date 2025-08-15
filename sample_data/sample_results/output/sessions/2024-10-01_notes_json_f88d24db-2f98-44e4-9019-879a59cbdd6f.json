@@ -1,0 +1,86 @@
+{
+    "meta": {
+        "session_id": "f88d24db-2f98-44e4-9019-879a59cbdd6f",
+        "schema_version": "2.0",
+        "source_system": "notes.json",
+        "source_identifiers": [
+            "\\syncro_data_consolidator\\data\\input/notes_json/notes.json",
+            "/tickets/1"
+        ],
+        "processing_status": "Linked",
+        "processing_log": [
+            "session_llm_analyzer_title_v1.1",
+            "session_llm_analyzer_summary_v1.1"
+        ],
+        "ingestion_timestamp_utc": "2025-08-13T21:01:01.296437Z",
+        "last_updated_timestamp_utc": "2025-08-13T21:02:43.544355Z"
+    },
+    "context": {
+        "customer_id": 47656197,
+        "customer_name": "Innovatech Services",
+        "contact_id": null,
+        "contact_name": "John Doe",
+        "links": []
+    },
+    "insights": {
+        "session_start_time_utc": "2024-10-01T00:00:00Z",
+        "session_end_time_utc": "2024-10-01T00:00:00Z",
+        "session_duration_minutes": 0,
+        "source_title": "Server Hardware Alert",
+        "llm_generated_title": "Server Hardware & Access Checks",
+        "llm_generated_category": null,
+        "generated_summaries": {
+            "default": "Innovatech Services reported a server hardware alert. This 0-minute session involved planning initial steps to inspect server hardware indicators and verify access to the management portal, with these actions noted as To-Do items rather than completed."
+        },
+        "structured_llm_results": {},
+        "user_notes": ""
+    },
+    "segments": [
+        {
+            "segment_id": "c494e9c5-b11a-42f2-b998-22efc024266f",
+            "start_time_utc": "2024-10-01T00:00:00Z",
+            "end_time_utc": "2024-10-01T00:00:00Z",
+            "type": "TicketNote",
+            "author": "John Doe",
+            "content": "Inspect server hardware status indicators",
+            "metadata": {
+                "order": 1
+            }
+        },
+        {
+            "segment_id": "e4a8fd85-531b-4eb7-bb34-49a110db6ca5",
+            "start_time_utc": "2024-10-01T00:00:00Z",
+            "end_time_utc": "2024-10-01T00:00:00Z",
+            "type": "TicketNote",
+            "author": "John Doe",
+            "content": "Verify access to server management portal",
+            "metadata": {
+                "order": 2
+            }
+        },
+        {
+            "segment_id": "3737c369-8a01-4f79-857d-a4e7f4a1e272",
+            "start_time_utc": "2024-10-01T00:00:00Z",
+            "end_time_utc": "2024-10-01T00:00:00Z",
+            "type": "TicketToDo",
+            "author": "John Doe",
+            "content": "To-Do: Inspect server hardware status indicators",
+            "metadata": {
+                "order": 1,
+                "completed": null
+            }
+        },
+        {
+            "segment_id": "3b8c5f38-811e-4830-aa7f-273752f66d0a",
+            "start_time_utc": "2024-10-01T00:00:00Z",
+            "end_time_utc": "2024-10-01T00:00:00Z",
+            "type": "TicketToDo",
+            "author": "John Doe",
+            "content": "To-Do: Verify access to server management portal",
+            "metadata": {
+                "order": 2,
+                "completed": null
+            }
+        }
+    ]
+}

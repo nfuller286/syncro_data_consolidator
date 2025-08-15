@@ -1,0 +1,96 @@
+{
+    "meta": {
+        "session_id": "a0d54a54-582c-41df-ad19-78cfd873746e",
+        "schema_version": "2.0",
+        "source_system": "ScreenConnect",
+        "source_identifiers": [
+            "\\syncro_data_consolidator\\data\\input/screenconnect_logs\\SampleRemoteAccessLogs.csv",
+            "rows/18,19,20,21"
+        ],
+        "processing_status": "Linked",
+        "processing_log": [
+            "session_llm_analyzer_title_v1.1",
+            "session_llm_analyzer_summary_v1.1"
+        ],
+        "ingestion_timestamp_utc": "2025-08-13T21:01:01.396162Z",
+        "last_updated_timestamp_utc": "2025-08-13T21:03:29.143481Z"
+    },
+    "context": {
+        "customer_id": 48222716,
+        "customer_name": "Wellness Partners West",
+        "contact_id": null,
+        "contact_name": null,
+        "links": []
+    },
+    "insights": {
+        "session_start_time_utc": "2025-01-10T15:25:00Z",
+        "session_end_time_utc": "2025-01-10T20:07:00Z",
+        "session_duration_minutes": 282,
+        "source_title": "ScreenConnect Session for AdminUser",
+        "llm_generated_title": "Machine Connections Log",
+        "llm_generated_category": null,
+        "generated_summaries": {
+            "default": "A 282-minute ScreenConnect session was conducted for Wellness Partners West, during which an AdminUser remotely accessed WKSTN-01 and OFFICE-PC. The session successfully facilitated administrative tasks on these two workstations."
+        },
+        "structured_llm_results": {},
+        "user_notes": ""
+    },
+    "segments": [
+        {
+            "segment_id": "4c093943-aadc-4f90-800d-b1f87248562a",
+            "start_time_utc": "2025-01-10T15:25:00Z",
+            "end_time_utc": "2025-01-10T17:01:00Z",
+            "type": "RemoteConnection",
+            "author": "AdminUser",
+            "content": "Connected to machine: WKSTN-01",
+            "metadata": {
+                "connection_id": "f6192851-2b3a-4723-0f2e-173f3d4c5b6e",
+                "process_type": "Host",
+                "session_type": "Access",
+                "duration_seconds": 5798
+            }
+        },
+        {
+            "segment_id": "182e7cee-9fdc-4871-aab3-4c5389caff5e",
+            "start_time_utc": "2025-01-10T17:03:00Z",
+            "end_time_utc": "2025-01-10T17:10:00Z",
+            "type": "RemoteConnection",
+            "author": "AdminUser",
+            "content": "Connected to machine: WKSTN-01",
+            "metadata": {
+                "connection_id": "d4f7063f-0918-4501-ed0c-f51d1b2a394c",
+                "process_type": "Host",
+                "session_type": "Access",
+                "duration_seconds": 438
+            }
+        },
+        {
+            "segment_id": "9745ecb2-6606-4e59-bb6e-d7901f575147",
+            "start_time_utc": "2025-01-10T17:05:00Z",
+            "end_time_utc": "2025-01-10T20:07:00Z",
+            "type": "RemoteConnection",
+            "author": "AdminUser",
+            "content": "Connected to machine: OFFICE-PC",
+            "metadata": {
+                "connection_id": "c3e6f52e-f807-44f0-dcfb-e40c0a19283b",
+                "process_type": "Host",
+                "session_type": "Access",
+                "duration_seconds": 10917
+            }
+        },
+        {
+            "segment_id": "98d393be-81de-4cac-b876-cf201e217126",
+            "start_time_utc": "2025-01-10T19:13:00Z",
+            "end_time_utc": "2025-01-10T19:15:00Z",
+            "type": "RemoteConnection",
+            "author": "AdminUser",
+            "content": "Connected to machine: OFFICE-PC",
+            "metadata": {
+                "connection_id": "b2d5e41d-e7f6-43e0-cbea-d3fbfa08172a",
+                "process_type": "Host",
+                "session_type": "Access",
+                "duration_seconds": 97
+            }
+        }
+    ]
+}

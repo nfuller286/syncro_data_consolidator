@@ -1,0 +1,85 @@
+{
+    "meta": {
+        "session_id": "654879bb-60f1-4492-8961-dc5c593458ef",
+        "schema_version": "2.0",
+        "source_system": "SillyTavern",
+        "source_identifiers": [
+            "\\syncro_data_consolidator\\data\\input\\sillytavern_chat\\Test Chat - No Reasoning2025-08-06@18h48m10s.jsonl"
+        ],
+        "processing_status": "Complete",
+        "processing_log": [
+            "session_llm_analyzer_title_v1.1",
+            "session_llm_analyzer_summary_v1.1"
+        ],
+        "ingestion_timestamp_utc": "2025-08-13T21:01:01.240328Z",
+        "last_updated_timestamp_utc": "2025-08-13T21:03:47.003117Z"
+    },
+    "context": {
+        "customer_id": null,
+        "customer_name": null,
+        "contact_id": null,
+        "contact_name": null,
+        "links": [
+            "st_chat_id:1645423684533243"
+        ]
+    },
+    "insights": {
+        "session_start_time_utc": "2025-08-06T18:48:00Z",
+        "session_end_time_utc": "2025-08-06T18:50:00Z",
+        "session_duration_minutes": 2,
+        "source_title": "SillyTavern Chat with Test Chat",
+        "llm_generated_title": "Computer Work Log Guide",
+        "llm_generated_category": null,
+        "generated_summaries": {
+            "default": "Nick Info required a simple method to log work performed on a customer's computer. Test Chat provided a structured template for recording work, including fields for date, customer, task, and a detailed description. The session concluded with Test Chat helping Nick integrate a start time into a sample log entry."
+        },
+        "structured_llm_results": {},
+        "user_notes": ""
+    },
+    "segments": [
+        {
+            "segment_id": "b5c2ba33-95bd-4dce-9087-0565f7357763",
+            "start_time_utc": "2025-08-06T18:48:00Z",
+            "end_time_utc": "2025-08-06T18:48:00Z",
+            "type": "ChatMessage",
+            "author": "Nick Info",
+            "content": "So here is a non thinking chat. I worked on somebody's computer and need to log things down.",
+            "metadata": {
+                "is_user": true
+            }
+        },
+        {
+            "segment_id": "9c60e9d9-47e4-475f-8a1f-fbce76fb99a2",
+            "start_time_utc": "2025-08-06T18:49:00Z",
+            "end_time_utc": "2025-08-06T18:49:00Z",
+            "type": "ChatMessage",
+            "author": "Test Chat",
+            "content": "Here is a simple way to log the work you did on the computer.\n\nYou can create a basic text file or use a spreadsheet. Here are the key things to include for each entry:\n\n*   **Date:** The date the work was performed.\n*   **Customer:** Customer's name.\n*   **Task:** A brief description of the work done.\n*   **Description:** More detailed notes about the task, including any issues found or specific actions taken.\n\nHere is a sample log entry:\n\n**Date:** 2025-08-06\n**Customer:** Nora\n**Task:** Malware Scan and Removal\n**Description:** Ran a full system scan using antivirus software. Detected and removed two malware threats. Also cleared temporary files to improve performance.",
+            "metadata": {
+                "is_user": false
+            }
+        },
+        {
+            "segment_id": "da5ade01-b7e3-4122-a9e6-2e21f7e274eb",
+            "start_time_utc": "2025-08-06T18:50:00Z",
+            "end_time_utc": "2025-08-06T18:50:00Z",
+            "type": "ChatMessage",
+            "author": "Nick Info",
+            "content": "Started 20 minutes ago.",
+            "metadata": {
+                "is_user": true
+            }
+        },
+        {
+            "segment_id": "0bc621ec-fa8f-4eaa-ad9c-0ef8247d8fe6",
+            "start_time_utc": "2025-08-06T18:50:00Z",
+            "end_time_utc": "2025-08-06T18:50:00Z",
+            "type": "ChatMessage",
+            "author": "Test Chat",
+            "content": "Noted. The log entry has been updated to show a start time of approximately 10:30 PM UTC.\n\n**Date:** 2025-08-06\n**Customer:** Nora Info\n**Start Time:** 10:30 PM UTC\n**Task:** Malware Scan and Removal\n**Description:** Ran a full system scan using antivirus software. Detected and removed two malware threats. Also cleared temporary files to improve performance.",
+            "metadata": {
+                "is_user": false
+            }
+        }
+    ]
+}

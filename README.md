@@ -1,23 +1,32 @@
-# Project: Syncro Data Consolidator (SDC)
+# Syncro Data Consolidator
 
-This document provides a comprehensive overview of the Syncro Data Consolidator (SDC), a project I designed to serve as a powerful, automated data pipeline. It addresses the common challenge of having valuable data siloed across different platforms by ingesting, standardizing, and enriching information from multiple sources into a unified, queryable format.
+**A modular data pipeline that consolidates events from multiple support platforms, links them to customers, and uses AI to summarize and categorize work sessions.**
 
-## High-Level Overview
+## Overview
 
-The Syncro Data Consolidator is a Python-based ETL (Extract, Transform, Load) pipeline. Its primary function is to pull data from various sources relevant to my operations, including:
+The Syncro Data Consolidator (SDC) is a Python-based tool designed to create a unified view of work performed across various systems like **Syncro RMM**, ScreenConnect, and other data sources. It ingests, **standardizes, and normalizes** raw data from diverse formats—including API calls, JSON, CSV, and JSONL files—into a structured canonical data model called a "Session" format.
 
-*   **SyncroMSP API**: For ticketing and customer data.
-*   **ScreenConnect Logs**: For remote session information (CSV).
-*   **SillyTavern Chat Logs**: For conversational data (JSONL).
-*   **Structured JSON Notes**: A custom legacy format for notes and to-dos.
+A key strength of this project is its intelligent, cost-effective approach to data processing. To link sessions to the correct customer, it employs a **local-first strategy**, using high-accuracy fuzzy matching before falling back on an LLM for only the most ambiguous cases. This dramatically reduces API costs and processing time.
 
-The system processes this disparate data, transforming it into a standardized `Session` model. This model acts as a "source of truth," where each object represents a distinct activity, like a ticket, a remote session, or a chat conversation.
+The architecture is highly **modular and optimized for cost-efficiency**. This design provides granular control over operational costs, allowing powerful models to be used for complex tasks while leveraging lighter, faster models for simpler ones.
 
-A key feature of this project is its integration with Large Language Models (LLMs) through a flexible `langchain`-based utility. This allows for advanced data enrichment, such as generating titles, summarizing content, and assisting in linking data to the correct customers. The entire pipeline is designed to be highly configurable and portable, managed through a central `config.json` file.
+## Features
 
-## Data Flow and Architecture
+*   **Multi-Source Ingestion:** Processes data from a wide variety of sources and formats, including **Syncro RMM tickets (via API), ScreenConnect logs (CSV), legacy notes (JSON), and chat logs (JSONL).**
+*   **Robust Chat Deduplication:** The SillyTavern ingestor uses a hashing mechanism to create a unique fingerprint for every message. This prevents the re-ingestion of duplicate messages across different chat files, snapshots, or branches, ensuring data integrity.
+*   **Modular & Extensible Architecture:** Components are decoupled, making it easy to add new data sources or processing steps. The LLM API handler, for example, is self-contained, allowing for easy adaptation to any **chat completion** source, whether it's a comprehensive framework like **LangChain** or a direct, vendor-specific API.
+*   **Intelligent Customer Linking:** Uses a sophisticated, local-first cascade logic:
+    1.  **Exact Match:** First, it looks for a perfect name match.
+    2.  **Fuzzy Match:** If no exact match exists, it applies a fuzzy matching algorithm to find the closest 3 names, selecting the top candidate only if its confidence score is clearly higher than the next best options.
+    3.  **AI Fallback:** Only for truly ambiguous cases does it make a call to an LLM, minimizing cost and latency.
+*   **Cost-Optimized AI Analysis:** Leverages a configurable LLM (e.g., Google Gemini, local models) and allows you to assign different models to different tasks based on complexity. Use a cheap, fast model for simple categorization and a more powerful model for nuanced summarization.
+*   **Stateful Processing:** Remembers which files and data have already been processed to avoid redundant work on subsequent runs.
+*   **Centralized Logging:** All operations are logged, providing transparency and a clear audit trail for every processing step.
+*   **Command-Line Interface:** Provides clear commands to run the entire pipeline or specific parts, such as ingesting new data or running analysis.
 
-The project follows a logical ETL pattern, orchestrated by a main execution script. The flow can be visualized as follows:
+## Architecture
+
+The project follows a multi-stage ETL (Extract, Transform, Load) pipeline. Raw data is ingested, converted into a standard format, enriched with customer information, and finally processed by an AI model.
 
 ```mermaid
 %%{init: {
@@ -126,94 +135,96 @@ graph TD
   P2 ==> L0 
   ```
 
-**The process unfolds in these stages:**
 
-1.  **Initiation & Configuration**: The pipeline is started by running `run_sdc.py`. The first step is loading the `config.json` file, which defines all paths, API keys, and processing rules.
-2.  **Caching (Optional but Recommended)**: The `syncro_customer_contact_cacher` can be run to fetch all customer and contact data from the Syncro API. This data is cached locally to speed up the linking process and reduce API calls.
-3.  **Ingestion (Extract & Transform)**: Each `ingestor` module is responsible for a specific data source. It reads the raw data, transforms it into the standardized `Session` Pydantic model, and saves it as a unique JSON file in the output directory. Each ingestor tracks its state to avoid reprocessing files that haven't changed.
-4.  **Processing (Enrichment)**: Once raw sessions are created, the `processor` modules run:
-    *   `session_customer_linker`: This processor iterates through unprocessed `Session` files. It uses the cached Syncro data to link each session to an official customer and contact. It employs a waterfall logic of exact matching, fuzzy string matching, and finally, LLM-based analysis to find the correct link.
-    *   `session_llm_analyzer`: This processor further enriches the data by sending the content of a session to an LLM to generate a concise, descriptive title or other insights.
-5.  **Final Output**: The result is a folder of clean, enriched, and standardized JSON files. Each file represents a single, context-aware event, ready for analysis, reporting, or further processing.
+## Project Structure
 
-## Core Components
-
-The project's codebase is intentionally modular to promote maintainability and scalability. It is broken down into four key areas: `models`, `ingestors`, `processors`, and `utils`.
-
-### Data Models (`sdc/models`)
-
-The heart of the application is the `Session` data model, defined in `session_v2.py` using Pydantic. This ensures that all data, regardless of origin, conforms to a single, predictable structure.
-
-*   **`Session`**: The top-level object representing a complete, continuous activity from a single source. It is composed of the following sub-models:
-    *   **`SessionMeta`**: Contains system-level metadata for tracking, such as a unique `session_id`, the `source_system`, processing status, and timestamps.
-    *   **`SessionContext`**: Holds the business context, most importantly the `customer_id` and `contact_id` that link the session to an entity in Syncro.
-    *   **`SessionInsights`**: Stores data derived from analysis, such as calculated duration, `llm_generated_title`, summaries, and a field for manual user notes.
-    *   **`SessionSegment`**: A list of these represents the raw events that make up the session (e.g., each chat message, each ticket comment).
-
-### Ingestors (`sdc/ingestors`)
-
-These modules are responsible for the "Extract" and "Transform" parts of the ETL pipeline.
-
-*   **`syncro_ticket_ingestor`**: Fetches tickets and their comments from the Syncro API.
-*   **`screenconnect_log_ingestor`**: Parses CSV logs from ScreenConnect to reconstruct remote sessions.
-*   **`st_chat_ingestor`**: Processes `.jsonl` chat logs from SillyTavern, segmenting conversations into logical sessions.
-*   **`notes_json_ingestor`**: Handles the one-time ingestion of data from a legacy `notes.json` file.
-*   **`syncro_customer_contact_cacher`**: Fetches and caches customer/contact data from Syncro to be used by other parts of the system.
-
-### Processors (`sdc/processors`)
-
-These modules handle the "Enrichment" phase, adding value to the standardized `Session` objects.
-
-*   **`session_customer_linker`**: The crucial module that connects session data to the correct Syncro customer, using a multi-step matching strategy for accuracy.
-*   **`session_llm_analyzer`**: Leverages an LLM to perform content analysis, such as generating a clean title for a ticket or session based on its content.
-
-### Utilities (`sdc/utils`)
-
-This directory contains helper modules that provide common functionality across the project.
-
-*   **`config_loader.py`**: A robust utility that loads the `config.json` file, resolves path placeholders (e.g., `{{project_root}}`), and can override keys with environment variables for better security.
-*   **`llm_utils.py`**: A factory for creating LLM clients. It reads the configuration to determine which provider to use (e.g., Google Gemini, a local LLM) and abstracts away the instantiation logic.
-*   **`session_handler.py`**: Provides simple functions to save and load `Session` objects to and from JSON files.
-*   **`sdc_logger.py`**: A standardized logger configuration utility.
-
-## Configuration
-
-The entire project is controlled by the `config.json` file. I designed it this way to avoid hardcoding paths, credentials, or parameters, making the project portable and easy to reconfigure. Key sections include:
-
-*   **`project_paths`**: Defines all file and directory locations.
-*   **`logging`**: Controls log level and output (file and/or terminal).
-*   **`syncro_api`**: Contains the base URL and API key for the SyncroMSP API.
-*   **`llm_config`**: Allows switching between different LLM providers (`google_gemini`, `local_llm`) and specifies models for different tasks (e.g., complex vs. simple).
-*   **`processing_defaults`**: Sets thresholds and behaviors, like the fuzzy matching score for customer linking and cache expiry times.
-
-## How to Run
-
-The application is executed through a single entry point, which provides a command-line interface for running different parts of the pipeline.
-
-```bash
-# Navigate to the source directory
-cd /a0/syncro_data_consolidator/src
-
-# Example: Run all ingestion steps
-python -m sdc.run_sdc ingest-all
-
-# Example: Run the customer linking and LLM analysis processors
-python -m sdc.run_sdc process-all
-
-# Example: Run a specific ingestor
-python -m sdc.run_sdc ingest-syncro
+```
+syncro_data_consolidator/
+├── requirements.txt
+├── config/              # Configuration files
+├── data/                # All dynamic data: inputs, outputs, logs, cache
+└── src/
+    └── sdc/
+        ├── run_sdc.py   # Main entry point and CLI
+        ├── api_clients/ # Connectors for external APIs (e.g., Syncro)
+        ├── ingestors/   # Scripts to read and standardize source data
+        ├── llm/         # LLM prompt templates and API client logic
+        ├── models/      # Pydantic data models (session_v2.py)
+        ├── processors/  # Scripts for enrichment (linking, AI analysis)
+        └── utils/       # Shared helper functions
 ```
 
-The `run_sdc.py` script uses `argparse` to interpret these commands and orchestrate the calls to the appropriate modules.
+## Installation & Setup
 
-## Self-Analysis and Future Enhancements
+This project uses Conda for environment management.
 
-In building this project, I've identified several strengths and areas for future improvement.
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/nfuller286/syncro_data_consolidator.git
+    cd syncro_data_consolidator
+    ```
 
-*   **Architectural Strength**: The modular design with a clear separation of concerns is a major advantage. The standardized `Session` model is the cornerstone of this architecture, allowing new data sources or processing steps to be added with minimal impact on the rest of the system.
+2.  **Create and activate the Conda environment:**
+    ```bash
+    conda create --name sdc python=3.10
+    conda activate sdc
+    ```
 
-*   **Security**: A critical consideration is the handling of API keys. My `config_loader` is already built to prioritize loading secrets from environment variables over the `config.json` file. The next step is to fully adopt this practice and remove all secrets from the configuration file to prevent them from ever being committed to version control.
+3.  **Install dependencies:**
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-*   **Performance**: The `notes_json_ingestor` currently loads the entire file into memory. For very large legacy files, this could become a bottleneck. A future enhancement would be to refactor this ingestor to use a streaming JSON parser (like `ijson`) to process the file incrementally, reducing memory consumption.
+4.  **Configure the application:**
+    *   Copy `config/sampleconfig.json` to `config/config.json`.
+    *   Edit `config/config.json` to add your Syncro RMM API credentials and adjust paths if necessary.
+    *   Review `config/llm_configs.json` and add your LLM API keys.
 
-*   **Robustness**: To prevent potential race conditions if multiple instances were run simultaneously, a global file-based locking mechanism could be implemented. This would ensure that only one process can read from and write to the session files at any given time, guaranteeing data integrity.
+## Usage
+
+> **Important:** All commands should be run from the `src/` directory. This project is designed as a Python package, and running it from `src/` ensures that module imports like `from sdc.utils import ...` resolve correctly.
+
+### Quick Start
+
+The easiest way to run the entire pipeline is to use the `run` command. This will cache fresh Syncro RMM data, ingest all sources, and link customers.
+
+```bash
+# Navigate to the src directory first
+cd src
+
+# Run the full pipeline
+python -m sdc.run_sdc run --pipeline full
+```
+
+After the `full` pipeline runs, you can perform AI analysis on the linked sessions:
+
+```bash
+# Generate titles for all linked sessions
+python -m sdc.run_sdc process --step llm_title
+
+# Generate summaries for all linked sessions
+python -m sdc.run_sdc process --step llm_summary
+```
+
+### Command-Line Interface (CLI)
+
+*   **Run a full pipeline:**
+    *   `run --pipeline full`: Caches data, ingests all sources, links customers.
+    *   `run --pipeline ingest_only`: Runs all ingestors without caching or linking.
+
+*   **Run a specific ingestor:**
+    *   `ingest --source <name>`: Sources: `syncro`, `screenconnect`, `notes`, `sillytavern`, `all`.
+    *   Example: `python -m sdc.run_sdc ingest --source screenconnect`
+
+*   **Run a specific processing step:**
+    *   `process --step <name>`: Steps: `customer_linking`, `llm_title`, `llm_summary`, `all`.
+    *   Example: `python -m sdc.run_sdc process --step customer_linking`
+
+*   **Manage Caches:**
+    *   `cache --source syncro`: Forces a refresh of the Syncro RMM customer data.
+
+## Future Enhancements
+
+*   **Work Item Grouping:** Implement a new processor to group related `Session` objects into a single "Work Item." This would consolidate billable events from different sources (e.g., a ticket, a remote session, and a follow-up note) into one structured entity, which can then be exported for invoicing or reporting.
+*   **Data Redaction Module:** Add an optional processing step to automatically find and redact PII (Personally Identifiable Information) before data is sent to an external LLM, enhancing privacy.
+*   **Test Suite:** Implement a full test suite with `pytest` to ensure reliability and simplify future development.

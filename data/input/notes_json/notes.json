@@ -1,0 +1,91 @@
+{
+  "tickets": [
+    {
+      "date": "12/10/24",
+      "ticketNumber": "1001",
+      "customer": "Global Tech Solutions",
+      "contact": "Alx Ray",
+      "status": "Open",
+      "priority": "High",
+      "subject": "Desktop Performance Issue",
+      "notes": [
+        {
+          "order": 1,
+          "date": "",
+          "note": "Follow-up with Alx Ray"
+        },
+        {
+          "order": 2,
+          "date": "",
+          "note": "Investigate high memory usage by window manager"
+        },
+        {
+          "order": 3,
+          "date": "",
+          "note": "Review network logs for connectivity drops"
+        }
+      ],
+      "to-do": [
+        {
+          "order": 1,
+          "date": "",
+          "task": "Inspect server hardware status indicators"
+        },
+        {
+          "order": 2,
+          "date": "",
+          "task": "Verify access to server management portal"
+        }
+      ]
+    },
+    {
+      "date": "10/1/24",
+      "ticketNumber": "1002",
+      "customer": "Innovatech Industries",
+      "contact": "John Doe",
+      "status": "Open",
+      "priority": "Medium",
+      "subject": "Server Hardware Alert",
+      "notes": [
+        {
+          "order": 1,
+          "date": "",
+          "note": "Inspect server hardware status indicators"
+        },
+        {
+          "order": 2,
+          "date": "",
+          "note": "Verify access to server management portal"
+        }
+      ],
+      "to-do": [
+        {
+          "order": 1,
+          "date": "",
+          "task": "Inspect server hardware status indicators"
+        },
+        {
+          "order": 2,
+          "date": "",
+          "task": "Verify access to server management portal"
+        }
+      ]
+    }
+  ],
+  "toDoItems": [
+    {
+      "date": "09/15/24",
+      "customer": "Sample Corp",
+      "contact": "Dr. Smith",
+      "subject": "Review Communication Logs",
+      "task": "Review phone and video call logs for the contact"
+    },
+    {
+      "date": "4/15/24",
+      "customer": "Acme Inc.",
+      "contact": "Jane Roe",
+      "subject": "New Domain Email Setup",
+      "task": "Set up mailboxes and configure domain forwarding for new-domain.com to a cloud email service"
+    }
+  ]
+}

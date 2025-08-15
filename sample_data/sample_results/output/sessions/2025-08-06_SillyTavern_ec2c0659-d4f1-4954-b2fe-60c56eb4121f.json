@@ -1,0 +1,129 @@
+{
+    "meta": {
+        "session_id": "ec2c0659-d4f1-4954-b2fe-60c56eb4121f",
+        "schema_version": "2.0",
+        "source_system": "SillyTavern",
+        "source_identifiers": [
+            "\\syncro_data_consolidator\\data\\input\\sillytavern_chat\\Test Chat - No Reasoning2025-08-06@18h48m10s.jsonl"
+        ],
+        "processing_status": "Complete",
+        "processing_log": [
+            "session_llm_analyzer_title_v1.1",
+            "session_llm_analyzer_summary_v1.1"
+        ],
+        "ingestion_timestamp_utc": "2025-08-13T21:01:01.250502Z",
+        "last_updated_timestamp_utc": "2025-08-13T21:03:51.484121Z"
+    },
+    "context": {
+        "customer_id": null,
+        "customer_name": null,
+        "contact_id": null,
+        "contact_name": null,
+        "links": [
+            "st_chat_id:1645423684533243"
+        ]
+    },
+    "insights": {
+        "session_start_time_utc": "2025-08-06T18:59:00Z",
+        "session_end_time_utc": "2025-08-06T19:01:00Z",
+        "session_duration_minutes": 2,
+        "source_title": "SillyTavern Chat with Test Chat",
+        "llm_generated_title": "Flux Capacitor Remote Inspection Attempt Log",
+        "llm_generated_category": null,
+        "generated_summaries": {
+            "default": "The user initially instructed the AI, \"Test Chat,\" to log a remote inspection of a flux capacitor. The core problem emerged when the user highlighted that such a remote inspection is impossible. Test Chat then successfully resolved this by updating the log entry to accurately reflect an \"attempted\" remote inspection."
+        },
+        "structured_llm_results": {},
+        "user_notes": ""
+    },
+    "segments": [
+        {
+            "segment_id": "ac5d0505-bd16-4f93-ae5d-b970e9671649",
+            "start_time_utc": "2025-08-06T18:59:00Z",
+            "end_time_utc": "2025-08-06T18:59:00Z",
+            "type": "ChatMessage",
+            "author": "User Character",
+            "content": "Alright, Now for another message. This one is further separated than the last. ",
+            "metadata": {
+                "is_user": true
+            }
+        },
+        {
+            "segment_id": "199a1eca-a745-42e9-935e-38eab827a661",
+            "start_time_utc": "2025-08-06T18:59:00Z",
+            "end_time_utc": "2025-08-06T18:59:00Z",
+            "type": "ChatMessage",
+            "author": "Test Chat",
+            "content": "Okay, I am ready for the next log entry. Please provide the details.",
+            "metadata": {
+                "is_user": false
+            }
+        },
+        {
+            "segment_id": "e137a3bb-006c-4b6a-81a1-64a918ab082d",
+            "start_time_utc": "2025-08-06T19:00:00Z",
+            "end_time_utc": "2025-08-06T19:00:00Z",
+            "type": "ChatMessage",
+            "author": "User Character",
+            "content": "alright, now I remoted into a thing and inspected a flux capacitor",
+            "metadata": {
+                "is_user": true
+            }
+        },
+        {
+            "segment_id": "ca1fa142-019c-4123-b79b-7ba62171f122",
+            "start_time_utc": "2025-08-06T19:01:00Z",
+            "end_time_utc": "2025-08-06T19:01:00Z",
+            "type": "ChatMessage",
+            "author": "Test Chat",
+            "content": "Got it. Here is the new log entry:\n\n**Date:** 2025-08-06\n**Customer:** Nora Info\n**Task:** Remote Inspection\n**Description:** Remoted into a device to inspect the flux capacitor.",
+            "metadata": {
+                "is_user": false
+            }
+        },
+        {
+            "segment_id": "5fa2cc3a-667e-4441-ba47-862f4971a95c",
+            "start_time_utc": "2025-08-06T19:01:00Z",
+            "end_time_utc": "2025-08-06T19:01:00Z",
+            "type": "ChatMessage",
+            "author": "User Character",
+            "content": "Tricky because you can't actaully check on one remotely.",
+            "metadata": {
+                "is_user": true
+            }
+        },
+        {
+            "segment_id": "ce2fc589-1a75-4723-b447-9c0d7a9332a1",
+            "start_time_utc": "2025-08-06T19:01:00Z",
+            "end_time_utc": "2025-08-06T19:01:00Z",
+            "type": "ChatMessage",
+            "author": "Test Chat",
+            "content": "You are right, that is a good point. Since a remote inspection of a flux capacitor isn't possible, how should I correct the log entry?",
+            "metadata": {
+                "is_user": false
+            }
+        },
+        {
+            "segment_id": "57f09abe-2de1-47cd-ab90-f332ee79381d",
+            "start_time_utc": "2025-08-06T19:01:00Z",
+            "end_time_utc": "2025-08-06T19:01:00Z",
+            "type": "ChatMessage",
+            "author": "User Character",
+            "content": "I attempted to inspect it.",
+            "metadata": {
+                "is_user": true
+            }
+        },
+        {
+            "segment_id": "2bc321d5-df14-4501-97c6-73c904e57f66",
+            "start_time_utc": "2025-08-06T19:01:00Z",
+            "end_time_utc": "2025-08-06T19:01:00Z",
+            "type": "ChatMessage",
+            "author": "Test Chat",
+            "content": "Understood. The log entry has been updated to reflect the attempt.\n\n**Date:** 2025-08-06\n**Customer:** Nora Info\n**Task:** Remote Inspection Attempt\n**Description:** Attempted to remote into a device to inspect the flux capacitor.",
+            "metadata": {
+                "is_user": false
+            }
+        }
+    ]
+}
