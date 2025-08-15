@@ -1,0 +1,45 @@
+{
+    "analysis_tasks": {
+        "title": {
+            "processor_name": "session_llm_analyzer_title_v1.1",
+            "prompt_key": "session_analysis.generate_title",
+            "capability": "lightweight",
+            "save_to_attribute": "llm_generated_title"
+        },
+        "summary": {
+            "processor_name": "session_llm_analyzer_summary_v1.1",
+            "prompt_key": "session_analysis.generate_summary",
+            "capability": "general",
+            "save_to_attribute": "generated_summaries",
+            "summary_key": "default"
+        },
+        "categorize": {
+            "processor_name": "session_llm_analyzer_category_v1.1",
+            "prompt_key": "session_analysis.categorize_session",
+            "capability": "general",
+            "save_to_attribute": "llm_generated_category"
+        }
+    },
+    "prompts": {
+        "session_analysis": {
+            "generate_title": "Create a very short, concise title (less than 10 words) that summarizes the main topic of the following text.\n\n---\n{session.segments:each({content}):join(\n)}\n---\n\nTitle:",
+            "generate_summary": {
+                "system": "You are an expert at creating concise summaries. Your task is to summarize the provided text in 2-3 sentences, focusing on the key problem and resolution.",
+                "user": "Please summarize the following session for customer '{session.context.customer_name}'.\n\nThe original ticket subject was: '{session.insights.source_title}'.\nThe session lasted for {session.insights.session_duration_minutes} minutes.\n\nHere is the full conversation log:\n---\n{session.segments:each({author}: {content}):join(\n)}\n---\n\nSummary:"
+            },
+            "categorize_session": "Categorize the following session into one of these categories: [Hardware, Software, Network, Account, How-To, Other]. Respond with only the category name.\n\n---\nTitle: {session.insights.source_title}\n\nContent:\n{session.segments:each({content}):join(\n)}\n---\n\nCategory:"
+        },
+        "data_linking": {
+            "disambiguation": {
+                "system": "You are a highly accurate data matching assistant. Your task is to identify the single best match from a list of {item_type} names. Respond with only the name of the winner, exactly as it appears in the list provided.",
+                "user": "From the following list of names:\n{candidate_names}\n\nWhich one is the most likely match for the name: \"{guessed_name}\"?"
+            }
+        },
+        "notes_json": {
+            "summarize_and_categorize": {
+                "system": "You are an expert at analyzing IT work logs. Your task is to extract key information from the provided session content and provide a structured analysis in JSON format.",
+                "user": "Analyze the following collection of notes and to-do items for an IT work session.\n\n**Session Content:**\n---\n{session.segments:each({content}):join(\n)}\n---\n\n**Instructions:**\nRespond with ONLY a valid JSON object. Do not include any other text or markdown formatting. The JSON object must have the following keys:\n\n- `summary`: A 2-3 sentence summary of the work performed, based on the notes. This is a play-by-play of the work done.\n- `keywords`: A JSON array of 3-5 single-word keywords that describe the main topics (e.g., \"Firewall\", \"Password\", \"QuickBooks\", \"Server\").\n\n**JSON Output:**"
+            }
+        }
+    }
+}
