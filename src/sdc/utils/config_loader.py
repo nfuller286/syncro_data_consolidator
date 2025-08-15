@@ -64,16 +64,21 @@ def _find_and_load_config() -> Optional[Dict[str, Any]]:
     try:
         project_root = None
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        for _ in range(5):
-            if os.path.basename(current_dir) == 'syncro_data_consolidator':
+        for _ in range(5):  # Traverse up to 5 levels
+            config_path_to_check = os.path.join(current_dir, 'config', 'config.json')
+            sample_config_path_to_check = os.path.join(current_dir, 'config', 'sampleconfig.json')
+            
+            if os.path.isfile(config_path_to_check) or os.path.isfile(sample_config_path_to_check):
                 project_root = current_dir
                 break
+            
             parent_dir = os.path.dirname(current_dir)
-            if parent_dir == current_dir: break
+            if parent_dir == current_dir:  # Reached root of filesystem
+                break
             current_dir = parent_dir
 
         if not project_root:
-            print("FATAL ERROR: Could not find project root 'syncro_data_consolidator'.")
+            print("FATAL ERROR: Could not find project root. Searched for 'config/config.json' or 'config/sampleconfig.json'.")
             return None
 
         config_path = os.path.join(project_root, "config", "config.json")
