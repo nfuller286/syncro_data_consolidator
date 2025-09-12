@@ -1,0 +1,19 @@
+# --- Config ---
+/config/*
+!/config/sampleconfig.json
+/config/config.json
+!.gitkeep
+
+# --- Data ---
+/data/
+!/data/.gitkeep
+
+# --- Python bytecode ---
+__pycache__/
+*.py[cod]
+
+# --- VS Code ---
+.vscode/settings.json
+
+# Utility script not tracked
+ClearState.ps1
