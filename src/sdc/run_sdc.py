@@ -108,7 +108,7 @@ def main():
             logger.info("Executing 'full' pipeline...")
             
             # Check if we are in a test file mode for Syncro
-            syncro_test_mode = config.get('syncro_api', {}).get('test_file_path')
+            syncro_test_mode = config.get('syncro_api', {}).get('syncro_test_ticket_file')
 
             if not syncro_test_mode:
                 # 1. Cache (only if not in test mode)
