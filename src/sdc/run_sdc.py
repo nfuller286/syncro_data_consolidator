@@ -32,6 +32,10 @@ def main():
     logger = get_sdc_logger('run_sdc', config)
     logger.info("SDC application starting.")
 
+    # --- Dynamically build process steps from LLM configs ---
+    llm_analysis_tasks = config.get('llm_configs', {}).get('analysis_tasks', {})
+    llm_task_keys = list(llm_analysis_tasks.keys())
+
     # --- Argument Parsing Setup ---
     parser = argparse.ArgumentParser(description="Syncro Data Consolidator (SDC) CLI", formatter_class=argparse.RawTextHelpFormatter)
     subparsers = parser.add_subparsers(dest='command', required=True, help='Available commands')
@@ -42,7 +46,8 @@ def main():
 
     # 'process' command
     parser_process = subparsers.add_parser('process', help='Run a specific processing step')
-    parser_process.add_argument('--step', required=True, choices=['all', 'customer_linking', 'llm_title', 'llm_summary', 'llm_categorize'], help='The processing step to run')
+    valid_process_steps = ['all', 'customer_linking'] + llm_task_keys
+    parser_process.add_argument('--step', required=True, choices=valid_process_steps, help='The processing step to run')
 
     # 'run' command
     parser_run = subparsers.add_parser('run', help='Run a predefined pipeline')
@@ -74,10 +79,10 @@ def main():
     
     process_map = {
         'customer_linking': partial(link_customers_to_sessions, config, logger),
-        'llm_title': partial(run_llm_analysis, config, logger, analysis_type='title'),
-        'llm_summary': partial(run_llm_analysis, config, logger, analysis_type='summary'),
-        'llm_categorize': partial(run_llm_analysis, config, logger, analysis_type='categorize')
     }
+    # Dynamically add LLM analysis tasks to the process map
+    for task_key in llm_task_keys:
+        process_map[task_key] = partial(run_llm_analysis, config, logger, analysis_type=task_key)
     
     if args.command == 'cache':
         if args.source == 'syncro':

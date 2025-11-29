@@ -132,3 +132,24 @@ def load_config() -> Optional[Dict[str, Any]]:
     if _cached_config is None:
         _cached_config = _find_and_load_config()
     return _cached_config
+
+def get_config_value(config: Dict[str, Any], key_path: str, default: Any = None) -> Any:
+    """
+    Safely retrieves a nested value from a dictionary using a dot-separated path.
+
+    Args:
+        config: The configuration dictionary to search.
+        key_path: A dot-separated string representing the nested key (e.g., 'parent.child.key').
+        default: The value to return if the key is not found.
+
+    Returns:
+        The value found at the specified path, or the default value.
+    """
+    keys = key_path.split('.')
+    value = config
+    for key in keys:
+        if isinstance(value, dict) and key in value:
+            value = value[key]
+        else:
+            return default
+    return value

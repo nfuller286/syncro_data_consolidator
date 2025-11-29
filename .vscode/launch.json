@@ -71,21 +71,41 @@
       "justMyCode": true
     },
     {
-      "name": "SDC: Process LLM Title Generation",
+      "name": "SDC: Process Title Generation",
       "type": "debugpy",
       "request": "launch",
       "module": "sdc.run_sdc",
-      "args": ["process", "--step", "llm_title"],
+      "args": ["process", "--step", "title"],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/src",
       "justMyCode": true
     },
     {
-      "name": "SDC: Process LLM Summarization",
+      "name": "SDC: Process Summarization",
       "type": "debugpy",
       "request": "launch",
       "module": "sdc.run_sdc",
-      "args": ["process", "--step", "llm_summary"],
+      "args": ["process", "--step", "summary"],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/src",
+      "justMyCode": true
+    },
+    {
+      "name": "SDC: Process Categorization",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "sdc.run_sdc",
+      "args": ["process", "--step", "categorize"],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/src",
+      "justMyCode": true
+    },
+    {
+      "name": "SDC: Process Notes Analysis",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "sdc.run_sdc",
+      "args": ["process", "--step", "notes_json_analysis"],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/src",
       "justMyCode": true
@@ -144,9 +164,10 @@
       "options": [
         "all",
         "customer_linking",
-        "llm_title",
-        "llm_summary",
-        "llm_categorize"
+        "title",
+        "summary",
+        "categorize",
+        "notes_json_analysis"
       ],
       "default": "all"
     },
