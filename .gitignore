@@ -15,5 +15,11 @@ __pycache__/
 # --- VS Code ---
 .vscode/settings.json
 
+# --- Docs ---
+/docs/
+/dev docs/
+# --- tmp ---
+/tmp/
+
 # Utility script not tracked
 ClearState.ps1

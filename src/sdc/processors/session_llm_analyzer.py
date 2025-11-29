@@ -27,7 +27,10 @@ def run_llm_analysis(config: Dict[str, Any], logger, analysis_type: str):
         logger.critical(f"Invalid analysis type '{analysis_type}' passed to LLM analyzer. Aborting.")
         return
 
-    logger.info(f"Starting V2 Session LLM analysis process for type: '{analysis_type}'.")
+    output_target = analysis_config.get('output_target')
+    if not output_target or 'type' not in output_target or 'key' not in output_target:
+        logger.critical(f"Analysis config for '{analysis_type}' is missing a valid 'output_target'. Aborting.")
+        return
 
     try:
         sessions_output_folder = config['project_paths']['sessions_output_folder']
@@ -35,8 +38,10 @@ def run_llm_analysis(config: Dict[str, Any], logger, analysis_type: str):
         logger.critical(f"Configuration key missing: {e}. Aborting LLM analysis for '{analysis_type}'.")
         return
 
+    logger.info(f"Starting V2 Session LLM analysis process for type: '{analysis_type}'.")
+
     processed_files, analyzed_files, error_files, skipped_files = 0, 0, 0, 0
-    PROCESSOR_NAME = analysis_config['processor_name']
+    PROCESSOR_NAME = analysis_config.get('processor_name', f"session_llm_analyzer_{analysis_type}")
 
     with os.scandir(sessions_output_folder) as it:
         for entry in it:
@@ -51,13 +56,17 @@ def run_llm_analysis(config: Dict[str, Any], logger, analysis_type: str):
 
             # 1. Skip if this processor has already run on this session
             if PROCESSOR_NAME in session.meta.processing_log:
-                logger.info(f"Skipping session {session.meta.session_id} because it has already been processed by {PROCESSOR_NAME}.")
                 skipped_files += 1
                 continue
 
             # 2. Skip if the session is in a state we don't want to analyze (e.g., needs linking)
             if session.meta.processing_status not in ['Linked', 'Complete', 'Reviewed']:
-                logger.info(f"Skipping session {session.meta.session_id} because its status is '{session.meta.processing_status}'.")
+                skipped_files += 1
+                continue
+
+            # 3. Implement Source System Filtering
+            applicable_source_systems = analysis_config.get('applicable_source_systems')
+            if applicable_source_systems and session.meta.source_system not in applicable_source_systems:
                 skipped_files += 1
                 continue
 
@@ -81,20 +90,41 @@ def run_llm_analysis(config: Dict[str, Any], logger, analysis_type: str):
                 if isinstance(response_content, str) and response_content.strip():
                     clean_response = response_content.strip().strip('"')
 
-                    # Save the result to the correct attribute based on analysis type
-                    if analysis_type == 'title':
-                        session.insights.llm_generated_title = clean_response
-                    elif analysis_type == 'summary':
-                        summary_key = analysis_config.get('summary_key', 'default')
-                        session.insights.generated_summaries[summary_key] = clean_response
-                    elif analysis_type == 'categorize':
-                        session.insights.llm_generated_category = clean_response
+                    # Implement Flexible Output Saving
+                    target_type = output_target['type']
+                    target_key = output_target['key']
+
+                    if target_type == "comprehensive_json":
+                        try:
+                            # The response itself is a JSON string
+                            parsed_json = json.loads(clean_response)
+                            # Populate multiple fields from the single response
+                            if 'title' in parsed_json:
+                                session.insights.structured_llm_results['title'] = parsed_json['title']
+                            if 'category' in parsed_json:
+                                session.insights.structured_llm_results['category'] = parsed_json['category']
+                            # Save the full JSON blob to its own summary key
+                            session.insights.generated_summaries[target_key] = clean_response
+
+                        except json.JSONDecodeError:
+                            logger.error(f"Failed to parse JSON response for '{analysis_type}' on session {session.meta.session_id}. Response was: {clean_response}")
+                            error_files += 1
+                            continue
+
+                    elif target_type == 'structured_llm_results':
+                        session.insights.structured_llm_results[target_key] = clean_response
+                    elif target_type == 'generated_summaries':
+                        session.insights.generated_summaries[target_key] = clean_response
+                    else:
+                        logger.warning(f"Unknown output_target type '{target_type}' for analysis '{analysis_type}'. Result not saved.")
+                        error_files += 1
+                        continue
 
                     session.meta.processing_log.append(PROCESSOR_NAME)
                     session.meta.last_updated_timestamp_utc = datetime.now(timezone.utc)
                     session_handler.save_session_to_file(session, config, logger)
                     analyzed_files += 1
-                    logger.info(f"Generated {analysis_type} for {session.meta.session_id}")
+                    logger.info(f"Generated '{analysis_type}' for {session.meta.session_id} and saved to {target_type}.{target_key}")
             else:
                 error_files += 1
                 continue

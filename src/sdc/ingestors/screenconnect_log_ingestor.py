@@ -14,106 +14,17 @@ from sdc.models.session_v2 import Session, SessionSegment, SessionMeta, SessionC
 from sdc.utils.session_handler import save_session_to_file
 # --- SHARED UTILS ---
 from sdc.utils import file_ingestor_state_handler as state_handler
+from sdc.utils import session_aggregator
 from sdc.utils.sdc_logger import get_sdc_logger
+from sdc.utils.constants import UNDEFINED_TIMESTAMP
 
 # --- CONSTANTS ---
 STATE_FILE_NAME = 'screenconnect_log_ingestor_state.json'
-UNDEFINED_TIMESTAMP = datetime.datetime(1970, 1, 1, 0, 0, 0, tzinfo=datetime.timezone.utc)
 SESSION_WINDOW_MINUTES = 30
 
 # =================================================================================
 #  HELPER FUNCTIONS - PURE LOGIC
 # =================================================================================
-
-def _consolidate_events(df: pd.DataFrame) -> list[list[dict]]:
-    """
-    Groups individual event rows from a DataFrame into consolidated sessions.
-
-    A new session is started when the customer, participant, or time gap between
-    events exceeds a defined threshold.
-
-    Args:
-        df: A pre-sorted and cleaned DataFrame of ScreenConnect events.
-
-    Returns:
-        A list of sessions, where each session is a list of event dictionaries.
-    """
-    if df.empty:
-        return []
-
-    sessions = []
-    current_session_events = [df.iloc[0].to_dict()]
-    session_customer = df.iloc[0]['SessionCustomProperty1']
-    session_participant = df.iloc[0]['ParticipantName']
-    session_end_time = df.iloc[0]['DisconnectedTime_dt']
-
-    # Iterate over rows as dictionaries for cleaner access
-    for _, row_dict in df.iloc[1:].to_dict('index').items():
-        time_gap_exceeded = (row_dict['ConnectedTime_dt'] - session_end_time) > timedelta(minutes=SESSION_WINDOW_MINUTES)
-        
-        # Condition to start a new session
-        if row_dict['SessionCustomProperty1'] != session_customer or row_dict['ParticipantName'] != session_participant or time_gap_exceeded:
-            # Finalize and append the previous session
-            sessions.append(current_session_events)
-            
-            # Start a new session, resetting state with the current event's data
-            current_session_events = [row_dict]
-            session_customer = row_dict['SessionCustomProperty1']
-            session_participant = row_dict['ParticipantName']
-            session_end_time = row_dict['DisconnectedTime_dt']
-        else:
-            # Continue the current session
-            current_session_events.append(row_dict)
-            session_end_time = max(session_end_time, row_dict['DisconnectedTime_dt'])
-
-    if current_session_events:
-        sessions.append(current_session_events)
-    
-    return sessions
-
-def _transform_group_to_session(event_group: list[dict], target_file: str) -> Session:
-    """Transforms a group of events into a single V2 Session object."""
-    session_start_time = min(e['ConnectedTime_dt'] for e in event_group)
-    session_end_time = max(e['DisconnectedTime_dt'] for e in event_group)
-    customer_name = event_group[0]['SessionCustomProperty1']
-    participant_name = event_group[0]['ParticipantName']
-
-    segments = []
-    source_row_indices = []
-    for event in event_group:
-        segments.append(SessionSegment(
-            segment_id=str(uuid.uuid4()),
-            start_time_utc=event['ConnectedTime_dt'],
-            end_time_utc=event['DisconnectedTime_dt'],
-            type="RemoteConnection",
-            author=event['ParticipantName'],
-            content=f"Connected to machine: {event.get('SessionName', 'Unknown')}",
-            metadata={
-                "connection_id": event.get('ConnectionID'), "process_type": event.get('ProcessType'),
-                "session_type": event.get('SessionSessionType'), "duration_seconds": event.get('DurationSeconds')
-            }
-        ))
-        source_row_indices.append(str(event['original_row_index']))
-
-    return Session(
-        meta=SessionMeta(
-            session_id=str(uuid.uuid4()), schema_version="2.0", source_system="ScreenConnect",
-            source_identifiers=[target_file, f"rows/{','.join(source_row_indices)}"],
-            processing_status="Needs Linking",
-            ingestion_timestamp_utc=datetime.datetime.now(datetime.timezone.utc),
-            last_updated_timestamp_utc=datetime.datetime.now(datetime.timezone.utc)
-        ),
-        context=SessionContext(
-            customer_name=customer_name, contact_name=None, customer_id=None, contact_id=None
-        ),
-        insights=SessionInsights(
-            session_start_time_utc=session_start_time, session_end_time_utc=session_end_time,
-            session_duration_minutes=int((session_end_time - session_start_time).total_seconds() / 60),
-            source_title=f"ScreenConnect Session for {participant_name}",
-            llm_generated_category=None, llm_generated_title=None, user_notes=""
-        ),
-        segments=segments
-    )
 
 # =================================================================================
 #  REFACTORED INGESTION FUNCTION
@@ -164,26 +75,57 @@ def ingest_screenconnect(config: Dict[str, Any], logger) -> None:
         df.reset_index(inplace=True)
         df.rename(columns={'index': 'original_row_index'}, inplace=True)
 
-
         if df.empty:
             logger.info("DataFrame is empty after cleaning. No sessions to process.")
             return
         
-        # 1. Call the consolidation helper
-        consolidated_sessions = _consolidate_events(df)
-        logger.info(f"Grouped {len(df)} events into {len(consolidated_sessions)} consolidated sessions.")
+        # 1. Convert all DataFrame rows to SessionSegment objects
+        all_segments = []
+        for _, row in df.iterrows():
+            all_segments.append(SessionSegment(
+                segment_id=str(uuid.uuid4()),
+                start_time_utc=row['ConnectedTime_dt'],
+                end_time_utc=row['DisconnectedTime_dt'],
+                type="RemoteConnection",
+                author=row['ParticipantName'],
+                content=f"Connected to machine: {row.get('SessionName', 'Unknown')}",
+                metadata={
+                    "customer_name": row['SessionCustomProperty1'], # For grouping
+                    "original_row_index": row['original_row_index'], # For source identifiers
+                    "connection_id": row.get('ConnectionID'),
+                    "process_type": row.get('ProcessType'),
+                    "session_type": row.get('SessionSessionType'),
+                    "duration_seconds": row.get('DurationSeconds')
+                }
+            ))
 
-        # 2. Loop and call the transformation helper
+        # 2. Group segments using the session aggregator
+        grouped_sessions = session_aggregator.group_segments_by_time_gap_and_keys(
+            segments=all_segments,
+            time_gap=timedelta(minutes=SESSION_WINDOW_MINUTES),
+            grouping_keys=['customer_name', 'author']
+        )
+        logger.info(f"Grouped {len(all_segments)} events into {len(grouped_sessions)} consolidated sessions.")
+
+        # 3. Transform each group into a Session object and save
         processed_count = 0
         failed_count = 0
-        for group in consolidated_sessions:
+        for group in grouped_sessions:
             try:
-                session_object = _transform_group_to_session(group, target_file)
+                first_segment = group[0]
+                source_row_indices = [str(s.metadata['original_row_index']) for s in group]
+                session_object = session_aggregator.transform_grouped_segments_to_session(
+                    segments=group,
+                    source_system="ScreenConnect",
+                    source_identifiers=[target_file, f"rows/{','.join(source_row_indices)}"],
+                    customer_name=first_segment.metadata.get('customer_name'),
+                    source_title=f"ScreenConnect Session for {first_segment.author}"
+                )
                 save_session_to_file(session_object, config, logger)
                 processed_count += 1
             except Exception as e:
                 # Ensure group is not empty before trying to access it for logging
-                start_time_for_log = group[0].get('ConnectedTime_dt', 'Unknown Time') if group else 'Unknown Time'
+                start_time_for_log = group[0].start_time_utc if group else 'Unknown Time'
                 logger.error(f"Error processing session group starting at {start_time_for_log}: {e}", exc_info=True)
                 failed_count += 1
 

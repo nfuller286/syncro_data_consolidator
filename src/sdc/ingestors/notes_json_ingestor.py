@@ -4,7 +4,6 @@
 import json
 import os
 import uuid
-import datetime
 from typing import Any, Dict
 
 # --- V2 IMPORTS ---
@@ -14,7 +13,9 @@ from sdc.utils.session_handler import save_session_to_file
 # --- SHARED UTILS ---
 from sdc.utils import file_ingestor_state_handler as state_handler
 from sdc.utils.date_utils import parse_datetime_utc
+from sdc.utils.session_builder import build_session
 from sdc.utils.sdc_logger import get_sdc_logger
+from sdc.utils.constants import UNDEFINED_TIMESTAMP
 
 # --- CONSTANTS ---
 STATE_FILE_NAME = 'notes_json_ingestor_state.json'
@@ -28,7 +29,6 @@ def _transform_ticket_to_session(
     index: int,
     notes_file_path: str,
     config: Dict[str, Any],
-    UNDEFINED_TIMESTAMP: datetime.datetime,
     logger
 ) -> Session:
     """Transforms a single ticket dictionary into a V2 Session object."""
@@ -80,23 +80,14 @@ def _transform_ticket_to_session(
             metadata={'order': sub_todo.get('order'), 'completed': sub_todo.get('completed')}
         ))
 
-    return Session(
-        meta=SessionMeta(
-            session_id=str(uuid.uuid4()), schema_version="2.0", source_system="notes.json",
-            source_identifiers=[notes_file_path, f"/tickets/{index}"], processing_status="Needs Linking",
-            ingestion_timestamp_utc=datetime.datetime.now(datetime.timezone.utc),
-            last_updated_timestamp_utc=datetime.datetime.now(datetime.timezone.utc)
-        ),
-        context=SessionContext(
-            customer_name=ticket.get('customer'), contact_name=ticket.get('contact'),
-            customer_id=None, contact_id=None
-        ),
-        insights=SessionInsights(
-            session_start_time_utc=ticket_creation_time, session_end_time_utc=ticket_creation_time,
-            session_duration_minutes=0, source_title=ticket.get('subject'),
-            llm_generated_category=None, llm_generated_title=None, user_notes=""
-        ),
-        segments=segments
+    return build_session(
+        segments=segments,
+        source_system="notes.json",
+        source_identifiers=[notes_file_path, f"/tickets/{index}"],
+        customer_name=ticket.get('customer'),
+        contact_name=ticket.get('contact'),
+        source_title=ticket.get('subject')
+        # processing_status defaults to "Needs Linking", which is correct here
     )
 
 def _transform_todo_to_session(
@@ -104,7 +95,6 @@ def _transform_todo_to_session(
     index: int,
     notes_file_path: str,
     config: Dict[str, Any],
-    UNDEFINED_TIMESTAMP: datetime.datetime,
     logger
 ) -> Session:
     """Transforms a single standalone ToDo dictionary into a V2 Session object."""
@@ -117,23 +107,14 @@ def _transform_todo_to_session(
         metadata={'completed': todo.get('completed')}
     )]
 
-    return Session(
-        meta=SessionMeta(
-            session_id=str(uuid.uuid4()), schema_version="2.0", source_system="notes.json",
-            source_identifiers=[notes_file_path, f"/toDoItems/{index}"], processing_status="Needs Linking",
-            ingestion_timestamp_utc=datetime.datetime.now(datetime.timezone.utc),
-            last_updated_timestamp_utc=datetime.datetime.now(datetime.timezone.utc)
-        ),
-        context=SessionContext(
-            customer_name=todo.get('customer'), contact_name=todo.get('contact'),
-            customer_id=None, contact_id=None
-        ),
-        insights=SessionInsights(
-            session_start_time_utc=todo_creation_time, session_end_time_utc=todo_creation_time,
-            session_duration_minutes=0, source_title=todo.get('subject'),
-            llm_generated_category=None, llm_generated_title=None, user_notes=""
-        ),
-        segments=segments
+    return build_session(
+        segments=segments,
+        source_system="notes.json",
+        source_identifiers=[notes_file_path, f"/toDoItems/{index}"],
+        customer_name=todo.get('customer'),
+        contact_name=todo.get('contact'),
+        source_title=todo.get('subject')
+        # processing_status defaults to "Needs Linking", which is correct here
     )
 
 # =================================================================================
@@ -144,9 +125,6 @@ def ingest_notes(config: Dict[str, Any], logger) -> None:
     Loads data from notes.json, transforms it into the V2 Session format, and saves it.
     """
     logger.info("Starting ingestion for source: NotesJSON")
-
-    # Define a placeholder for items with no valid timestamp, ensuring orphaned work is captured for review.
-    UNDEFINED_TIMESTAMP = datetime.datetime(1970, 1, 1, 0, 0, 0, tzinfo=datetime.timezone.utc)
 
     notes_file_path = config['project_paths']['notes_json']
     state_file_path = os.path.join(config['project_paths']['cache_folder'], STATE_FILE_NAME)
@@ -175,7 +153,7 @@ def ingest_notes(config: Dict[str, Any], logger) -> None:
                 logger.warning("Skipping ticket with no ticketNumber.")
                 failed_items += 1
                 continue
-            session_object = _transform_ticket_to_session(ticket, index, notes_file_path, config, UNDEFINED_TIMESTAMP, logger)
+            session_object = _transform_ticket_to_session(ticket, index, notes_file_path, config, logger)
             save_session_to_file(session_object, config, logger)
             processed_items += 1
         except Exception as e:
@@ -185,7 +163,7 @@ def ingest_notes(config: Dict[str, Any], logger) -> None:
     # --- Process standalone ToDo items ---
     for index, todo in enumerate(data.get('toDoItems', [])):
         try:
-            session_object = _transform_todo_to_session(todo, index, notes_file_path, config, UNDEFINED_TIMESTAMP, logger)
+            session_object = _transform_todo_to_session(todo, index, notes_file_path, config, logger)
             save_session_to_file(session_object, config, logger)
             processed_items += 1
         except Exception as e:
