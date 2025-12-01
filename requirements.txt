@@ -2,4 +2,10 @@ pandas
 thefuzz[speedup]
 python-dateutil
 pydantic
+langchain
+langchain-community
 langchain-google-genai
+langchain-huggingface
+langchain-openai
+faiss-cpu
+sentence-transformers
