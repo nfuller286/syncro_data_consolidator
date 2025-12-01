@@ -49,6 +49,19 @@
       "max_tokens": 2048
     }
   },
+  "embedding_config": {
+    "active_provider": "local",
+    "base_storage_path": "{{project_paths.cache_folder}}/embeddings",
+    "providers": {
+        "local": {
+            "model_name": "sentence-transformers/all-MiniLM-L6-v2",
+            "device": "cpu"
+        },
+        "openai": {
+            "model_name": "text-embedding-3-small"
+        }
+    }
+  },
   "processing_defaults": {
     "recursive_sillytavern_scan": true,
     "syncro_cache_policy": "if_older_than_hours",
