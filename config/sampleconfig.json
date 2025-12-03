@@ -10,7 +10,8 @@
     "sillytavern_chat_input_folder": "{{input_folder}}/sillytavern_chat",
     "syncro_tickets_input_folder": "{{input_folder}}/syncro_tickets",
     "sessions_output_folder": "{{output_folder}}/sessions",
-    "cache_folder": "{{data_folder}}/cache"
+    "cache_folder": "{{data_folder}}/cache",
+    "database_file": "{{data_folder}}/sdc.db"
   },
   "logging": {
     "log_file_path": "{{logs_folder}}/sdc.log",
@@ -47,6 +48,19 @@
     "default_llm_params": {
       "temperature": 0.7,
       "max_tokens": 2048
+    }
+  },
+  "embedding_config": {
+    "active_provider": "local",
+    "base_storage_path": "{{cache_folder}}/embeddings",
+    "providers": {
+        "local": {
+            "model_name": "sentence-transformers/all-MiniLM-L6-v2",
+            "device": "cpu"
+        },
+        "openai": {
+            "model_name": "text-embedding-3-small"
+        }
     }
   },
   "processing_defaults": {
