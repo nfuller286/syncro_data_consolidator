@@ -24,8 +24,8 @@ except ImportError as e:
     print(f"Failed to import project modules. Ensure this script is run from the project root. Error: {e}")
     sys.exit(1)
 
-TARGET_SIZE = 1000
-MAX_SIZE = 4000
+CHUNK_TARGET_SIZE = 1000  # Soft limit: Try to break here at a segment boundary
+CHUNK_MAX_SIZE = 4000     # Hard limit: Must break here (splitting the segment)
 
 def cosine_similarity(v1, v2):
     """Computes the cosine similarity between two vectors."""
@@ -46,82 +46,106 @@ class SessionVectorizer:
         self.logger = logger
         db_path = config['project_paths']['database_file']
         self.conn = sqlite3.connect(db_path)
-        self.conn.row_factory = sqlite3.Row
         self.logger.info(f"Connected to database at {db_path}")
         self.embedding_client = get_embedding_client(config, self.logger)
         if not self.embedding_client:
             raise ValueError("Failed to initialize embedding client.")
 
-    def _create_chunks_for_session(self, session_id):
-        """Creates text chunks for a session using 'smart boundary' logic."""
-        cursor = self.conn.execute(
-            "SELECT segment_id, content, metadata FROM segments WHERE session_id = ? ORDER BY start_time ASC",
-            (session_id,)
-        )
-        segments = cursor.fetchall()
-        
-        chunks = []
-        current_buffer = ""
-        current_segment_ids = []
+    def _process_segments_into_chunks(self, rows):
+        """
+        Processes database rows into text chunks with associated segment IDs.
+        - Accumulates segments into a buffer.
+        - Flushes buffer when it exceeds CHUNK_TARGET_SIZE.
+        - Splits individual segments that exceed CHUNK_MAX_SIZE.
+        """
+        final_chunks = []
+        current_buffer_text = ""
+        current_buffer_ids = []
 
-        def finalize_chunk(buffer, segment_ids):
-            if buffer.strip():
-                chunks.append({
-                    "text": buffer.strip(),
-                    "segment_ids": list(segment_ids)
-                })
+        def flush_buffer():
+            nonlocal current_buffer_text, current_buffer_ids
+            if current_buffer_text:
+                final_chunks.append({'text': current_buffer_text.strip(), 'ids': list(current_buffer_ids)})
+                current_buffer_text = ""
+                current_buffer_ids = []
 
-        for segment in segments:
-            segment_id, content, metadata_str = segment['segment_id'], segment['content'], segment['metadata']
+        for content, metadata_str, segment_id in rows:
             metadata = json.loads(metadata_str) if metadata_str else {}
-            
-            prefix = "\nUser: " if metadata.get("is_user") or metadata.get("author") == "local_author" else "\nAssistant: "
-            segment_text = prefix + (content or "")
+            # Determine prefix
+            is_local = metadata.get("is_user") is True or metadata.get("author") == "local_author"
+            prefix = "\nUser: " if is_local else "\nAssistant: "
 
-            # Overflow protection for single large segments
-            while len(segment_text) > MAX_SIZE:
-                split_pos = segment_text.rfind('\n', 0, MAX_SIZE)
-                if split_pos == -1:  # No newline found, hard split
-                    split_pos = MAX_SIZE
-                
-                finalize_chunk(segment_text[:split_pos], [segment_id])
-                segment_text = segment_text[split_pos:]
+            seg_text = prefix + (content or "")
 
-            # Boundary check
-            if len(current_buffer) + len(segment_text) > TARGET_SIZE and current_buffer:
-                finalize_chunk(current_buffer, current_segment_ids)
-                current_buffer = ""
-                current_segment_ids = []
+            # --- MONSTER SEGMENT HANDLING ---
+            if len(seg_text) > CHUNK_MAX_SIZE:
+                flush_buffer() # Clear any pending small segments first
 
-            current_buffer += segment_text
-            current_segment_ids.append(segment_id)
+                remaining_text = seg_text
+                while len(remaining_text) > 0:
+                    # If what's left fits, take it all
+                    if len(remaining_text) <= CHUNK_MAX_SIZE:
+                        final_chunks.append({'text': remaining_text.strip(), 'ids': [segment_id]})
+                        break
 
-        finalize_chunk(current_buffer, current_segment_ids)
-        return chunks
+                    # Attempt to find a semantic split point
+                    slice_candidate = remaining_text[:CHUNK_MAX_SIZE]
+                    last_newline = slice_candidate.rfind('\n')
+                    last_space = slice_candidate.rfind(' ')
+
+                    split_pos = last_newline if last_newline != -1 else last_space
+
+                    # CRITICAL FIX: Ensure forward progress.
+                    # If split_pos is -1 (not found) OR 0 (start of string), force hard cut.
+                    if split_pos <= 0:
+                        split_pos = CHUNK_MAX_SIZE
+
+                    chunk_text = remaining_text[:split_pos]
+                    final_chunks.append({'text': chunk_text.strip(), 'ids': [segment_id]})
+
+                    # Advance the text
+                    remaining_text = remaining_text[split_pos:]
+                continue
+
+            # --- STANDARD ACCUMULATION ---
+            if len(current_buffer_text) + len(seg_text) > CHUNK_TARGET_SIZE:
+                flush_buffer()
+
+            current_buffer_text += seg_text
+            current_buffer_ids.append(segment_id)
+
+        flush_buffer() # Final flush
+        return final_chunks
 
     def get_session_vectors(self, session_id):
         """Computes the embedding centroid and chunk vectors for a session."""
-        chunks_data = self._create_chunks_for_session(session_id)
-        if not chunks_data:
-            self.logger.warning(f"Session {session_id} has no text content. Skipping.")
+        cursor = self.conn.execute(
+            "SELECT content, metadata, segment_id FROM segments WHERE session_id = ? ORDER BY start_time ASC",
+            (session_id,)
+        )
+        rows = cursor.fetchall()
+        if not rows:
+            self.logger.warning(f"Session {session_id} has no segments. Skipping.")
             return None
 
-        chunk_texts = [chunk['text'] for chunk in chunks_data]
-        
+        chunks_data = self._process_segments_into_chunks(rows)
+        chunk_texts = [c['text'] for c in chunks_data]
+        if not chunk_texts:
+            self.logger.warning(f"No text chunks were generated for session {session_id}.")
+            return None
+
         try:
             chunk_vectors = self.embedding_client.embed_documents(chunk_texts)
             if not chunk_vectors:
                 return None
             
-            for i, vector in enumerate(chunk_vectors):
-                chunks_data[i]['vector'] = vector
-
             centroid_vector = np.mean(chunk_vectors, axis=0)
-            
             return {
                 "session_id": session_id,
                 "centroid_vector": centroid_vector,
-                "chunk_data": chunks_data
+                "chunk_vectors": chunk_vectors,
+                "chunk_texts": chunk_texts,
+                "chunk_metadata": [c['ids'] for c in chunks_data]
             }
         except Exception as e:
             self.logger.error(f"Failed to embed chunks for session {session_id}: {e}")
@@ -148,41 +172,51 @@ def run_interactive_search(session_vectors_data, vectorizer):
                 continue
 
             centroid = data['centroid_vector']
-            chunk_scores = [cosine_similarity(query_vector, chunk['vector']) for chunk in data['chunk_data']]
+            chunks = data['chunk_vectors']
+            
+            score_centroid = cosine_similarity(query_vector, centroid)
+            
+            chunk_scores = [cosine_similarity(query_vector, chunk) for chunk in chunks]
             score_chunk_max = max(chunk_scores) if chunk_scores else 0
             
             results.append({
                 "session_id": session_id,
-                "score_centroid": cosine_similarity(query_vector, centroid),
+                "score_centroid": score_centroid,
                 "score_chunk_max": score_chunk_max,
                 "data": data 
             })
             
         results.sort(key=lambda x: x['score_chunk_max'], reverse=True)
         
-        print("\n" + "-"*80)
-        print(f"{'#':<3} | {'ID':<38} | {'Centroid Score':<16} | {'MaxChunk Score':<16} | {'Delta'}")
-        print("-" * 80)
-        
-        for i, res in enumerate(results):
-            delta = res['score_chunk_max'] - res['score_centroid']
-            print(f"{i+1:<3} | {res['session_id']:<38} | {res['score_centroid']:<16.4f} | {res['score_chunk_max']:<16.4f} | {delta:+.2f}")
-        print("-" * 80 + "\n")
-
+        # 2. Inner Loop: Validation & Navigation
         while True:
-            selection = input("Select row # to inspect (or enter to search again): ")
-            if not selection:
-                break
+            # Just print the table headers and rows here
+            print("\n" + "-"*80)
+            print(f"{'#':<3} | {'ID':<38} | {'Centroid Score':<16} | {'MaxChunk Score':<16} | {'Delta'}")
+            print("-" * 80)
+            
+            for i, res in enumerate(results):
+                delta = res['score_chunk_max'] - res['score_centroid']
+                delta_str = f"{delta:+.2f}"
+                
+                print(f"{i+1:<3} | {res['session_id']:<38} | {res['score_centroid']:<16.4f} | {res['score_chunk_max']:<16.4f} | {delta_str}")
+            print("-" * 80 + "\n")
+
+            # 3. Input Decision
+            selection = input("Select row # to inspect, or 'n' for new search: ")
+            if selection.lower() == 'n':
+                break # Breaks Inner Loop, goes back to Get Query
+
             try:
                 index = int(selection) - 1
                 if 0 <= index < len(results):
                     inspector_view(results[index]['data'], query_vector)
-                    break 
+                    input("\nPress Enter to return to results...")
+                    # DO NOT break here. Let Inner Loop repeat.
                 else:
                     print("Invalid row number.")
             except ValueError:
-                print("Invalid input. Please enter a number or press Enter.")
-
+                print("Invalid input. Please enter a number or 'n'.")
 
 def inspector_view(session_data, query_vector):
     """
@@ -190,16 +224,19 @@ def inspector_view(session_data, query_vector):
     """
     print(f"\n--- Inspector for Session: {session_data['session_id']} ---")
     
-    chunk_data = session_data['chunk_data']
-    scores = [cosine_similarity(query_vector, chunk['vector']) for chunk in chunk_data]
+    chunk_vectors = session_data['chunk_vectors']
+    chunk_texts = session_data['chunk_texts']
+    chunk_metadata = session_data.get('chunk_metadata', [])
+
+    scores = [cosine_similarity(query_vector, vec) for vec in chunk_vectors]
     
     highest_score = -1
     highest_scoring_chunk_index = -1
     
     for i, score in enumerate(scores):
         bar_length = int(score * 20)
-        bar = '█' * bar_length + ' ' * (20 - bar_length)
-        print(f"Chunk {i+1:<2}: [{bar}] {score:.4f}")
+        bar = '[' + '█' * bar_length + ' ' * (20 - bar_length) + ']'
+        print(f"Chunk {i+1:<2}: {bar} {score:.4f}")
         if score > highest_score:
             highest_score = score
             highest_scoring_chunk_index = i
@@ -207,25 +244,25 @@ def inspector_view(session_data, query_vector):
     if highest_scoring_chunk_index != -1:
         print("\nMost Relevant Passage:")
         print("-" * 25)
-        print(chunk_data[highest_scoring_chunk_index]['text'])
-        print("\nContributing Segments:", chunk_data[highest_scoring_chunk_index]['segment_ids'])
+        print(chunk_texts[highest_scoring_chunk_index])
+        if chunk_metadata and highest_scoring_chunk_index < len(chunk_metadata):
+            print(f"Segments included: {chunk_metadata[highest_scoring_chunk_index]}")
         print("-" * 25)
     
     print("-" * 50 + "\n")
-
 
 def main():
     """Main application logic."""
     config = load_config()
     logger = get_sdc_logger(__name__, config)
     
+    vectorizer = None
     try:
         vectorizer = SessionVectorizer(config, logger)
     except (ValueError, KeyError) as e:
         logger.critical(f"Initialization failed: {e}")
         return
 
-    # --- Startup ---
     while True:
         try:
             num_sessions_str = input("How many recent sessions to load? [Default: 20]: ")
@@ -239,8 +276,10 @@ def main():
                 print("Please enter a positive number.")
         except ValueError:
             print("Invalid input. Please enter a number.")
+        except (EOFError, KeyboardInterrupt):
+            logger.info("Exiting.")
+            return
 
-    # --- Loading Data ---
     logger.info(f"Fetching latest {num_sessions} sessions to compute vectors...")
     try:
         cursor = vectorizer.conn.execute(f"SELECT session_id FROM sessions ORDER BY start_time DESC LIMIT {num_sessions}")
@@ -248,18 +287,18 @@ def main():
         
         session_vectors_data = {}
         for i, session_id in enumerate(session_ids):
-            print(f"Processing session {i+1}/{len(session_ids)}: {session_id}") # Progress bar
+            print(f"\rProcessing session {i+1}/{len(session_ids)}: {session_id}...", end="", flush=True)
             session_vectors_data[session_id] = vectorizer.get_session_vectors(session_id)
-        
-        logger.info("Vector computation complete.")
+        print("\nVector computation complete.")
 
-        # --- Main Loop ---
         run_interactive_search(session_vectors_data, vectorizer)
 
     except sqlite3.Error as e:
         logger.error(f"A database error occurred: {e}")
+    except (EOFError, KeyboardInterrupt):
+        logger.info("\nShutdown requested.")
     finally:
-        if 'vectorizer' in locals() and vectorizer:
+        if vectorizer:
             vectorizer.close()
             logger.info("Database connection closed. Exiting.")
 
