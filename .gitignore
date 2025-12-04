@@ -23,3 +23,4 @@ __pycache__/
 
 # Utility script not tracked
 ClearState.ps1
+.aiexclude
