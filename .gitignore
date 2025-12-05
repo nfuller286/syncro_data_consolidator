@@ -20,7 +20,7 @@ __pycache__/
 /dev docs/
 # --- tmp ---
 /tmp/
-
+/Screenconnect temp documentation/
 # Utility script not tracked
 ClearState.ps1
 .aiexclude
