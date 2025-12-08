@@ -14,12 +14,12 @@ __pycache__/
 
 # --- VS Code ---
 .vscode/settings.json
-
+.aiexclude
 # --- Docs ---
 /docs/
 /dev docs/
 # --- tmp ---
 /tmp/
-
+/Screenconnect temp documentation/
 # Utility script not tracked
 ClearState.ps1

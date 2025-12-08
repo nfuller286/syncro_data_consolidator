@@ -18,13 +18,14 @@ def get_file_metadata(file_path: str) -> Dict[str, Any]:
 
 def load_state(state_file_path: str, logger, default_state: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """
-    Loads an ingestor's state from a JSON file.
+    Loads an ingestor's state from a JSON file. If the file does not exist,
+    it is created with the default state.
 
     Args:
         state_file_path: The full path to the state file.
         logger: The SDC logger instance.
-        default_state: The state to return if the file is not found or invalid.
-                       If None, an empty dictionary is returned.
+        default_state: The state to return and save if the file is not found or invalid.
+                       If None, an empty dictionary is used.
 
     Returns:
         The loaded state as a dictionary.
@@ -34,9 +35,43 @@ def load_state(state_file_path: str, logger, default_state: Optional[Dict[str, A
     try:
         with open(state_file_path, 'r', encoding='utf-8') as f:
             return json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError, TypeError):
-        logger.info(f"State file not found or invalid at {state_file_path}. Using default state.")
+    except FileNotFoundError:
+        logger.info(f"State file not found at {state_file_path}. Creating it with default state.")
+        save_state(default_state, state_file_path, logger)
         return default_state
+    except (json.JSONDecodeError, TypeError):
+        logger.warning(f"State file at {state_file_path} is invalid. Using default state.")
+        return default_state
+
+def verify_writability(state_file_path: str, logger) -> bool:
+    """
+    Verifies that the state file path is writable.
+
+    This is a "fail-fast" check. It ensures that the directory exists and that
+    a file can be created at the specified path before any main processing begins.
+
+    Args:
+        state_file_path: The full path to the state file.
+        logger: The SDC logger instance.
+
+    Returns:
+        True if the path is writable, False otherwise.
+    """
+    try:
+        # Ensure the parent directory exists
+        os.makedirs(os.path.dirname(state_file_path), exist_ok=True)
+        # Test writability by opening in append mode. This creates the file if it
+        # doesn't exist without truncating it if it does.
+        with open(state_file_path, 'a', encoding='utf-8'):
+            pass
+        return True
+    except (IOError, PermissionError) as e:
+        logger.error(
+            f"State file path at {state_file_path} is not writable. "
+            f"Aborting operation. Please check directory permissions. Error: {e}"
+        )
+        return False
+
 
 def save_state(state: Dict[str, Any], state_file_path: str, logger) -> None:
     """Saves the ingestor state to a JSON file using an atomic write operation."""
