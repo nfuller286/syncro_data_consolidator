@@ -71,5 +71,13 @@
     "sillytavern_session_gap_minutes": 60,
     "customer_linking_fuzzy_match_threshold": 95,
     "notes_json_filename": "notes.json"
+  },
+"screenconnect_ingestor": {
+    "mode": "csv",
+    "api_config": {
+"base_url": "https://your.screenconnect.instance",
+      "extension_id": "2d558935-686a-4bd0-9991-07539f5fe749",
+      "api_key": "Ocd3e44f-cb13-4f7a-99c3-b3787091e8eb"
+    }
   }
 }
