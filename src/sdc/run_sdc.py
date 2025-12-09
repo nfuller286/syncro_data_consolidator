@@ -63,6 +63,10 @@ def main():
     parser_clean.add_argument('sources', nargs='+', choices=valid_clean_targets, help='One or more sources to clean. Use "all" to clean all sources and logs.')
     parser_clean.add_argument('--commit', action='store_true', help='Perform the actual deletion. Without this flag, a dry run is performed.')
 
+    # 'query' command
+    parser_query = subparsers.add_parser('query', help='Run a natural language query against the data')
+    parser_query.add_argument('natural_language_query', help='The natural language query to run')
+
     args = parser.parse_args()
 
     # --- Command Execution Logic ---
@@ -162,6 +166,12 @@ def main():
             logger=logger,
             dry_run=is_dry_run
         )
+    
+    elif args.command == 'query':
+        from sdc.agent.executor import run_query
+        logger.info(f"Running query: {args.natural_language_query}")
+        result = run_query(args.natural_language_query)
+        print(result)
 
     logger.info("SDC application finished.")
 
