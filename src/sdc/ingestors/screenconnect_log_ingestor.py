@@ -1,12 +1,12 @@
+
 # -*- coding: utf-8 -*-
 """Ingestor for ScreenConnect session logs from CSV files."""
 
 import pandas as pd
 import os
-import json
 import uuid
 import datetime
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 # --- V2 IMPORTS ---
 from sdc.models.session_v2 import Session, SessionSegment, SessionMeta, SessionContext, SessionInsights
@@ -14,9 +14,12 @@ from sdc.utils.session_handler import save_session_to_file
 # --- SHARED UTILS ---
 from sdc.utils import file_ingestor_state_handler as state_handler
 from sdc.utils import session_aggregator
-from sdc.utils.sdc_logger import get_sdc_logger
-from sdc.utils.constants import UNDEFINED_TIMESTAMP, SCREENCONNECT_NAMESPACE_OID
+from sdc.utils.constants import (
+    UNDEFINED_TIMESTAMP, SCREENCONNECT_NAMESPACE_OID,
+    SCREENCONNECT_QUERY_FIELDS,
+)
 from sdc.api_clients.screenconnect_gateway import ScreenConnectGateway
+from sdc.utils.date_utils import parse_datetime_utc
 
 
 # --- CONSTANTS ---
@@ -27,19 +30,16 @@ SESSION_WINDOW_MINUTES = 30
 #  HELPER FUNCTIONS - PURE LOGIC
 # =================================================================================
 
-def _convert_raw_data_to_segments(raw_data: List[Dict]) -> List[SessionSegment]:
+def _convert_raw_data_to_segments(raw_data: List[Dict], config: Dict[str, Any]) -> List[SessionSegment]:
     """Converts a list of raw connection records into SessionSegment objects."""
     all_segments = []
     for row in raw_data:
         # Use a deterministic UUID based on the ConnectionID
         segment_uuid = uuid.uuid5(SCREENCONNECT_NAMESPACE_OID, str(row.get('ConnectionID')))
 
-        # Coerce invalid date strings into NaT (Not a Time), then to our undefined timestamp
-        connected_time = pd.to_datetime(row.get('ConnectedTime'), errors='coerce')
-        disconnected_time = pd.to_datetime(row.get('DisconnectedTime'), errors='coerce')
-
-        connected_time_utc = connected_time.tz_localize('UTC') if pd.notna(connected_time) else UNDEFINED_TIMESTAMP
-        disconnected_time_utc = disconnected_time.tz_localize('UTC') if pd.notna(disconnected_time) else UNDEFINED_TIMESTAMP
+        # Use the robust date utility to parse and convert to UTC
+        connected_time_utc = parse_datetime_utc(row.get('ConnectedTime'), config) or UNDEFINED_TIMESTAMP
+        disconnected_time_utc = parse_datetime_utc(row.get('DisconnectedTime'), config) or UNDEFINED_TIMESTAMP
 
         all_segments.append(SessionSegment(
             segment_id=str(segment_uuid),
@@ -49,11 +49,11 @@ def _convert_raw_data_to_segments(raw_data: List[Dict]) -> List[SessionSegment]:
             author=row.get('ParticipantName', 'Unknown'),
             content=f"Connected to machine: {row.get('SessionName', 'Unknown')}",
             metadata={
-                "customer_name": row.get('SessionCustomProperty1'), # For grouping
-                "connection_id": row.get('ConnectionID'), # Keep original for reference
+                "customer_name": row.get('SessionCustomProperty1'),  # For grouping
+                "connection_id": row.get('ConnectionID'),            # Keep original for reference
                 "process_type": row.get('ProcessType'),
                 "session_type": row.get('SessionSessionType'),
-                "duration_seconds": row.get('DurationSeconds')
+                "duration_seconds": row.get('DurationSeconds'),
             }
         ))
     return all_segments
@@ -62,25 +62,30 @@ def _convert_raw_data_to_segments(raw_data: List[Dict]) -> List[SessionSegment]:
 # =================================================================================
 #  REFACTORED INGESTION FUNCTION
 # =================================================================================
-def ingest_screenconnect(config: Dict[str, Any], logger) -> None:
+def ingest_screenconnect(config: Dict[str, Any], logger, **kwargs) -> None:
     """
     Loads ScreenConnect data from CSV or API, consolidates events into sessions,
     and transforms them into the V2 Session format.
     """
+    # Extract dynamic args
+    start_date: Optional[str] = kwargs.get('start_date')
+    end_date: Optional[str] = kwargs.get('end_date')
+    filters: List[str] = kwargs.get('filters', [])
+
     logger.info("Starting ScreenConnect ingestion...")
 
     sc_ingestor_config = config.get('screenconnect_ingestor', {})
-    mode = sc_ingestor_config.get('mode', 'csv') # Default to 'csv'
+    mode = sc_ingestor_config.get('mode', 'csv')  # Default to 'csv'
 
-    raw_data = []
-    source_identifiers = []
+    raw_data: List[Dict] = []
+    source_identifiers: List[str] = []
     
     # These will be populated differently depending on the mode
-    ingestor_state = None
-    state_file_path = None
-    current_metadata = None
-    target_file = None
-    new_last_processed_utc = None
+    ingestor_state: Dict[str, Any] = {}
+    state_file_path: Optional[str] = None
+    current_metadata: Optional[Dict[str, Any]] = None
+    target_file: Optional[str] = None
+    new_last_processed_utc: Optional[str] = None
 
     try:
         if mode == 'csv':
@@ -114,16 +119,58 @@ def ingest_screenconnect(config: Dict[str, Any], logger) -> None:
             api_config = sc_ingestor_config.get('api_config', {})
             state_file_path = os.path.join(config['project_paths']['cache_folder'], 'screenconnect_ingestor_api_state.json')
             source_identifiers = [f"ScreenConnect API @ {api_config.get('base_url')}"]
-            
             ingestor_state = state_handler.load_state(state_file_path, logger)
-            last_processed_utc = ingestor_state.get('last_processed_utc')
             
-            if last_processed_utc:
-                filter_expression = f"ConnectedTime > '{last_processed_utc}'"
-            else:
-                # If no state exists, fetch records from the last 7 days as a safe default
-                seven_days_ago = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=7)
-                filter_expression = f"ConnectedTime > '{seven_days_ago.isoformat()}'"
+            # --- Build dynamic filter expression ---
+            all_filter_parts: List[str] = []
+
+            # 1. Date filters: Always establish a start time.
+            # Priority: Manual start_date > saved state > default 7 days ago.
+            if start_date:
+                try:
+                    start_dt = datetime.datetime.strptime(start_date, '%Y-%m-%d').replace(tzinfo=datetime.timezone.utc)
+                    all_filter_parts.append(f"ConnectedTime > '{start_dt.isoformat()}'")
+                except ValueError:
+                    logger.error(f"Invalid start date format: '{start_date}'. Use YYYY-MM-DD. Aborting.")
+                    return
+            else: # No manual start_date provided, use incremental logic.
+                last_processed_utc = ingestor_state.get('last_processed_utc')
+                if last_processed_utc:
+                    all_filter_parts.append(f"ConnectedTime > '{last_processed_utc}'")
+                else:
+                    # Default to 7 days ago if no start_date and no saved state.
+                    seven_days_ago = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=7)
+                    all_filter_parts.append(f"ConnectedTime > '{seven_days_ago.isoformat()}'")
+
+            if end_date:
+                try:
+                    # Inclusive of end date’s full day
+                    end_dt = datetime.datetime.strptime(end_date, '%Y-%m-%d').replace(tzinfo=datetime.timezone.utc) + datetime.timedelta(days=1)
+                    all_filter_parts.append(f"ConnectedTime < '{end_dt.isoformat()}'")
+                except ValueError:
+                    logger.error(f"Invalid end date format: '{end_date}'. Use YYYY-MM-DD. Aborting.")
+                    return
+
+            # 2. Validated Key=Value filters from kwargs
+            for f in filters:
+                if not isinstance(f, str):
+                    logger.warning(f"Ignoring non-string filter {f!r}. Expected 'Key=Value'.")
+                    continue
+                if '=' not in f:
+                    logger.warning(f"Invalid filter '{f}'. Skipping. Use Key=Value.")
+                    continue
+                key, value = f.split('=', 1)
+                if key not in SCREENCONNECT_QUERY_FIELDS:
+                    logger.error(f"Invalid filter key '{key}'. Allowed keys: {sorted(SCREENCONNECT_QUERY_FIELDS)}")
+                    continue
+                safe_value = value.replace("'", "\\'")
+                all_filter_parts.append(f"{key} = '{safe_value}'")
+
+            if not all_filter_parts:
+                logger.error("No valid filters constructed. Aborting to prevent full data dump.")
+                return
+
+            filter_expression = " AND ".join(all_filter_parts)
             
             logger.info(f"Fetching ScreenConnect data with filter: {filter_expression}")
             
@@ -149,7 +196,7 @@ def ingest_screenconnect(config: Dict[str, Any], logger) -> None:
         return
 
     # 1. Convert all raw data (from whatever source) to SessionSegment objects
-    all_segments = _convert_raw_data_to_segments(raw_data)
+    all_segments = _convert_raw_data_to_segments(raw_data, config)
 
     # 2. Group segments using the session aggregator
     grouped_sessions = session_aggregator.group_segments_by_time_gap_and_keys(
@@ -190,6 +237,10 @@ def ingest_screenconnect(config: Dict[str, Any], logger) -> None:
         ingestor_state[target_file] = current_metadata
         state_handler.save_state(ingestor_state, state_file_path, logger)
         
-    elif mode == 'api' and new_last_processed_utc:
+    # Only save state in API mode if we are doing an incremental run (no manual dates)
+    elif mode == 'api' and new_last_processed_utc and not start_date and not end_date:
+        logger.info("Updating API state with new last_processed_utc timestamp.")
         ingestor_state['last_processed_utc'] = new_last_processed_utc
         state_handler.save_state(ingestor_state, state_file_path, logger)
+    elif mode == 'api' and (start_date or end_date):
+        logger.warning("Manual date range provided. Skipping state update to protect incremental progress.")

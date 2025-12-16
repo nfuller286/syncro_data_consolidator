@@ -43,6 +43,19 @@ def main():
     # 'ingest' command
     parser_ingest = subparsers.add_parser('ingest', help='Run a specific data ingestor')
     parser_ingest.add_argument('--source', required=True, choices=['all', 'sillytavern', 'syncro', 'notes', 'screenconnect'], help='The data source to ingest')
+    parser_ingest.add_argument('--start-date', help='For API-based ingestors, the start date for fetching data (YYYY-MM-DD). Overrides saved state.')
+    parser_ingest.add_argument('--end-date', help='For API-based ingestors, the end date for fetching data (YYYY-MM-DD).')
+    parser_ingest.add_argument(
+        '--show-filters',
+        action='store_true',
+        help='Display the available filter keys for the specified source and exit.'
+    )
+    parser_ingest.add_argument(
+        '--filter',
+        action='append',
+        dest='filters',
+        help="Add a key=value filter. Can be specified multiple times (e.g., --filter ParticipantName=Nick)."
+    )
 
     # 'process' command
     parser_process = subparsers.add_parser('process', help='Run a specific processing step')
@@ -68,6 +81,16 @@ def main():
     parser_query.add_argument('natural_language_query', help='The natural language query to run')
 
     args = parser.parse_args()
+
+    if args.command == 'ingest' and args.show_filters:
+        if args.source == 'screenconnect':
+            from sdc.utils.constants import SCREENCONNECT_QUERY_FIELDS
+            print("Available filter keys for ScreenConnect:")
+            for field in sorted(SCREENCONNECT_QUERY_FIELDS):
+                print(f"- {field}")
+            return # Exit the program
+        # ... (other logic for other sources could go here in the future) ...
+        return
 
     # --- Command Execution Logic ---
     logger.info(f"Executing command: {args.command} with arguments: {vars(args)}")
@@ -97,7 +120,14 @@ def main():
         for source in sources_to_run:
             if source in ingest_map:
                 logger.info(f"Ingesting from {source}...")
-                ingest_map[source]()
+                # Build a dictionary of optional arguments
+                ingest_kwargs = {
+                    'start_date': args.start_date,
+                    'end_date': args.end_date,
+                    'filters': args.filters or []
+                }
+                # Call the ingestor, unpacking the kwargs. This works for ALL ingestors.
+                ingest_map[source](**ingest_kwargs)
 
     elif args.command == 'process':
         steps_to_run = process_map.keys() if args.step == 'all' else [args.step]
