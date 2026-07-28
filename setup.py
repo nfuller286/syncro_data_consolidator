@@ -1,21 +1,25 @@
 
 import os
 import sys
-import json
 import shutil
 import zipfile
 import tempfile
 
+import yaml
+
 # --- Configuration ---
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 CONFIG_DIR = os.path.join(PROJECT_ROOT, "config")
-SAMPLE_CONFIG_PATH = os.path.join(CONFIG_DIR, "sampleconfig.json")
-CONFIG_PATH = os.path.join(CONFIG_DIR, "config.json")
+SAMPLE_CONFIG_PATH = os.path.join(CONFIG_DIR, "sampleconfig.yaml")
+CONFIG_PATH = os.path.join(CONFIG_DIR, "config.yaml")
 TEST_DATA_ARCHIVE = os.path.join(PROJECT_ROOT, "dev docs", "test_data.zip")
+
+sys.path.insert(0, os.path.join(PROJECT_ROOT, "src"))
+from sdc.utils.config_loader import load_yaml_config, resolve_project_paths
 
 def setup_config():
     """
-    Creates config.json from sampleconfig.json if it doesn't exist.
+    Creates config.yaml from sampleconfig.yaml if it doesn't exist.
     """
     if os.path.exists(CONFIG_PATH):
         print("Configuration file already exists.")
@@ -25,7 +29,7 @@ def setup_config():
     try:
         shutil.copy(SAMPLE_CONFIG_PATH, CONFIG_PATH)
         print(f"Successfully created {CONFIG_PATH}")
-        print("!!! ACTION REQUIRED: Please edit config.json to add your API keys and other required values. !!!")
+        print("!!! ACTION REQUIRED: Please edit config.yaml to add your API keys and other required values. !!!")
     except FileNotFoundError:
         print(f"FATAL: {SAMPLE_CONFIG_PATH} not found. Cannot create configuration.")
         sys.exit(1)
@@ -35,33 +39,19 @@ def setup_config():
 
 def create_directories():
     """
-    Creates the directory structure specified in config.json.
+    Creates the directory structure specified in config.yaml.
     """
     print("\nCreating data directories...")
     try:
-        with open(CONFIG_PATH, 'r') as f:
-            config = json.load(f)
+        config = load_yaml_config(CONFIG_PATH)
 
         # --- Robust Placeholder Resolution ---
-        templates = config.get('project_paths', {})
-        if not templates:
-            print("WARNING: No 'project_paths' found in config.json. Cannot create directories.")
+        project_paths = config.get('project_paths', {})
+        if not project_paths:
+            print("WARNING: No 'project_paths' found in config.yaml. Cannot create directories.")
             return
-            
-        templates['project_root'] = PROJECT_ROOT
 
-        for _ in range(5):  # Limit iterations to prevent infinite loops
-            made_replacement = False
-            for key, value in templates.items():
-                if isinstance(value, str):
-                    new_value = value
-                    for placeholder, replacement in templates.items():
-                        if f'{{{{{placeholder}}}}}' in new_value and placeholder != key:
-                            new_value = new_value.replace(f'{{{{{placeholder}}}}}', str(replacement))
-                            made_replacement = True
-                    templates[key] = new_value
-            if not made_replacement:
-                break
+        templates = resolve_project_paths(PROJECT_ROOT, project_paths)
 
         # --- Directory Creation ---
         for key, path in templates.items():
@@ -85,8 +75,8 @@ def create_directories():
     except FileNotFoundError:
         print(f"FATAL: {CONFIG_PATH} not found. Run setup without flags first.")
         sys.exit(1)
-    except json.JSONDecodeError:
-        print(f"FATAL: Could not parse {CONFIG_PATH}. Please ensure it is valid JSON.")
+    except yaml.YAMLError:
+        print(f"FATAL: Could not parse {CONFIG_PATH}. Please ensure it is valid YAML.")
         sys.exit(1)
     except Exception as e:
         print(f"FATAL: An error occurred during directory creation: {e}")
@@ -108,25 +98,11 @@ def install_test_data():
         return
 
     try:
-        with open(CONFIG_PATH, 'r') as f:
-            config = json.load(f)
-        
+        config = load_yaml_config(CONFIG_PATH)
+
         # --- Resolve Destination Paths ---
-        templates = config.get('project_paths', {})
-        templates['project_root'] = PROJECT_ROOT
-        for _ in range(5): # Multi-pass placeholder resolution
-            made_replacement = False
-            for key, value in templates.items():
-                if isinstance(value, str):
-                    new_value = value
-                    for placeholder, replacement in templates.items():
-                        if f'{{{{{placeholder}}}}}' in new_value and placeholder != key:
-                            new_value = new_value.replace(f'{{{{{placeholder}}}}}', str(replacement))
-                            made_replacement = True
-                    templates[key] = new_value
-            if not made_replacement:
-                break
-        
+        templates = resolve_project_paths(PROJECT_ROOT, config.get('project_paths', {}))
+
         final_input_dest = os.path.normpath(templates.get('input_folder', ''))
         final_cache_dest = os.path.normpath(templates.get('cache_folder', ''))
 

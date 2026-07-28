@@ -4,7 +4,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 
 # Define a type alias for known chat capabilities.
 # This makes the overloads explicit and may need to be updated if new
-# capabilities are added to config.json.
+# capabilities are added to config.yaml.
 ChatCapability = Literal['lightweight', 'complex', 'general', 'flash']
 
 def get_chat_client(
@@ -17,17 +17,17 @@ def get_chat_client(
     Reads config to select and configure the correct provider.
     """
     try:
-        llm_config = config.get('llm_config')
-        if not llm_config:
-            logger.error("[AUDIT] Failed to instantiate LLM client. Reason: LLM configuration 'llm_config' not found. Capability: '%s'", capability)
+        llm_provider_config = config.get('llm_provider_config')
+        if not llm_provider_config:
+            logger.error("[AUDIT] Failed to instantiate LLM client. Reason: LLM configuration 'llm_provider_config' not found. Capability: '%s'", capability)
             return None
- 
-        active_provider = llm_config.get('active_provider')
+
+        active_provider = llm_provider_config.get('active_provider')
         if not active_provider:
-            logger.error("[AUDIT] Failed to instantiate LLM client. Reason: No 'active_provider' specified in llm_config. Capability: '%s'", capability)
+            logger.error("[AUDIT] Failed to instantiate LLM client. Reason: No 'active_provider' specified in llm_provider_config. Capability: '%s'", capability)
             return None
- 
-        provider_config = llm_config.get(active_provider)
+
+        provider_config = llm_provider_config.get(active_provider)
         if not provider_config:
             logger.error("[AUDIT] Failed to instantiate LLM client. Reason: Configuration for active provider '%s' not found. Capability: '%s'", active_provider, capability)
             return None

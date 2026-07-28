@@ -3,14 +3,20 @@
 Utility for loading and parsing the project's configuration file.
 """
 
-import json
 import os
 import re
 from typing import Dict, Any, Optional, Union, List
 
+import yaml
+
 _cached_config: Optional[Dict[str, Any]] = None
 
-def _resolve_placeholders_recursive(obj: Union[Dict, List], templates: Dict[str, str]) -> bool:
+def load_yaml_config(path: str) -> Dict[str, Any]:
+    """Loads and parses a YAML config file, returning {} for an empty file."""
+    with open(path, 'r', encoding='utf-8') as f:
+        return yaml.safe_load(f) or {}
+
+def resolve_placeholders(obj: Union[Dict, List], templates: Dict[str, str]) -> bool:
     """
     To recursively search through the configuration dictionary and replace
     placeholder strings (e.g., `{{project_root}}`) with their actual values.
@@ -35,7 +41,7 @@ def _resolve_placeholders_recursive(obj: Union[Dict, List], templates: Dict[str,
                         obj[key] = new_value
             
             elif isinstance(value, (dict, list)):
-                if _resolve_placeholders_recursive(value, templates):
+                if resolve_placeholders(value, templates):
                     made_replacement = True
 
     elif isinstance(obj, list):
@@ -51,11 +57,25 @@ def _resolve_placeholders_recursive(obj: Union[Dict, List], templates: Dict[str,
                     obj[i] = new_item # No path normalization needed for list items by default
             
             elif isinstance(item, (dict, list)):
-                if _resolve_placeholders_recursive(item, templates):
+                if resolve_placeholders(item, templates):
                     made_replacement = True
     # --- END OF FIX ---
-            
+
     return made_replacement
+
+def resolve_project_paths(project_root: str, project_paths: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Seeds `project_paths` with `project_root` and resolves `{{...}}`
+    placeholders within it in place (multi-pass, since some paths reference
+    other paths, e.g. input_folder references data_folder). Returns the same
+    dict, for use both as the resolved project_paths section and as the
+    template source for resolving placeholders elsewhere in a config.
+    """
+    project_paths['project_root'] = project_root
+    for _ in range(5):  # Limit iterations to prevent infinite loops
+        if not resolve_placeholders(project_paths, project_paths):
+            break
+    return project_paths
 
 def _find_and_load_config() -> Optional[Dict[str, Any]]:
     """
@@ -65,58 +85,55 @@ def _find_and_load_config() -> Optional[Dict[str, Any]]:
         project_root = None
         current_dir = os.path.dirname(os.path.abspath(__file__))
         for _ in range(5):  # Traverse up to 5 levels
-            config_path_to_check = os.path.join(current_dir, 'config', 'config.json')
-            sample_config_path_to_check = os.path.join(current_dir, 'config', 'sampleconfig.json')
-            
+            config_path_to_check = os.path.join(current_dir, 'config', 'config.yaml')
+            sample_config_path_to_check = os.path.join(current_dir, 'config', 'sampleconfig.yaml')
+
             if os.path.isfile(config_path_to_check) or os.path.isfile(sample_config_path_to_check):
                 project_root = current_dir
                 break
-            
+
             parent_dir = os.path.dirname(current_dir)
             if parent_dir == current_dir:  # Reached root of filesystem
                 break
             current_dir = parent_dir
 
         if not project_root:
-            print("FATAL ERROR: Could not find project root. Searched for 'config/config.json' or 'config/sampleconfig.json'.")
+            print("FATAL ERROR: Could not find project root. Searched for 'config/config.yaml' or 'config/sampleconfig.yaml'.")
             return None
 
-        config_path = os.path.join(project_root, "config", "config.json")
+        config_path = os.path.join(project_root, "config", "config.yaml")
         if not os.path.exists(config_path):
             print(f"FATAL ERROR: Config file not found at {config_path}")
             return None
 
-        with open(config_path, 'r', encoding='utf-8') as f:
-            config = json.load(f)
+        config = load_yaml_config(config_path)
+
+        # --- REVISED PLACEHOLDER RESOLUTION ---
+        # Resolved before llm_configs is merged in below, so this pass can
+        # never see (and can never mangle) the single-brace prompt templates
+        # that live in llm_configs.yaml.
+        templates = resolve_project_paths(project_root, config.get('project_paths', {}))
+        config['project_paths'] = templates
+        for _ in range(5): # Limit iterations to prevent infinite loops
+            if not resolve_placeholders(config, templates):
+                break # Exit if a full pass makes no changes
 
         # --- Load and merge all LLM-related configurations ---
-        llm_configs_path = os.path.join(project_root, "config", "llm_configs.json")
+        llm_configs_path = os.path.join(project_root, "config", "llm_configs.yaml")
         if os.path.exists(llm_configs_path):
-            with open(llm_configs_path, 'r', encoding='utf-8') as f:
-                llm_configs = json.load(f)
-                config['llm_configs'] = llm_configs
+            config['llm_configs'] = load_yaml_config(llm_configs_path)
         else:
             print(f"WARNING: LLM configs file not found at {llm_configs_path}. LLM functionality will be limited.")
             config['llm_configs'] = {}
 
-        # --- REVISED PLACEHOLDER RESOLUTION ---
-        # 1. Seed the templates with the project root.
-        templates = config.get('project_paths', {})
-        templates['project_root'] = project_root
-
-        # 2. Multi-pass resolution to handle nested placeholders.
-        for _ in range(5): # Limit iterations to prevent infinite loops
-            if not _resolve_placeholders_recursive(config, templates):
-                break # Exit if a full pass makes no changes
-
-        # 3. Apply environment variable overrides
+        # --- Apply environment variable overrides
         syncro_api_key = os.getenv('SYNCRO_API_KEY')
         if syncro_api_key:
             config.setdefault('syncro_api', {})['api_key'] = syncro_api_key
 
         google_api_key = os.getenv('GOOGLE_API_KEY')
         if google_api_key:
-            config.setdefault('llm_config', {}).setdefault('google_gemini', {})['api_key'] = google_api_key
+            config.setdefault('llm_provider_config', {}).setdefault('google_gemini', {})['api_key'] = google_api_key
 
         return config
 

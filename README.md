@@ -176,9 +176,9 @@ This project uses Conda for environment management.
     ```
 
 4.  **Configure the application:**
-    *   Copy `config/sampleconfig.json` to `config/config.json`.
-    *   Edit `config/config.json` to add your Syncro RMM API credentials and adjust paths if necessary.
-    *   Review `config/llm_configs.json` and add your LLM API keys.
+    *   Copy `config/sampleconfig.yaml` to `config/config.yaml`.
+    *   Edit `config/config.yaml` to add your Syncro RMM API credentials and adjust paths if necessary.
+    *   Review `config/llm_configs.yaml` and add your LLM API keys.
 
 ## Usage
 
