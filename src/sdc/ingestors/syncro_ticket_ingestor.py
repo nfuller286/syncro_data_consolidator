@@ -1,9 +1,9 @@
 import os
 import json
-from typing import Dict, Any
+import uuid
+from typing import Dict, Any, List
 from datetime import datetime, timezone, timedelta
 from sdc.api_clients.syncro_gateway import SyncroGateway
-from sdc.utils.sdc_logger import get_sdc_logger
 # --- V2 IMPORTS ---
 from sdc.models.session_v2 import Session, SessionSegment, SessionMeta, SessionContext, SessionInsights
 from sdc.utils.session_handler import save_session_to_file
@@ -76,3 +76,119 @@ def ingest_syncro_tickets(config: Dict[str, Any], logger, **kwargs) -> None:
         except KeyError:
             logger.critical("Aborting ticket ingestion due to Syncro Gateway initialization failure.")
             return
+
+    if not tickets_data:
+        logger.info("No new tickets to process.")
+        return
+
+    latest_timestamp_this_run = None
+    processed_count, error_count = 0, 0
+
+    for ticket in tickets_data:
+        try:
+            updated_at_str = ticket.get('updated_at')
+            current_ts = parse_datetime_utc(updated_at_str, config)
+
+            # Track the latest update timestamp seen this run (successes and
+            # failures alike) so the watermark still advances even if some
+            # tickets fail to parse below.
+            if current_ts:
+                if latest_timestamp_this_run is None or current_ts > latest_timestamp_this_run:
+                    latest_timestamp_this_run = current_ts
+
+            # --- V2 Session Creation Logic ---
+            segments: List[SessionSegment] = []
+            ticket_creation_time = parse_datetime_utc(ticket.get('created_at'), config)
+            if not ticket_creation_time:
+                logger.warning(f"Skipping ticket ID {ticket.get('id')} due to missing or invalid creation date.")
+                error_count += 1
+                continue
+
+            # Create the first segment for the ticket creation event itself
+            segments.append(SessionSegment(
+                segment_id=str(uuid.uuid4()),
+                start_time_utc=ticket_creation_time,
+                end_time_utc=ticket_creation_time,
+                type="TicketCreation",
+                author=ticket.get('creator_name_or_email'),
+                content=ticket.get('subject'),
+                metadata={
+                    'syncro_ticket_number': ticket.get('number'),
+                    'syncro_problem_type': ticket.get('problem_type'),
+                    'syncro_status': ticket.get('status'),
+                    'syncro_priority': ticket.get('priority'),
+                    'syncro_tag_list': ticket.get('tag_list', [])
+                }
+            ))
+
+            # Create a segment for each comment
+            if ticket.get('comments'):
+                for comment in ticket['comments']:
+                    # Deduce the entry type based on available metadata
+                    if comment.get('sms_body'):
+                        segment_type = 'SMS'
+                    elif comment.get('subject') or comment.get('destination_emails') or comment.get('email_sender'):
+                        segment_type = 'Email'
+                    elif comment.get('hidden') is True:
+                        segment_type = 'PrivateNote'
+                    else:
+                        segment_type = 'PublicNote'
+
+                    comment_time = parse_datetime_utc(comment.get('created_at'), config) or ticket_creation_time
+                    segments.append(SessionSegment(
+                        segment_id=str(uuid.uuid4()),
+                        start_time_utc=comment_time,
+                        end_time_utc=comment_time,
+                        type=segment_type,
+                        author=comment.get('user_name'),
+                        content=comment.get('body'),
+                        metadata={
+                            'syncro_comment_id': comment.get('id'),
+                            'syncro_user_id': comment.get('user_id')
+                        }
+                    ))
+
+            # Use the session builder to construct the final object
+            session_object = build_session(
+                segments=segments,
+                source_system="SyncroRMM",
+                source_identifiers=[f"/tickets/{ticket.get('id')}"],
+                customer_name=ticket.get('customer_business_then_name'),
+                contact_name=ticket.get('contact_fullname'),
+                customer_id=ticket.get('customer_id'),
+                contact_id=ticket.get('contact_id'),
+                source_title=ticket.get('subject'),
+                processing_status="Linked"  # Pre-linked since Syncro provides IDs
+            )
+
+            save_session_to_file(session_object, config, logger)
+            processed_count += 1
+        except Exception as e:
+            logger.error(f"Error processing Syncro ticket ID {ticket.get('id', 'N/A')}: {e}", exc_info=True)
+            error_count += 1
+
+    logger.info(f"Syncro Ticket Ingestor finished. Processed: {processed_count}, Errors: {error_count}")
+
+    if error_count > 0:
+        logger.warning(
+            f"{error_count} ticket(s) failed to process this run and were skipped. "
+            "The state watermark still advances past this batch (below) so the "
+            "tickets that succeeded aren't reprocessed and duplicated on the next "
+            "run; failed tickets will not be retried automatically."
+        )
+
+    # If it was an API run, update the timestamp. This advances regardless of
+    # per-ticket errors above: successfully processed tickets are already
+    # saved, and a ticket that failed to parse will fail identically on every
+    # retry, so gating the whole batch's progress on it would just cause the
+    # successful tickets to be reprocessed (and duplicated — session IDs are
+    # randomly generated with no dedup) every run.
+    if not syncro_test_ticket_file and latest_timestamp_this_run:
+        final_timestamp = latest_timestamp_this_run + timedelta(seconds=1)
+        ingestor_state['api']['last_updated_at'] = final_timestamp.strftime('%Y-%m-%dT%H:%M:%SZ')
+        logger.info(f"Updating last_updated_at timestamp to: {ingestor_state['api']['last_updated_at']}")
+        state_needs_saving = True
+
+    if state_needs_saving:
+        logger.info("Saving updated ingestor state.")
+        state_handler.save_state(ingestor_state, state_file_path, logger)
