@@ -35,7 +35,7 @@ def _calculate_message_fingerprint(message: Dict[str, Any]) -> str:
     fingerprint_str = f"{timestamp}|{author}|{content}".encode('utf-8')
     return hashlib.sha256(fingerprint_str).hexdigest()
 
-def ingest_sillytavern_chats(config: Dict[str, Any], logger) -> None:
+def ingest_sillytavern_chats(config: Dict[str, Any], logger, **kwargs) -> None:
     """
     Loads ST .jsonl chat logs, segments them into sessions,
 Loads ST .jsonl chat logs, segments them into sessions,

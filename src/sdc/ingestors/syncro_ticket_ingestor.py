@@ -13,7 +13,7 @@ from sdc.utils import file_ingestor_state_handler as state_handler
 
 STATE_FILE_NAME = 'syncro_ticket_ingestor_state.json'
 
-def ingest_syncro_tickets(config: Dict[str, Any], logger) -> None:
+def ingest_syncro_tickets(config: Dict[str, Any], logger, **kwargs) -> None:
     logger.info("Starting Syncro Ticket Ingestor...")
 
     api_config = config.get('syncro_api', {})
