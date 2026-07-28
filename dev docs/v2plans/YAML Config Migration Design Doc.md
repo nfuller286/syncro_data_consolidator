@@ -195,3 +195,31 @@ branch for convenience:
   silently accepted (and silently ignored) for every other `--source`.
   `run_sdc.py` now rejects that combination with a clear `parser.error()`
   instead of no-op'ing.
+
+## Addendum 2: further fixes and additions on the same branch
+
+- **Restored Syncro ticket → Session transformation.** `ingest_syncro_tickets`
+  loaded ticket data but never built or saved `Session` objects from it — the
+  function stopped right where that logic should begin, so Syncro was the
+  only ingestor producing zero output. Grafted the missing logic back in from
+  an older backup of the file, adapted to use the current `SyncroGateway`
+  (the backup predated that abstraction) and the current `syncro_test_ticket_file`
+  config key. Also fixed a real bug found in the ported logic: it skipped
+  saving the state watermark entirely if any single ticket in a batch failed
+  to parse, which would cause already-successfully-processed tickets to be
+  reprocessed and duplicated (session IDs are random UUIDs with no dedup) on
+  every subsequent run. The watermark now advances on the max `updated_at`
+  seen regardless of individual ticket failures, with a warning logged for
+  skipped tickets instead.
+- **Deferred `run_sdc.py`'s ingestor/processor imports.** All five ingestors
+  and both processors — including `session_llm_analyzer`, which pulls in
+  langchain/google-auth/cryptography — were imported unconditionally at
+  module load, so even `--help` paid that cost (~10s). Moved those imports
+  into each command branch instead; `--help` now returns in well under a
+  second.
+- **Added local LLM (OpenAI-compatible) support to `get_chat_client`.**
+  `active_provider` now also accepts `local_llm`, returning a `ChatOpenAI`
+  client pointed at the configured `base_url` instead of
+  `ChatGoogleGenerativeAI`. `langchain-openai` was already a dependency.
+  Callers only use the common LangChain chat-model interface, so no other
+  code needed to change.
