@@ -4,10 +4,7 @@
 from functools import partial
 import argparse
 
-# Import project utilities needed for argument parsing. The ingestor/processor
-# modules pull in heavy dependencies (langchain, google-auth, etc.) and are
-# imported lazily inside each command branch below instead, so `--help` and
-# argument-parsing errors return immediately instead of paying that cost.
+# Import project utilities needed for argument parsing
 from sdc.utils.config_loader import load_config
 from sdc.utils.sdc_logger import get_sdc_logger
 from sdc.utils.workspace_cleaner import SOURCE_MAPPING
@@ -29,25 +26,13 @@ def main():
     llm_task_keys = list(llm_analysis_tasks.keys())
 
     # --- Argument Parsing Setup ---
+    # This section remains the same, as it needs config and SOURCE_MAPPING
     parser = argparse.ArgumentParser(description="Syncro Data Consolidator (SDC) CLI", formatter_class=argparse.RawTextHelpFormatter)
     subparsers = parser.add_subparsers(dest='command', required=True, help='Available commands')
 
     # 'ingest' command
     parser_ingest = subparsers.add_parser('ingest', help='Run a specific data ingestor')
     parser_ingest.add_argument('--source', required=True, choices=['all', 'sillytavern', 'syncro', 'notes', 'screenconnect'], help='The data source to ingest')
-    parser_ingest.add_argument('--start-date', help='ScreenConnect only: the start date for fetching data via the API (YYYY-MM-DD). Overrides saved state.')
-    parser_ingest.add_argument('--end-date', help='ScreenConnect only: the end date for fetching data via the API (YYYY-MM-DD).')
-    parser_ingest.add_argument(
-        '--show-filters',
-        action='store_true',
-        help='ScreenConnect only: display the available filter keys and exit.'
-    )
-    parser_ingest.add_argument(
-        '--filter',
-        action='append',
-        dest='filters',
-        help="ScreenConnect only: add a key=value filter. Can be specified multiple times (e.g., --filter ParticipantName=TechName)."
-    )
 
     # 'process' command
     parser_process = subparsers.add_parser('process', help='Run a specific processing step')
@@ -70,25 +55,6 @@ def main():
 
     args = parser.parse_args()
 
-    if args.command == 'ingest':
-        # start_date/end_date/filters/show_filters only have defined behavior for
-        # ScreenConnect (the only connector with a queryable API to filter against;
-        # the others rely on incremental state tracking instead). Reject them
-        # explicitly elsewhere rather than silently accepting and ignoring them.
-        screenconnect_only_flags_used = args.start_date or args.end_date or args.filters or args.show_filters
-        if screenconnect_only_flags_used and args.source != 'screenconnect':
-            parser.error(
-                "--start-date, --end-date, --filter, and --show-filters are only supported "
-                "with --source screenconnect."
-            )
-
-        if args.show_filters:
-            from sdc.utils.constants import SCREENCONNECT_QUERY_FIELDS
-            print("Available filter keys for ScreenConnect:")
-            for field in sorted(SCREENCONNECT_QUERY_FIELDS):
-                print(f"- {field}")
-            return # Exit the program
-
     # --- Command Execution Logic ---
     logger.info(f"Executing command: {args.command} with arguments: {vars(args)}")
 
@@ -103,36 +69,26 @@ def main():
         from sdc.ingestors.st_chat_ingestor import ingest_sillytavern_chats
         from sdc.ingestors.syncro_ticket_ingestor import ingest_syncro_tickets
 
-        # Using partial to create function objects with pre-filled arguments.
-        # This standardizes the function signatures for easier calling.
         ingest_map = {
             'syncro': partial(ingest_syncro_tickets, config, logger),
             'sillytavern': partial(ingest_sillytavern_chats, config, logger),
             'notes': partial(ingest_notes, config, logger),
             'screenconnect': partial(ingest_screenconnect, config, logger)
         }
-
+        
         sources_to_run = ingest_map.keys() if args.source == 'all' else [args.source]
         for source in sources_to_run:
             if source in ingest_map:
                 logger.info(f"Ingesting from {source}...")
-                # Build a dictionary of optional arguments
-                ingest_kwargs = {
-                    'start_date': args.start_date,
-                    'end_date': args.end_date,
-                    'filters': args.filters or []
-                }
-                # Call the ingestor, unpacking the kwargs. This works for ALL ingestors.
-                ingest_map[source](**ingest_kwargs)
+                ingest_map[source]()
 
     elif args.command == 'process':
-        from sdc.processors.session_customer_linker import link_customers_to_sessions # V2 linker
-        from sdc.processors.session_llm_analyzer import run_llm_analysis # V2 analyzer
+        from sdc.processors.session_customer_linker import link_customers_to_sessions
+        from sdc.processors.session_llm_analyzer import run_llm_analysis
 
         process_map = {
             'customer_linking': partial(link_customers_to_sessions, config, logger),
         }
-        # Dynamically add LLM analysis tasks to the process map
         for task_key in llm_task_keys:
             process_map[task_key] = partial(run_llm_analysis, config, logger, analysis_type=task_key)
 
@@ -143,16 +99,14 @@ def main():
                 process_map[step]()
 
     elif args.command == 'run':
-        # The 'run' pipelines only ever use the customer-linking processing
-        # step (see NOTE below), not LLM analysis, so session_llm_analyzer
-        # (and the langchain dependencies it pulls in) is never imported here.
+        # Import everything needed for the run command
         from sdc.ingestors.syncro_customer_contact_cacher import cache_syncro_data
         from sdc.ingestors.notes_json_ingestor import ingest_notes
         from sdc.ingestors.screenconnect_log_ingestor import ingest_screenconnect
         from sdc.ingestors.st_chat_ingestor import ingest_sillytavern_chats
         from sdc.ingestors.syncro_ticket_ingestor import ingest_syncro_tickets
-        from sdc.processors.session_customer_linker import link_customers_to_sessions # V2 linker
-
+        from sdc.processors.session_customer_linker import link_customers_to_sessions
+        
         ingest_map = {
             'syncro': partial(ingest_syncro_tickets, config, logger),
             'sillytavern': partial(ingest_sillytavern_chats, config, logger),
@@ -168,26 +122,19 @@ def main():
 
         elif args.pipeline == 'full':
             logger.info("Executing 'full' pipeline...")
-
-            # Check if we are in a test file mode for Syncro
+            
             syncro_test_mode = config.get('syncro_api', {}).get('syncro_test_ticket_file')
-
             if not syncro_test_mode:
-                # 1. Cache (only if not in test mode)
                 logger.info("Caching Syncro data...")
                 cache_syncro_data(config, logger)
             else:
                 logger.info("Syncro test file path is configured. Skipping live data caching.")
 
-            # 2. Ingest All
             for source, func in ingest_map.items():
                 logger.info(f"Ingesting from {source}...")
                 func()
 
-            # 3. Automated Processing
             logger.info("--- Starting Automated Processing ---")
-
-            # Run the customer linker to link all newly ingested sessions.
             logger.info("Running Customer Linker...")
             link_customers_to_sessions(config, logger)
 
@@ -196,11 +143,8 @@ def main():
 
     elif args.command == 'clean':
         from sdc.utils.workspace_cleaner import clean_workspace
-
-        # Determine if this is a dry run based on the ABSENCE of --commit
         is_dry_run = not args.commit
 
-        # The dangerous interactive confirmation prompt ONLY appears if we are committing changes.
         if not is_dry_run:
             confirm_sources = ' '.join(args.sources)
             confirm = input(f"WARNING: This will permanently delete files for source(s): '{confirm_sources}'. Are you sure? [y/N] ")
@@ -208,12 +152,9 @@ def main():
                 logger.info("Cleanup aborted by user.")
                 return
 
-        # Separate 'logs' from the other sources, as it's handled by a separate flag.
-        # The cleaner utility handles the 'all' keyword for sources.
         sources_to_clean = [s for s in args.sources if s != 'logs']
         should_clean_logs = 'logs' in args.sources or 'all' in args.sources
 
-        # Call the new, safer utility function
         clean_workspace(
             sources=sources_to_clean,
             clean_logs=should_clean_logs,
