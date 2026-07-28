@@ -43,18 +43,18 @@ def main():
     # 'ingest' command
     parser_ingest = subparsers.add_parser('ingest', help='Run a specific data ingestor')
     parser_ingest.add_argument('--source', required=True, choices=['all', 'sillytavern', 'syncro', 'notes', 'screenconnect'], help='The data source to ingest')
-    parser_ingest.add_argument('--start-date', help='For API-based ingestors, the start date for fetching data (YYYY-MM-DD). Overrides saved state.')
-    parser_ingest.add_argument('--end-date', help='For API-based ingestors, the end date for fetching data (YYYY-MM-DD).')
+    parser_ingest.add_argument('--start-date', help='ScreenConnect only: the start date for fetching data via the API (YYYY-MM-DD). Overrides saved state.')
+    parser_ingest.add_argument('--end-date', help='ScreenConnect only: the end date for fetching data via the API (YYYY-MM-DD).')
     parser_ingest.add_argument(
         '--show-filters',
         action='store_true',
-        help='Display the available filter keys for the specified source and exit.'
+        help='ScreenConnect only: display the available filter keys and exit.'
     )
     parser_ingest.add_argument(
         '--filter',
         action='append',
         dest='filters',
-        help="Add a key=value filter. Can be specified multiple times (e.g., --filter ParticipantName=TechName)."
+        help="ScreenConnect only: add a key=value filter. Can be specified multiple times (e.g., --filter ParticipantName=TechName)."
     )
 
     # 'process' command
@@ -78,15 +78,24 @@ def main():
 
     args = parser.parse_args()
 
-    if args.command == 'ingest' and args.show_filters:
-        if args.source == 'screenconnect':
+    if args.command == 'ingest':
+        # start_date/end_date/filters/show_filters only have defined behavior for
+        # ScreenConnect (the only connector with a queryable API to filter against;
+        # the others rely on incremental state tracking instead). Reject them
+        # explicitly elsewhere rather than silently accepting and ignoring them.
+        screenconnect_only_flags_used = args.start_date or args.end_date or args.filters or args.show_filters
+        if screenconnect_only_flags_used and args.source != 'screenconnect':
+            parser.error(
+                "--start-date, --end-date, --filter, and --show-filters are only supported "
+                "with --source screenconnect."
+            )
+
+        if args.show_filters:
             from sdc.utils.constants import SCREENCONNECT_QUERY_FIELDS
             print("Available filter keys for ScreenConnect:")
             for field in sorted(SCREENCONNECT_QUERY_FIELDS):
                 print(f"- {field}")
             return # Exit the program
-        # ... (other logic for other sources could go here in the future) ...
-        return
 
     # --- Command Execution Logic ---
     logger.info(f"Executing command: {args.command} with arguments: {vars(args)}")
