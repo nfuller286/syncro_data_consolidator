@@ -120,7 +120,7 @@ def _transform_todo_to_session(
 # =================================================================================
 #  REFACTORED INGESTION FUNCTION
 # =================================================================================
-def ingest_notes(config: Dict[str, Any], logger) -> None:
+def ingest_notes(config: Dict[str, Any], logger, **kwargs) -> None:
     """
     Loads data from notes.json, transforms it into the V2 Session format, and saves it.
     """

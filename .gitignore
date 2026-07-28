@@ -1,7 +1,8 @@
 # --- Config ---
 /config/*
-!/config/sampleconfig.json
-/config/config.json
+!/config/sampleconfig.yaml
+!/config/llm_configs.yaml
+/config/config.yaml
 !.gitkeep
 
 # --- Data ---
