@@ -175,3 +175,23 @@ risks were format-specific, not retrieval-specific:
 - Injected a literal `{{cache_folder}}` into a prompt string in
   `llm_configs.yaml`, reloaded config, and confirmed it was **not**
   resolved/mangled — proof the scoping fix in section 2 works.
+
+## Addendum: `run_sdc.py` fixes found while testing against real data
+
+Test data was added to the branch after the migration above and used to
+actually exercise `ingest --source all`, surfacing two pre-existing
+`run_sdc.py` bugs unrelated to the YAML work itself, fixed on the same
+branch for convenience:
+
+- **Ingestor signature mismatch.** `run_sdc.py` calls every ingestor
+  uniformly with `start_date`/`end_date`/`filters` kwargs, but only
+  `ingest_screenconnect` declared `**kwargs` to accept them — the other
+  three ingestors raised `TypeError` on any `ingest` call. Fixed by adding
+  `**kwargs` to `ingest_notes`, `ingest_sillytavern_chats`, and
+  `ingest_syncro_tickets` (they accept and ignore the args; only
+  ScreenConnect's API mode uses them).
+- **Flags with undefined scope.** `--start-date`/`--end-date`/`--filter`/
+  `--show-filters` only ever had real behavior for ScreenConnect, but were
+  silently accepted (and silently ignored) for every other `--source`.
+  `run_sdc.py` now rejects that combination with a clear `parser.error()`
+  instead of no-op'ing.
