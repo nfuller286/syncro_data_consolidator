@@ -9,7 +9,7 @@ ChatClient = Union[ChatGoogleGenerativeAI, ChatOpenAI]
 # Define a type alias for known chat capabilities.
 # This makes the overloads explicit and may need to be updated if new
 # capabilities are added to config.yaml.
-ChatCapability = Literal['lightweight', 'complex', 'general', 'flash']
+ChatCapability = Literal['lightweight', 'complex', 'general']
 
 def get_chat_client(
     capability: ChatCapability,

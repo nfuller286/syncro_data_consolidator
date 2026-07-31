@@ -5,14 +5,49 @@ It uses a configuration-driven approach to build prompts dynamically from sessio
 """
 
 import os
+import json
 from datetime import datetime, timezone
 from typing import Any, Dict
 
 from sdc.models.session_v2 import Session
 from sdc.utils import session_handler
+from sdc.utils.constants import ANALYZABLE_STATUSES
 from sdc.llm import chat_api, prompts
 
-def run_llm_analysis(config: Dict[str, Any], logger, analysis_type: str):
+
+def _strip_code_fence(text: str) -> str:
+    """
+    Removes a surrounding markdown code fence from an LLM response, if present.
+
+    Models routinely wrap JSON in ```json ... ``` even when the prompt asks for
+    raw JSON, which json.loads() cannot parse.
+    """
+    stripped = text.strip()
+    if not stripped.startswith('```'):
+        return stripped
+
+    lines = stripped.splitlines()
+    lines = lines[1:]  # drop the opening fence (``` or ```json)
+    if lines and lines[-1].strip() == '```':
+        lines = lines[:-1]
+    return '\n'.join(lines).strip()
+
+
+def _get_existing_output(session: Session, target_type: str, target_key: str) -> Any:
+    """
+    Returns whatever this analysis task previously wrote for the session, if anything.
+
+    Used by retry runs to tell "already analysed successfully" apart from
+    "marked as analysed but the output is missing or empty".
+    """
+    if target_type == 'structured_llm_results':
+        return session.insights.structured_llm_results.get(target_key)
+    if target_type in ('generated_summaries', 'comprehensive_json'):
+        return session.insights.generated_summaries.get(target_key)
+    return None
+
+
+def run_llm_analysis(config: Dict[str, Any], logger, analysis_type: str, retry: bool = False):
     """
     Iterates through Session files, uses an LLM to generate insights, and updates the files.
 
@@ -20,6 +55,8 @@ def run_llm_analysis(config: Dict[str, Any], logger, analysis_type: str):
         config: The application's configuration dictionary.
         logger: The SDC logger instance.
         analysis_type: The type of analysis to perform (e.g., 'title', 'summary').
+        retry: When True, re-run this analysis for sessions that are marked as
+            processed but have no usable output stored (empty or missing).
     """
     analysis_configs = config.get('llm_configs', {}).get('analysis_tasks', {})
     analysis_config = analysis_configs.get(analysis_type)
@@ -54,19 +91,35 @@ def run_llm_analysis(config: Dict[str, Any], logger, analysis_type: str):
                 error_files += 1
                 continue
 
-            # 1. Skip if this processor has already run on this session
+            # 1. Skip if this processor has already run on this session. On a
+            # retry run, only skip when it also produced usable output - a
+            # session logged as processed but holding an empty result is
+            # exactly what --retry exists to pick up.
             if PROCESSOR_NAME in session.meta.processing_log:
+                existing_output = _get_existing_output(session, output_target['type'], output_target['key'])
+                if not retry or (existing_output and str(existing_output).strip()):
+                    skipped_files += 1
+                    continue
+                logger.info(f"Retrying '{analysis_type}' for session {session.meta.session_id}: no usable output stored.")
+
+            # 2. Skip if the session is in a state we don't want to analyze (e.g., needs linking).
+            # Note that unlinked sessions are still analysed: analysis
+            # summarises content, which does not depend on a customer link.
+            if session.meta.processing_status not in ANALYZABLE_STATUSES:
                 skipped_files += 1
                 continue
 
-            # 2. Skip if the session is in a state we don't want to analyze (e.g., needs linking)
-            if session.meta.processing_status not in ['Linked', 'Complete', 'Reviewed']:
-                skipped_files += 1
-                continue
-
-            # 3. Implement Source System Filtering
+            # 3. Implement Source System Filtering.
+            # Both keys are honoured with their own semantics: an allow-list
+            # ('applicable_source_systems') and a deny-list
+            # ('excluded_source_systems').
             applicable_source_systems = analysis_config.get('applicable_source_systems')
             if applicable_source_systems and session.meta.source_system not in applicable_source_systems:
+                skipped_files += 1
+                continue
+
+            excluded_source_systems = analysis_config.get('excluded_source_systems')
+            if excluded_source_systems and session.meta.source_system in excluded_source_systems:
                 skipped_files += 1
                 continue
 
@@ -95,16 +148,18 @@ def run_llm_analysis(config: Dict[str, Any], logger, analysis_type: str):
                     target_key = output_target['key']
 
                     if target_type == "comprehensive_json":
+                        # The response itself is a JSON string, possibly wrapped
+                        # in a markdown code fence by the model.
+                        json_text = _strip_code_fence(clean_response)
                         try:
-                            # The response itself is a JSON string
-                            parsed_json = json.loads(clean_response)
+                            parsed_json = json.loads(json_text)
                             # Populate multiple fields from the single response
                             if 'title' in parsed_json:
                                 session.insights.structured_llm_results['title'] = parsed_json['title']
                             if 'category' in parsed_json:
                                 session.insights.structured_llm_results['category'] = parsed_json['category']
                             # Save the full JSON blob to its own summary key
-                            session.insights.generated_summaries[target_key] = clean_response
+                            session.insights.generated_summaries[target_key] = json_text
 
                         except json.JSONDecodeError:
                             logger.error(f"Failed to parse JSON response for '{analysis_type}' on session {session.meta.session_id}. Response was: {clean_response}")
@@ -120,7 +175,9 @@ def run_llm_analysis(config: Dict[str, Any], logger, analysis_type: str):
                         error_files += 1
                         continue
 
-                    session.meta.processing_log.append(PROCESSOR_NAME)
+                    # Guard against duplicate entries when this is a retry run.
+                    if PROCESSOR_NAME not in session.meta.processing_log:
+                        session.meta.processing_log.append(PROCESSOR_NAME)
                     session.meta.last_updated_timestamp_utc = datetime.now(timezone.utc)
                     session_handler.save_session_to_file(session, config, logger)
                     analyzed_files += 1

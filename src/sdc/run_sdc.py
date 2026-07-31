@@ -3,6 +3,7 @@
 
 from functools import partial
 import argparse
+import sys
 
 # Import project utilities needed for argument parsing. The ingestor/processor
 # modules pull in heavy dependencies (langchain, google-auth, etc.) and are
@@ -30,11 +31,13 @@ def main():
 
     # --- Argument Parsing Setup ---
     parser = argparse.ArgumentParser(description="Syncro Data Consolidator (SDC) CLI", formatter_class=argparse.RawTextHelpFormatter)
-    subparsers = parser.add_subparsers(dest='command', required=True, help='Available commands')
+    parser.add_argument('--list-commands', action='store_true', help='Print a detailed list of all available commands and exit.')
+    subparsers = parser.add_subparsers(dest='command', help='Available commands')
 
     # 'ingest' command
     parser_ingest = subparsers.add_parser('ingest', help='Run a specific data ingestor')
-    parser_ingest.add_argument('--source', required=True, choices=['all', 'sillytavern', 'syncro', 'notes', 'screenconnect'], help='The data source to ingest')
+    ingest_sources = ['all', 'sillytavern', 'syncro', 'notes', 'screenconnect']
+    parser_ingest.add_argument('--source', required=True, choices=ingest_sources, help='The data source to ingest')
     parser_ingest.add_argument('--start-date', help='ScreenConnect only: the start date for fetching data via the API (YYYY-MM-DD). Overrides saved state.')
     parser_ingest.add_argument('--end-date', help='ScreenConnect only: the end date for fetching data via the API (YYYY-MM-DD).')
     parser_ingest.add_argument(
@@ -53,14 +56,26 @@ def main():
     parser_process = subparsers.add_parser('process', help='Run a specific processing step')
     valid_process_steps = ['all', 'customer_linking'] + llm_task_keys
     parser_process.add_argument('--step', required=True, choices=valid_process_steps, help='The processing step to run')
+    parser_process.add_argument(
+        '--retry',
+        action='store_true',
+        help=(
+            "Also re-process sessions that previously reached a terminal non-success\n"
+            "state for this step. For customer_linking that means sessions marked\n"
+            "'No Match Found' or 'Linking Failed'; for LLM steps it means sessions\n"
+            "marked as analysed but holding no usable output."
+        )
+    )
 
     # 'run' command
     parser_run = subparsers.add_parser('run', help='Run a predefined pipeline')
-    parser_run.add_argument('--pipeline', required=True, choices=['full', 'ingest_only'], help='The pipeline to execute')
+    run_pipelines = ['full', 'ingest_only']
+    parser_run.add_argument('--pipeline', required=True, choices=run_pipelines, help='The pipeline to execute')
 
     # 'cache' command
     parser_cache = subparsers.add_parser('cache', help='Manage data caches')
-    parser_cache.add_argument('--source', required=True, choices=['syncro'], help='The data source to cache')
+    cache_sources = ['syncro']
+    parser_cache.add_argument('--source', required=True, choices=cache_sources, help='The data source to cache')
 
     # 'clean' command
     valid_clean_targets = list(SOURCE_MAPPING.keys()) + ['all', 'logs']
@@ -69,6 +84,54 @@ def main():
     parser_clean.add_argument('--commit', action='store_true', help='Perform the actual deletion. Without this flag, a dry run is performed.')
 
     args = parser.parse_args()
+
+    # --- Pre-computation for command listing ---
+    if args.list_commands:
+        print("Available SDC commands:\n")
+
+        # Ingest
+        print("ingest")
+        for source in sorted([s for s in ingest_sources if s != 'all']):
+            print(f"  python -m sdc.run_sdc ingest --source {source}")
+        print()
+
+        # Process
+        print("process")
+        for step in sorted(valid_process_steps):
+            if step != 'all':
+                print(f"  python -m sdc.run_sdc process --step {step}")
+        print()
+
+        # Run
+        print("run")
+        for pipeline in sorted(run_pipelines):
+            print(f"  python -m sdc.run_sdc run --pipeline {pipeline}")
+        print()
+
+        # Cache
+        print("cache")
+        for source in sorted(cache_sources):
+            print(f"  python -m sdc.run_sdc cache --source {source}")
+        print()
+
+        # Clean
+        print("clean")
+        for target in sorted([t for t in valid_clean_targets if t not in ['all', 'logs']]):
+            print(f"  python -m sdc.run_sdc clean {target}")
+        print("  python -m sdc.run_sdc clean all")
+        print()
+        return
+
+    # --- Handle no command ---
+    if not args.command:
+        print("No command provided.\n")
+        print("Syncro Data Consolidator (SDC) CLI")
+        print(f"usage: {sys.argv[0]} [-h] {{ingest,process,run,cache,clean}} ...\n")
+        print("Available commands:")
+        for cmd in sorted(subparsers.choices.keys()):
+            print(f"  {cmd}")
+        print("\nRun `python -m sdc.run_sdc <command> -h` for more details.")
+        return
 
     if args.command == 'ingest':
         # start_date/end_date/filters/show_filters only have defined behavior for
@@ -130,11 +193,11 @@ def main():
         from sdc.processors.session_llm_analyzer import run_llm_analysis # V2 analyzer
 
         process_map = {
-            'customer_linking': partial(link_customers_to_sessions, config, logger),
+            'customer_linking': partial(link_customers_to_sessions, config, logger, retry=args.retry),
         }
         # Dynamically add LLM analysis tasks to the process map
         for task_key in llm_task_keys:
-            process_map[task_key] = partial(run_llm_analysis, config, logger, analysis_type=task_key)
+            process_map[task_key] = partial(run_llm_analysis, config, logger, analysis_type=task_key, retry=args.retry)
 
         steps_to_run = process_map.keys() if args.step == 'all' else [args.step]
         for step in steps_to_run:
@@ -192,7 +255,7 @@ def main():
             link_customers_to_sessions(config, logger)
 
             logger.info("--- Full pipeline complete. ---")
-            logger.info("NOTE: LLM analysis for titles/summaries must be run separately using the 'process' command (e.g., 'process --step llm_title').")
+            logger.info("NOTE: LLM analysis for titles/summaries must be run separately using the 'process' command (e.g., 'process --step title').")
 
     elif args.command == 'clean':
         from sdc.utils.workspace_cleaner import clean_workspace

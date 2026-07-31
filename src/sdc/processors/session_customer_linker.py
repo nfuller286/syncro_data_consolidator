@@ -14,7 +14,26 @@ from thefuzz import fuzz, process
 # --- V2 IMPORTS ---
 from sdc.models.session_v2 import Session
 from sdc.utils import session_handler, cache_utils
+from sdc.utils.constants import (LINKABLE_STATUSES, RETRYABLE_LINK_STATUSES,
+                                 STATUS_LINKED, STATUS_NO_MATCH_FOUND)
 from sdc.llm import chat_api, prompts
+
+# Identifies this processor's entries in SessionMeta.processing_log.
+LINKER_PROCESSOR_NAME = "session_customer_linker_v2.1"
+
+
+def _record_link_attempt(session: Session, note: str) -> None:
+    """
+    Records the outcome of a linking attempt in the session's processing log.
+
+    Any previous entry from this processor is dropped first, so repeated
+    --retry runs replace the note rather than growing the log unboundedly.
+    """
+    prefix = f"{LINKER_PROCESSOR_NAME}:"
+    session.meta.processing_log = [
+        entry for entry in session.meta.processing_log if not entry.startswith(prefix)
+    ]
+    session.meta.processing_log.append(f"{prefix} {note}")
 
 # --- HELPER FUNCTION (UNCHANGED) ---
 # This function is generic and does not need to be modified.
@@ -100,9 +119,17 @@ def _find_best_match(
 # =================================================================================
 #  REFACTORED MAIN LINKER FUNCTION
 # =================================================================================
-def link_customers_to_sessions(config: Dict[str, Any], logger):
+def link_customers_to_sessions(config: Dict[str, Any], logger, retry: bool = False):
     """
     Iterates through Session files, links them to Syncro customers and contacts, and updates the files.
+
+    Args:
+        config: The application's configuration dictionary.
+        logger: The SDC logger instance.
+        retry: When True, also re-process sessions that previously reached a
+            terminal non-success state ('No Match Found', 'Linking Failed').
+            Those are skipped by default so that permanently unmatchable names
+            do not re-run the fuzzy/LLM cascade on every single run.
     """
     logger.info("Starting V2 Session customer and contact linking process.")
 
@@ -122,7 +149,24 @@ def link_customers_to_sessions(config: Dict[str, Any], logger):
 
     logger.info(f"Successfully loaded {len(customer_cache)} customers from lean cache.")
 
-    processed_files, linked_files, error_files, skipped_files = 0, 0, 0, 0
+    eligible_statuses = set(LINKABLE_STATUSES)
+    if retry:
+        eligible_statuses |= RETRYABLE_LINK_STATUSES
+        logger.info("Retry mode enabled: previously unmatched/failed sessions will be re-processed.")
+
+    # Probe LLM availability once per run rather than per session. A missing or
+    # misconfigured provider makes get_chat_client() return None, which the
+    # match cascade treats the same as "no match" - recording which of the two
+    # happened is what makes an unmatched session diagnosable after the fact.
+    llm_available = chat_api.get_chat_client('lightweight', config, logger) is not None
+    if not llm_available:
+        logger.warning(
+            "No LLM client available; ambiguous names cannot be disambiguated this run. "
+            "Unmatched sessions will be marked '%s' and can be re-processed later with --retry.",
+            STATUS_NO_MATCH_FOUND
+        )
+
+    processed_files, linked_files, error_files, skipped_files, unmatched_files = 0, 0, 0, 0, 0
 
     # In-memory cache for this run to avoid re-processing the same names.
     # This is especially useful for sources like ScreenConnect with repeated, non-standard names.
@@ -143,17 +187,21 @@ def link_customers_to_sessions(config: Dict[str, Any], logger):
             
             # --- REVISED LOGIC FOR V2 MODEL ---
 
-            # 1. Skip if not in the 'Needs Linking' state
-            # CHANGED: Path to processing status field
-            if session.meta.processing_status != 'Needs Linking':
-                logger.info(f"Skipping session {session.meta.session_id} because its status is '{session.meta.processing_status}' (not 'Needs Linking').")
-                skipped_files += 1
-                continue
-
-            # 2. Skip sources that are not expected to have customers
+            # 1. Skip sources that are not expected to have customers.
+            # This is checked *before* the status check below: these sources
+            # are ingested in a terminal state (e.g. SillyTavern arrives as
+            # 'Complete'), so a status-first order would skip them with a
+            # generic message and this branch would never run.
             unlinkable_sources = ['SillyTavern'] # This list can be expanded
             if session.meta.source_system in unlinkable_sources:
                 logger.info(f"Skipping customer linking for Session from non-linkable source: {session.meta.source_system}")
+                skipped_files += 1
+                continue
+
+            # 2. Skip if the session is not in a state this run should process
+            # CHANGED: Path to processing status field
+            if session.meta.processing_status not in eligible_statuses:
+                logger.info(f"Skipping session {session.meta.session_id} because its status is '{session.meta.processing_status}' (not eligible for this run).")
                 skipped_files += 1
                 continue
 
@@ -161,15 +209,13 @@ def link_customers_to_sessions(config: Dict[str, Any], logger):
             # CHANGED: Path to guessed customer name
             guessed_name = session.context.customer_name
 
-            if not guessed_name:
-                logger.warning(f"Session {session.meta.session_id} has no guessed customer name. Setting to error.")
-                session.meta.processing_status = 'error'
-                error_files += 1
-                session_handler.save_session_to_file(session, config, logger)
-                continue
-
             # --- Customer Linking with Caching ---
-            if guessed_name in customer_link_cache:
+            # A session with no name to match against is not an error, just
+            # unmatched: it lands in the same terminal state as a name that
+            # found no candidate, so leaving `winner` as None routes it there.
+            if not guessed_name:
+                logger.warning(f"Session {session.meta.session_id} has no customer name in the source data.")
+            elif guessed_name in customer_link_cache:
                 winner = customer_link_cache[guessed_name]
                 if winner:
                     logger.info(f"Using cached link for customer '{guessed_name}' -> '{winner.get('business_name', 'N/A')}'")
@@ -193,7 +239,8 @@ def link_customers_to_sessions(config: Dict[str, Any], logger):
                 # CHANGED: Update the Session object's context
                 session.context.customer_id = winner.get('id')
                 session.context.customer_name = winner.get('business_name') # Overwrite with authoritative name
-                session.meta.processing_status = 'Linked' # Use new status
+                session.meta.processing_status = STATUS_LINKED
+                _record_link_attempt(session, f"linked to customer_id={winner.get('id')}")
                 linked_files += 1
                 logger.info(f"Successfully linked Session to customer '{winner.get('business_name')}'")
                 
@@ -235,9 +282,14 @@ def link_customers_to_sessions(config: Dict[str, Any], logger):
                     logger.warning(f"Contact linking skipped: Customer '{authoritative_customer_name}' has no contacts in cache.")
 
             else:
-                logger.warning(f"Could not link Session {session.meta.session_id} for guessed name '{guessed_name}'. Setting to error.")
-                session.meta.processing_status = 'error'
-                error_files += 1
+                if not guessed_name:
+                    reason = "no customer name in source data"
+                else:
+                    reason = f"no match for '{guessed_name}' (llm_available={llm_available})"
+                logger.warning(f"Could not link Session {session.meta.session_id}: {reason}.")
+                session.meta.processing_status = STATUS_NO_MATCH_FOUND
+                _record_link_attempt(session, f"no_match ({reason})")
+                unmatched_files += 1
 
             # CHANGED: Update the Session's last_updated timestamp
             session.meta.last_updated_timestamp_utc = datetime.now(timezone.utc)
@@ -246,7 +298,14 @@ def link_customers_to_sessions(config: Dict[str, Any], logger):
 
     summary_msg = (
         f"Session linking finished. Scanned: {processed_files}, "
-        f"Linked: {linked_files}, "
+        f"Linked: {linked_files}, Unmatched: {unmatched_files}, "
         f"Errors: {error_files}, Skipped: {skipped_files}"
     )
     logger.info(summary_msg)
+    if unmatched_files and not retry:
+        logger.info(
+            "%d session(s) are unmatched. Re-run with "
+            "`process --step customer_linking --retry` to try them again "
+            "(e.g. after refreshing the customer cache or configuring an LLM provider).",
+            unmatched_files
+        )

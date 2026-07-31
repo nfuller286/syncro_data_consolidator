@@ -10,6 +10,7 @@ from sdc.utils.session_handler import save_session_to_file
 from sdc.utils.date_utils import parse_datetime_utc
 from sdc.utils.session_builder import build_session
 from sdc.utils import file_ingestor_state_handler as state_handler
+from sdc.utils.constants import STATUS_LINKED
 
 STATE_FILE_NAME = 'syncro_ticket_ingestor_state.json'
 
@@ -158,7 +159,7 @@ def ingest_syncro_tickets(config: Dict[str, Any], logger, **kwargs) -> None:
                 customer_id=ticket.get('customer_id'),
                 contact_id=ticket.get('contact_id'),
                 source_title=ticket.get('subject'),
-                processing_status="Linked"  # Pre-linked since Syncro provides IDs
+                processing_status=STATUS_LINKED  # Pre-linked since Syncro provides IDs
             )
 
             save_session_to_file(session_object, config, logger)
