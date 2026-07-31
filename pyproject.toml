@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sdc-data-consolidator"
+version = "0.1.0"
+description = "A data pipeline for consolidating Syncro and ScreenConnect data."
+requires-python = ">=3.11"
+dependencies = [
+    "faiss-cpu==1.13.2",
+    "langchain==1.2.10",
+    "langchain-community==0.4.1",
+    "langchain-google-genai==4.2.1",
+    "langchain-huggingface==1.2.1",
+    "langchain-openai==1.1.11",
+    "numpy==2.3.1",
+    "pandas==2.3.0",
+    "pydantic==2.11.7",
+    "python-dateutil==2.9.0.post0",
+    "PyYAML==6.0.2",
+    "sentence-transformers==5.2.3",
+    "thefuzz[speedup]==0.22.1"
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+packages = { find = { where = ["src"] } }

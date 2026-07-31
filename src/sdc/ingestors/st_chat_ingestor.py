@@ -16,7 +16,7 @@ from sdc.utils import file_ingestor_state_handler as state_handler
 from sdc.utils.date_utils import parse_datetime_utc
 from sdc.utils.file_utils import find_files_recursive
 from sdc.utils import session_aggregator
-from sdc.utils.constants import UNDEFINED_TIMESTAMP
+from sdc.utils.constants import UNDEFINED_TIMESTAMP, STATUS_COMPLETE
 
 # --- CONSTANTS ---
 STATE_FILE_NAME = 'st_chat_ingestor_file_state.json'
@@ -152,7 +152,7 @@ Loads ST .jsonl chat logs, segments them into sessions,
                         source_system="SillyTavern",
                         source_identifiers=[file_path],
                         source_title=f"SillyTavern Chat with {character_name}",
-                        processing_status="Complete",  # SillyTavern sessions don't need linking
+                        processing_status=STATUS_COMPLETE,  # SillyTavern sessions don't need linking
                         links=[f"st_chat_id:{chat_id_hash}"]
                     )
                     save_session_to_file(session_object, config, logger)

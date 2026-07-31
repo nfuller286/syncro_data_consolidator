@@ -7,12 +7,13 @@ from typing import List, Optional
 
 from sdc.models.session_v2 import (Session, SessionContext, SessionInsights,
                                    SessionMeta, SessionSegment)
+from sdc.utils.constants import STATUS_NEEDS_LINKING
 
 
 def create_session_meta(
     source_system: str,
     source_identifiers: List[str],
-    processing_status: str = "Needs Linking"
+    processing_status: str = STATUS_NEEDS_LINKING
 ) -> SessionMeta:
     """Handles the default instantiation of SessionMeta."""
     now = datetime.datetime.now(datetime.timezone.utc)
@@ -68,7 +69,7 @@ def build_session(
     customer_id: Optional[int] = None,
     contact_id: Optional[int] = None,
     source_title: Optional[str] = None,
-    processing_status: str = "Needs Linking",
+    processing_status: str = STATUS_NEEDS_LINKING,
     links: Optional[List[str]] = None
 ) -> Session:
     """
